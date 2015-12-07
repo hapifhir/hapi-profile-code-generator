@@ -1,0 +1,1 @@
+referenceGetterCondition(propertyName, canonicalClassPath) ::= "adaptedClass.get<propertyName>().getResource() instanceof <canonicalClassPath>"

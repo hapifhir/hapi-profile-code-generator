@@ -1,0 +1,14 @@
+Interface/Adapter Generation
+
+== Handling Extensions ==
+Create all extended types
+Register new extended types
+Create all first level extended getters and setters that reference these new types
+Process regular (non-extended) attributes
+Process all first level extensions (i.e., extensions that point to Core FHIR type)
+
+== Currently Out-of-Scope ==
+FHIR types that have extensions - How to address that? E.g., an extension on Boolean (yuck), Quantity, Address (e.g., preferred.)
+
+== Bugs to fix ==
+	- No accessor for new extended types
