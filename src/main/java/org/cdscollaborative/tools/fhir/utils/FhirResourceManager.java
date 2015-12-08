@@ -144,7 +144,7 @@ public class FhirResourceManager {
 	 */
 	public void loadResourceProfiles(Reader resourceProfiles) {
 		try (Reader reader = resourceProfiles) {
-			IResource resource = ctx.newXmlParser().parseResource(resourceProfiles);
+			IResource resource = (IResource) ctx.newXmlParser().parseResource(resourceProfiles);
 			if(resource instanceof Bundle) {
 				List<Bundle.Entry> entries = ((Bundle)resource).getEntry();
 				for(Bundle.Entry entry : entries) {

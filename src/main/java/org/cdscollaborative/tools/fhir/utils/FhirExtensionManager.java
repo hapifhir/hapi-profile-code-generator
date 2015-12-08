@@ -92,7 +92,7 @@ public class FhirExtensionManager {
 		try(FileReader reader = new FileReader(extensionFile)) {
 			FhirContext context = FhirContext.forDstu2();
 			IParser parser = context.newXmlParser();
-			IResource resource = parser.parseResource(reader);
+			IResource resource = (IResource) parser.parseResource(reader);
 			if(resource instanceof StructureDefinition) {
 				extension = FhirExtension.populateFromStructureDefinition((StructureDefinition)resource);
 			}
