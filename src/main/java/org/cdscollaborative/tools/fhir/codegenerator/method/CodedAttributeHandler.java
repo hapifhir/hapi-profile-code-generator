@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 
@@ -167,8 +166,8 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 		if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt.class.getName()) 
 				&& getElement().getBinding() != null 
 				&& !isMultipleCardinality()) {
-			Binding binding = getElement().getBinding();
-			String bindingName = binding.getName();
+			//Binding binding = getElement().getBinding();
+			String bindingName = getParentClass() + getElement().getName();//TODO may be Condition[c]ategoryCodesEnum - check case
 			String enumClassName1 = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "Enum";
 			String enumClassName2 = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "CodesEnum";
 			if(classExists(enumClassName1)) {

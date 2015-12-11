@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 
@@ -176,12 +175,14 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	public void handleCode() {
 		if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
 				&& getElement().getBinding() != null) {
-			Binding binding = getElement().getBinding();
-			bindingName = binding.getName() + "Enum";
+			//Binding binding = getElement().getBinding();
+			bindingName = getParentClass() + getElement().getName() + "Enum";//TODO Condition[v]erificationStatusEnum
 			enumType = "ca.uhn.fhir.model.dstu2.valueset." + bindingName;
 			if(classExists(enumType)) {
 				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + enumType + ">");
 				imports.add(enumType);
+			} else {
+				LOGGER.info("Class " + enumType + " does not exist");
 			}
 		}
 	}
