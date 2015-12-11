@@ -82,7 +82,7 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 //			LOGGER.info("Extensions on extensions not currently supported. " + getElement().getName());
 //			return;
 //		}
-		extensionUri = getElement().getTypeFirstRep().getProfile().get(0).getValueAsString();//TODO How to handle multiple profiles on types
+		extensionUri = getElement().getTypeFirstRep().getProfileFirstRep().getValueAsString();//TODO How to handle multiple profiles on types
 		FhirExtension extensionDef = getFhirResourceManager().getFhirExtension(extensionUri);
 		extendedElement = FhirResourceManager.shallowCloneElement(getElement());
 		if(extensionDef != null) {

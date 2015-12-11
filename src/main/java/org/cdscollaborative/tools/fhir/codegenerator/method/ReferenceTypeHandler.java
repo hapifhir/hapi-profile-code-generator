@@ -117,7 +117,7 @@ public class ReferenceTypeHandler extends BaseMethodGenerator {
 	 */
 	protected void handleSingleCardinality(List<Method> accessors) {
 		String descriminator = "";
-		String profileUrl = getElement().getTypeFirstRep().getProfile();
+		String profileUrl = getElement().getTypeFirstRep().getProfileFirstRep().getValueAsString();
 		String resource = FhirResourceManager.getProfileSuffix(profileUrl);
 		if(getElement().getType().size() > 1) {
 			descriminator = resource;

@@ -66,7 +66,7 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 
 	@Override
 	public void execute(Node<ElementDefinitionDt> node) {
-		String extensionDefUri = node.getPayload().getTypeFirstRep().getProfile();
+		String extensionDefUri = node.getPayload().getTypeFirstRep().getProfileFirstRep().getValueAsString();
 		if(node.hasChildren()) {
 			System.out.println("Create a class for: " + node.getName());
 			String className = StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getName()));
