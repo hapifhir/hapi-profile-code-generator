@@ -185,7 +185,7 @@ public class FhirMethodGenerator {
 			
 		} else {
 			typeString = type.getCode();
-			profileUrl = type.getProfile();
+			profileUrl = type.getProfileFirstRep().getValueAsString();
 		}
 		
 		if(typeString == null) {
