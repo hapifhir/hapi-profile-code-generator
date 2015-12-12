@@ -23,6 +23,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	private FhirResourceManager fhirResourceManager;
 	private StructureDefinition profile;
 	private String parentClass;
+	private String resourceName;
 	private ElementDefinitionDt element;
 	private Cardinality cardinality;
 	private String topLevelCoreAttribute;
@@ -117,6 +118,24 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 		this.parentClass = rootResource;
 	}
 	
+	/**
+	 * Returns the unqualified resource name
+	 * 
+	 * @return
+	 */
+	public String getResourceName() {
+		return resourceName;
+	}
+	
+	/**
+	 * Sets the unqualified resource name
+	 * 
+	 * @param resourceName
+	 */
+	public void setResourceName(String resourceName) {
+		this.resourceName = resourceName;
+	}
+
 	/**
 	 * Returns the unqualified name of the top level attribute being processed.
 	 * For instance, if FHIR Condition or a profile derived from
@@ -277,7 +296,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * @return
 	 */
 	public void parseTopLevelCoreAttribute() {
-		String resourceName = CodeGenerationUtils.getLastPathComponent(parentClass);
+		resourceName = CodeGenerationUtils.getLastPathComponent(parentClass);
 		String attributePath = element.getPath();
 		String suffix = CodeGenerationUtils.getSuffix(resourceName, attributePath);
 		if(suffix != null && suffix.indexOf('.') >= 0) {

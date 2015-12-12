@@ -3,6 +3,7 @@ package org.cdscollaborative.tools.fhir.codegenerator.method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.cdscollaborative.model.meta.Method;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
@@ -90,8 +91,8 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	
 	public void initialize() {
 		super.initialize();
-		handleType(getElement().getTypeFirstRep());
 		parseTopLevelCoreAttribute();
+		handleType(getElement().getTypeFirstRep());
 	}
 	
 	/**
@@ -176,13 +177,20 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 		if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
 				&& getElement().getBinding() != null) {
 			//Binding binding = getElement().getBinding();
-			bindingName = getParentClass() + getElement().getName() + "Enum";//TODO Condition[v]erificationStatusEnum
-			enumType = "ca.uhn.fhir.model.dstu2.valueset." + bindingName;
+			bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());//TODO Condition[v]erificationStatusEnum
+			enumType = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "CodesEnum";
 			if(classExists(enumType)) {
 				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + enumType + ">");
 				imports.add(enumType);
 			} else {
-				LOGGER.info("Class " + enumType + " does not exist");
+				enumType = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "Enum";
+				if(classExists(enumType)) {
+					setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + enumType + ">");
+					imports.add(enumType);
+				} else {
+					LOGGER.info("Class " + enumType + " does not exist");
+					enumType = null;
+				}
 			}
 		}
 	}

@@ -261,6 +261,9 @@ public class FhirResourceManager {
 	 */
 	public String getFullyQualifiedJavaType(String type) {
 		String typeClass = primitiveMap.get(type);
+		if(type.equals("DomainResource")) {//TODO Figure how to handle this
+			typeClass = "ca.uhn.fhir.model.dstu2.resource.BaseResource";
+		}
 		if(typeClass != null) {
 			return typeClass;
 		} else if(type.equals("*")){

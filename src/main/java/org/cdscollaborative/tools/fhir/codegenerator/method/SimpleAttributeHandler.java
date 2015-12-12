@@ -3,6 +3,7 @@ package org.cdscollaborative.tools.fhir.codegenerator.method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.cdscollaborative.model.meta.Method;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
@@ -86,8 +87,8 @@ public class SimpleAttributeHandler extends BaseMethodGenerator {
 	
 	public void initialize() {
 		super.initialize();
-		handleType(getElement().getTypeFirstRep());
 		parseTopLevelCoreAttribute();
+		handleType(getElement().getTypeFirstRep());
 	}
 	
 	/**
@@ -150,6 +151,9 @@ public class SimpleAttributeHandler extends BaseMethodGenerator {
 	 */
 	public void handleType(Type type) {
 		String typeString = type.getCode();
+		if(typeString != null && typeString.equals("BackboneElement")) {
+			typeString = getResourceName() + "." + StringUtils.capitalize(getTopLevelCoreAttribute());
+		}
 		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString));
 	}
 	
