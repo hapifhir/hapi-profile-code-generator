@@ -1,24 +1,16 @@
 <executionPlan>
 	<profileSourceFilePaths>
-		<profileSourceFilePath>/root/profile/source/path1</profileSourceFilePath>
-		<profileSourceFilePath>/root/profile/source/path2</profileSourceFilePath>
-		<profileSourceFilePath>/root/profile/source/path3</profileSourceFilePath>
+		<profileSourceFilePath>/Users/cnanjo/repository/fhir/trunk/build/publish/profiles-resources.xml</profileSourceFilePath>
 	</profileSourceFilePaths>
 	<profileDirectoryPaths>
-		<profileDirectoryPath>/root/profile/dir/dir1</profileDirectoryPath>
-		<profileDirectoryPath>/root/profile/dir/dir2</profileDirectoryPath>
-		<profileDirectoryPath>/root/profile/dir/dir3</profileDirectoryPath>
-		<profileDirectoryPath>/root/profile/dir/dir4</profileDirectoryPath>
+		<profileDirectoryPath>/Users/cnanjo/work/qicore/profiles</profileDirectoryPath>
 	</profileDirectoryPaths>
 	<generatedCodePackage>org.socraticgrid.fhir.generated</generatedCodePackage>
-	<targetCodeGenerationDirectory>/root/dir/target</targetCodeGenerationDirectory>
+	<targetCodeGenerationDirectory>generated-source/java/</targetCodeGenerationDirectory>
 	<extensionRepositories>
-		<extensionRepository>/root/extension/dir/path1</extensionRepository>
-		<extensionRepository>/root/extension/dir/path2</extensionRepository>
-		<extensionRepository>/root/extension/dir/path3</extensionRepository>
-		<extensionRepository>/root/extension/dir/path4</extensionRepository>
-		<extensionRepository>/root/extension/dir/path5</extensionRepository>
+		<extensionRepository>/Users/cnanjo/repository/fhir/trunk/build/publish</extensionRepository>
 	</extensionRepositories>
+	<!--
 	<profileNames>
 		<profileName>Condition</profileName>
 		<profileName>Patient</profileName>
@@ -31,5 +23,16 @@
 		<profileName>Communication</profileName>
 		<profileName>DeviceUseRequest</profileName>
 		<profileName>DeviceUseStatement</profileName>
+		<profileName>QICore-Patient</profileName>
+		<profileName>QICore-Observation</profileName>
+	</profileNames>
+	-->
+	<profileNames>
+		<profileName>Condition</profileName>
+		<profileName>Patient</profileName>
+		<profileName>Observation</profileName>
+		<profileName>QICore-Patient</profileName>
+		<profileName>QICore-Observation</profileName>
+		<profileName>QICore-Condition</profileName>
 	</profileNames>
 </executionPlan>

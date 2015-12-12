@@ -2,12 +2,11 @@ package org.cdscollaborative.tools.fhir.codegenerator.config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import guru.mwangaza.common.util.io.ResourceLoadingUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cdscollaborative.tools.fhir.codegenerator.config.CodeGeneratorConfigurator;
+import org.cdscollaborative.common.utils.io.ResourceLoadingUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

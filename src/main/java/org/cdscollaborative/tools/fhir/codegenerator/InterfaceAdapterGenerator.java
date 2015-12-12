@@ -1,7 +1,5 @@
 package org.cdscollaborative.tools.fhir.codegenerator;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +12,6 @@ import org.cdscollaborative.model.meta.MethodParameter;
 import org.cdscollaborative.model.meta.ModifierEnum;
 import org.cdscollaborative.tools.fhir.codegenerator.method.IMethodHandler;
 import org.cdscollaborative.tools.fhir.codegenerator.method.MethodHandlerResolver;
-import org.cdscollaborative.tools.fhir.utils.FhirExtensionManager;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.Import;

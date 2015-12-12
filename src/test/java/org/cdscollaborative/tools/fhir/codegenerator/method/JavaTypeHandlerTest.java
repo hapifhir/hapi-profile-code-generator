@@ -37,21 +37,21 @@ public class JavaTypeHandlerTest extends BaseHandlerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		profile = buildMockProfile();
-		booleanElement = buildMockJavaBooleanTypeElement();
-		addElementToProfile(booleanElement, profile);
-		multiTypeElement = buildMockMultiTypeElement();
-		addElementToProfile(multiTypeElement, profile);
-		extensionElement = buildMockMultiTypeElement();
-		addElementToProfile(extensionElement, profile);
-		emptyTypeElement = buildMockEmptyTypeElement();
-		addElementToProfile(emptyTypeElement, profile);
-		codeableConceptElement = buildMockCodeableConceptElement();
-		addElementToProfile(codeableConceptElement, profile);
-		referenceTypeElement = buildMockReferenceTypeElement();
-		addElementToProfile(referenceTypeElement, profile);
-		booleanMultipleElement = buildMockJavaBooleanTypeMultipleCardinalityElement();
-		addElementToProfile(booleanMultipleElement, profile);
+//		profile = buildMockProfile();
+//		booleanElement = buildMockJavaBooleanTypeElement();
+//		addElementToProfile(booleanElement, profile);
+//		multiTypeElement = buildMockMultiTypeElement();
+//		addElementToProfile(multiTypeElement, profile);
+//		extensionElement = buildMockMultiTypeElement();
+//		addElementToProfile(extensionElement, profile);
+//		emptyTypeElement = buildMockEmptyTypeElement();
+//		addElementToProfile(emptyTypeElement, profile);
+//		codeableConceptElement = buildMockCodeableConceptElement();
+//		addElementToProfile(codeableConceptElement, profile);
+//		referenceTypeElement = buildMockReferenceTypeElement();
+//		addElementToProfile(referenceTypeElement, profile);
+//		booleanMultipleElement = buildMockJavaBooleanTypeMultipleCardinalityElement();
+//		addElementToProfile(booleanMultipleElement, profile);
 	}
 
 	@After

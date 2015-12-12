@@ -1,9 +1,6 @@
 package org.cdscollaborative.tools.fhir.codegenerator;
 
-import guru.mwangaza.common.util.io.ResourceLoadingUtils;
-
-import org.cdscollaborative.tools.fhir.codegenerator.InterfaceAdapterGenerator;
-import org.cdscollaborative.tools.fhir.codegenerator.Main;
+import org.cdscollaborative.common.utils.io.ResourceLoadingUtils;
 import org.cdscollaborative.tools.fhir.utils.FhirExtensionManager;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
 import org.jboss.forge.roaster.Roaster;
@@ -32,7 +29,7 @@ public class InterfaceAdapterGeneratorTest {
 	@Test
 	public void testGenerateInterface() {
 		try {//TODO Fix hard coded path
-			Main.generateCode("/Users/cnanjo/repository/fhir-cds-tools/src/main/resources/config/generation-plan.xml", false);
+			Main.generateCode(ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan.xml"), false);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

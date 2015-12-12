@@ -1,7 +1,5 @@
 package org.cdscollaborative.tools.fhir.utils;
 
-import guru.mwangaza.common.util.io.ResourceLoadingUtils;
-
 import java.io.File;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -10,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.cdscollaborative.common.utils.io.ResourceLoadingUtils;
 import org.cdscollaborative.tools.fhir.codegenerator.config.CodeGeneratorConfigurator;
 import org.cdscollaborative.tools.fhir.model.FhirExtension;
 import org.slf4j.Logger;
@@ -22,7 +21,6 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.dstu2.valueset.DataTypeEnum;
 import ca.uhn.fhir.parser.DataFormatException;
 
 /**
@@ -331,20 +329,16 @@ public class FhirResourceManager {
 		primitiveMap.put("Period", ca.uhn.fhir.model.dstu2.composite.TimingDt.class.getName());
 		primitiveMap.put("Timing.Repeat", ca.uhn.fhir.model.dstu2.composite.TimingDt.Repeat.class.getName());
 		primitiveMap.put("Extension", ca.uhn.fhir.model.api.ExtensionDt.class.getName());
-		primitiveMap.put("MedicationPrescription.DosageInstruction", ca.uhn.fhir.model.dstu2.resource.MedicationPrescription.DosageInstruction.class.getName());
-		primitiveMap.put("MedicationPrescription.Dispense", ca.uhn.fhir.model.dstu2.resource.MedicationPrescription.Dispense.class.getName());
-		primitiveMap.put("MedicationPrescription.Substitution", ca.uhn.fhir.model.dstu2.resource.MedicationPrescription.Substitution.class.getName());
+		primitiveMap.put("MedicationPrescription.DosageInstruction", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DosageInstruction.class.getName());
+		primitiveMap.put("MedicationPrescription.Dispense", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DispenseRequest.class.getName());
+		primitiveMap.put("MedicationPrescription.Substitution", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.Substitution.class.getName());
 		primitiveMap.put("Condition.Stage", ca.uhn.fhir.model.dstu2.resource.Condition.Stage.class.getName());
 		primitiveMap.put("Condition.Evidence", ca.uhn.fhir.model.dstu2.resource.Condition.Evidence.class.getName());
-		primitiveMap.put("Condition.Location", ca.uhn.fhir.model.dstu2.resource.Condition.Location.class.getName());
-		primitiveMap.put("Condition.DueTo", ca.uhn.fhir.model.dstu2.resource.Condition.DueTo.class.getName());
-		primitiveMap.put("Condition.OccurredFollowing", ca.uhn.fhir.model.dstu2.resource.Condition.OccurredFollowing.class.getName());
 		primitiveMap.put("CommunicationRequest.Payload", ca.uhn.fhir.model.dstu2.resource.CommunicationRequest.Payload.class.getName());
 		primitiveMap.put("Communication.Payload", ca.uhn.fhir.model.dstu2.resource.Communication.Payload.class.getName());
 		primitiveMap.put("MedicationAdministration.Dosage", ca.uhn.fhir.model.dstu2.resource.MedicationAdministration.Dosage.class.getName());
 		primitiveMap.put("Medication.Product", ca.uhn.fhir.model.dstu2.resource.Medication.Product.class.getName());
 		primitiveMap.put("Procedure.Performer", ca.uhn.fhir.model.dstu2.resource.Procedure.Performer.class.getName());
-		primitiveMap.put("Procedure.RelatedItem", ca.uhn.fhir.model.dstu2.resource.Procedure.RelatedItem.class.getName());
 		primitiveMap.put("Observation.ReferenceRange", ca.uhn.fhir.model.dstu2.resource.Observation.ReferenceRange.class.getName());
 		primitiveMap.put("Observation.Related", ca.uhn.fhir.model.dstu2.resource.Observation.Related.class.getName());
 		primitiveMap.put("Medication.ProductIngredient", ca.uhn.fhir.model.dstu2.resource.Medication.ProductIngredient.class.getName());
@@ -355,9 +349,6 @@ public class FhirResourceManager {
 		primitiveMap.put("Patient.Animal", ca.uhn.fhir.model.dstu2.resource.Patient.Animal.class.getName());
 		primitiveMap.put("Patient.Communication", ca.uhn.fhir.model.dstu2.resource.Patient.Communication.class.getName());
 		primitiveMap.put("Patient.Link", ca.uhn.fhir.model.dstu2.resource.Patient.Link.class.getName());
-		primitiveMap.put("ProcedureRequest.BodySite", ca.uhn.fhir.model.dstu2.resource.ProcedureRequest.BodySite.class.getName());
-		primitiveMap.put("Procedure.BodySite", ca.uhn.fhir.model.dstu2.resource.Procedure.BodySite.class.getName());
-		primitiveMap.put("Procedure.Device", ca.uhn.fhir.model.dstu2.resource.Procedure.Device.class.getName());
 	}
 	
 	/**
@@ -394,34 +385,36 @@ public class FhirResourceManager {
 	
 	/**
 	 * Returns true if type has a java equivalent type
+	 * Ask James Agnew
+	 * TODO Cover all simple types - https://hl7-fhir.github.io/datatypes.html
 	 * 
 	 * @param element
 	 * @return
 	 */
 	public static boolean hasEquivalentJavaType(Type type) {
 		boolean hasEquivalentJavaType = false;
-		DataTypeEnum code = type.getCodeElement().getValueAsEnum();
+		String code = type.getCodeElement().getValueAsString();
 		if(type == null || type.getCodeElement() == null) {
 			return hasEquivalentJavaType;
-		} else if(code == DataTypeEnum.DATETIME) {
+		} else if(code.equalsIgnoreCase("dateTime")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.DATE) {
+		} else if(code.equalsIgnoreCase("date")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.BOOLEAN) {
+		} else if(code.equalsIgnoreCase("boolean")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.INTEGER) {
+		} else if(code.equalsIgnoreCase("integer")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.STRING) {
+		} else if(code.equalsIgnoreCase("string")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.TIME) {
+		} else if(code.equalsIgnoreCase("time")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.INSTANT) {
+		} else if(code.equalsIgnoreCase("instant")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.DECIMAL) {
+		} else if(code.equalsIgnoreCase("decimal")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.POSITIVEINT) {
+		} else if(code.equalsIgnoreCase("positiveInt")) {
 			hasEquivalentJavaType = true;
-		} else if(code == DataTypeEnum.URI) {
+		} else if(code.equalsIgnoreCase("uri")) {
 			hasEquivalentJavaType = true;
 		}
 		return hasEquivalentJavaType;
@@ -573,7 +566,7 @@ public class FhirResourceManager {
 	public static String buildMultiAttributePath(String path, Type type) {
 		String modifiedPath = path.replaceAll("\\[x\\]", "");
 		if(type.getCode().equalsIgnoreCase("Reference")) {
-			modifiedPath += getProfileSuffix(type.getProfile());
+			modifiedPath += getProfileSuffix(type.getProfileFirstRep().getValueAsString());
 		} else {
 			modifiedPath += StringUtils.capitalize(type.getCode());
 		}
@@ -603,10 +596,10 @@ public class FhirResourceManager {
 		clonedElement.setMustSupport(element.getMustSupportElement());
 		clonedElement.setIsModifier(element.getIsModifierElement());
 		clonedElement.setShort(element.getShortElement());
-		clonedElement.setDefinition(element.getDefinition());
+		clonedElement.setDefinition(element.getDefinitionElement());
 		clonedElement.setAlias(element.getAlias());
 		clonedElement.setCode(element.getCode());
-		clonedElement.setComments(element.getComments());
+		clonedElement.setComments(element.getCommentsElement());
 		clonedElement.setCondition(element.getCondition());
 		clonedElement.setConstraint(element.getConstraint());
 		clonedElement.setDefaultValue(element.getDefaultValue());

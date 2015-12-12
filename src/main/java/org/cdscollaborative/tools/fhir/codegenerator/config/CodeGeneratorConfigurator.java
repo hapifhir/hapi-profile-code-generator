@@ -1,12 +1,11 @@
 package org.cdscollaborative.tools.fhir.codegenerator.config;
 
-import guru.mwangaza.common.util.xml.XmlUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cdscollaborative.common.utils.xml.XmlUtils;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.codegenerator.InterfaceAdapterGenerator;
 import org.cdscollaborative.tools.fhir.utils.FhirExtensionManager;
