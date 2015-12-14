@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.cdscollaborative.common.utils.io.ResourceLoadingUtils;
 import org.cdscollaborative.tools.fhir.codegenerator.config.CodeGeneratorConfigurator;
@@ -115,7 +116,10 @@ public class FhirResourceManager {
 			if(dir.exists() && dir.isDirectory()) {
 				File[] profileFiles = dir.listFiles();
 				for(File profileFile : profileFiles) {
-					loadResourceProfile(profileFile.getAbsolutePath());
+					if(FilenameUtils.getExtension(profileFile.getAbsolutePath()).equalsIgnoreCase("xml") ||
+							FilenameUtils.getExtension(profileFile.getAbsolutePath()).equalsIgnoreCase("json")) {
+						loadResourceProfile(profileFile.getAbsolutePath());
+					}
 				}
 			}
 		}
@@ -352,6 +356,7 @@ public class FhirResourceManager {
 		primitiveMap.put("Patient.Animal", ca.uhn.fhir.model.dstu2.resource.Patient.Animal.class.getName());
 		primitiveMap.put("Patient.Communication", ca.uhn.fhir.model.dstu2.resource.Patient.Communication.class.getName());
 		primitiveMap.put("Patient.Link", ca.uhn.fhir.model.dstu2.resource.Patient.Link.class.getName());
+		primitiveMap.put("Observation.Component", ca.uhn.fhir.model.dstu2.resource.Observation.Component.class.getName());
 	}
 	
 	/**

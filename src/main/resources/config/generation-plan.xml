@@ -31,8 +31,10 @@
 		<profileName>Condition</profileName>
 		<profileName>Patient</profileName>
 		<profileName>Observation</profileName>
+		<!-- 
 		<profileName>QICore-Patient</profileName>
 		<profileName>QICore-Observation</profileName>
 		<profileName>QICore-Condition</profileName>
+		-->
 	</profileNames>
 </executionPlan>
