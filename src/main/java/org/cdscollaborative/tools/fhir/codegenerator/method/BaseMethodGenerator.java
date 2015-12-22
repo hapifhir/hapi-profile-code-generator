@@ -367,11 +367,13 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 */
 	public boolean classExists(String clazz) {
 		boolean found = false;
-		try {
-			Class.forName(clazz, false, this.getClass().getClassLoader());
-			found = true;
-		} catch(ClassNotFoundException cnfe) {
-			LOGGER.info(clazz + " does not exist!");
+		if(!StringUtils.isEmpty(clazz)) {
+			try {
+				Class.forName(clazz, false, this.getClass().getClassLoader());
+				found = true;
+			} catch(ClassNotFoundException cnfe) {
+				LOGGER.info(clazz + " does not exist!");
+			}
 		}
 		return found;
 	}
@@ -532,6 +534,45 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	/**
 	 * <pre>
 	 * <code>
+	 * return (castToClass)adaptee.get{PropertyName}Element()
+	 * </code>
+	 * </pre>
+	 * @param propertyName
+	 * @return
+	 */
+	public String buildDelegatedGetterWithCastToExtendedTypeBody(String propertyName, String castTo) {
+		return template.getAdapterGetMethodDelegationWithCastBody(propertyName, castTo);
+	}
+	
+	/**
+	 * <pre>
+	 * <code>
+	 * return (List<castToClass>)(List<?>)adaptee.get{PropertyName}Element()
+	 * </code>
+	 * </pre>
+	 * @param propertyName
+	 * @return
+	 */
+	public String buildDelegatedGetterWithCastToExtendedTypeListBody(String propertyName, String castTo) {
+		return template.getAdapterGetListMethodDelegationWithCastToListBody(propertyName, castTo);
+	}
+	
+	/**
+	 * <pre>
+	 * <code>
+	 * adaptee.set{PropertyName}((List<castToClass>)(List<?>) param)
+	 * </code>
+	 * </pre>
+	 * @param propertyName
+	 * @return
+	 */
+	public String buildDelegatedSetterWithCastToExtendedTypeListBody(String propertyName, String castTo) {
+		return template.getAdapterSetListMethodDelegationWithCastToListBody(propertyName, castTo);
+	}
+	
+	/**
+	 * <pre>
+	 * <code>
 	 * return adaptee.get{PropertyName}();
 	 * </code>
 	 * </pre>
@@ -624,8 +665,16 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 		return template.getReferenceSetterBody(topLevelCoreAttribute);
 	}
 	
+	public String buildProfiledReferenceSetterBody() {
+		return template.getProfiledReferenceSetterBody(topLevelCoreAttribute);
+	}
+	
 	public String buildReferenceGetterBody() {
 		return template.getReferenceGetterBody(topLevelCoreAttribute, fullyQualifiedType);
+	}
+	
+	public String buildProfiledReferenceGetterBody(String adapterClass) {
+		return template.getProfiledReferenceGetterBody(topLevelCoreAttribute, adapterClass, fullyQualifiedType);
 	}
 	
 	public String buildMultivaluedGetterBody(String type) {
@@ -644,12 +693,20 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 		return template.getExtensionGetterBody(fullyQualifiedType, extensionUri, fieldName);
 	}
 	
+	public String buildExtensionGetterBody(String callee, String fullyQualifiedType, String extensionUri, String fieldName) {
+		return template.getExtensionGetterBody(callee, fullyQualifiedType, extensionUri, fieldName);
+	}
+	
 	public String buildExtensionListSetterBody(String fullyQualifiedType, String extensionUri) {
 		return template.getExtensionListSetterBody(fullyQualifiedType, extensionUri);
 	}
 	
 	public String buildExtensionSetterBody(String extensionUri) {
 		return template.getExtensionSetterBody(extensionUri);
+	}
+	
+	public String buildExtensionSetterBody(String callee, String extensionUri) {
+		return template.getExtensionSetterBody(callee, extensionUri);
 	}
 	
 	public String buildExtendedTypeGetterBody(String returnType, String fieldUri) {

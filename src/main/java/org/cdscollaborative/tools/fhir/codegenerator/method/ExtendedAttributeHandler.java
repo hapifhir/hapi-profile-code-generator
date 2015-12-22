@@ -8,6 +8,7 @@ import org.cdscollaborative.model.meta.Method;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.model.FhirExtension;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
+import org.cdscollaborative.tools.fhir.utils.PathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,14 @@ public class ExtendedAttributeHandler extends BaseExtensionMethodHandler {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedAttributeHandler.class);
 	
+	private boolean addExtensionsToThis = false;
+	
 	public ExtendedAttributeHandler(FhirResourceManager manager, CodeTemplateUtils template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
+	}
+	
+	public void setAddExtensionsToThis(boolean addToThis) {
+		addExtensionsToThis = addToThis;
 	}
 	
 	/**
@@ -111,12 +118,12 @@ public class ExtendedAttributeHandler extends BaseExtensionMethodHandler {
 	 * @param accessors
 	 */
 	protected void handleSingleCardinality(List<Method> accessors) {
-		if(getExtendedElement().getName().contains(".")) {
-			LOGGER.info("Skipping " + getExtendedElement().getName() + " since it is an extended path");
-		} else {
-			accessors.add(constructGetMethodFromField(getExtendedElement().getName(), getFullyQualifiedType()).setBody(buildExtensionGetterBody(getFullyQualifiedType(), getExtensionUri(), getExtendedElement().getName())));
-			accessors.add(constructSetMethodFromField(getExtendedElement().getName(), getFullyQualifiedType()).setBody(buildExtensionSetterBody(getExtensionUri())));
+		String callee = "adaptedClass";
+		if(addExtensionsToThis) {
+			callee = "this";
 		}
+		accessors.add(constructGetMethodFromField(PathUtils.getLastPathComponent(getExtendedElement().getName()), getFullyQualifiedType()).setBody(buildExtensionGetterBody(callee, getFullyQualifiedType(), getExtensionUri(), getExtendedElement().getName())));
+		accessors.add(constructSetMethodFromField(PathUtils.getLastPathComponent(getExtendedElement().getName()), getFullyQualifiedType()).setBody(buildExtensionSetterBody(callee, getExtensionUri())));
 	}
 	
 	/**
@@ -163,7 +170,7 @@ public class ExtendedAttributeHandler extends BaseExtensionMethodHandler {
 	 * @return
 	 */
 	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		if(FhirResourceManager.elementHasNoType(element) || FhirResourceManager.isMultiTypeAttribute(element)) {
+		if(FhirResourceManager.elementHasNoType(element)/* || FhirResourceManager.isMultiTypeAttribute(element)*/) { //TODO Figure out if commenting multitype is an issue
 			return false;
 		} else {
 			if(FhirResourceManager.isFhirExtension(element)) {

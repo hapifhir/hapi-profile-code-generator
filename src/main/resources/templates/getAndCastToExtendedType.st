@@ -1,0 +1,1 @@
+getAndCastToExtendedType(className, propertyName, castTo) ::= "return (<castTo>)<className>.get<propertyName>Element();"

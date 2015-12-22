@@ -11,11 +11,13 @@ public class ClassModel {
 	private List<ModifierEnum> modifiers;
 	private String namespace;
 	private List<String> interfaces;
+	private List<String> supertypes;
 	private List<String> imports;
 	
 	public ClassModel() {
 		fields = new ArrayList<ClassField>();
 		interfaces = new ArrayList<String>();
+		supertypes = new ArrayList<String>();
 		methods = new ArrayList<Method>();
 		imports = new ArrayList<String>();
 	}
@@ -35,8 +37,9 @@ public class ClassModel {
 		return name;
 	}
 
-	public void setName(String name) {
+	public ClassModel setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public List<Method> getMethods() {
@@ -93,6 +96,18 @@ public class ClassModel {
 	
 	public void addInterface(String anInterface) {
 		this.interfaces.add(anInterface);
+	}
+	
+	public List<String> getSupertypes() {
+		return supertypes;
+	}
+
+	public void setSupertypes(List<String> supertypes) {
+		this.supertypes = supertypes;
+	}
+	
+	public void addSupertype(String aSupertype) {
+		this.supertypes.add(aSupertype);
 	}
 
 	public List<String> getImports() {

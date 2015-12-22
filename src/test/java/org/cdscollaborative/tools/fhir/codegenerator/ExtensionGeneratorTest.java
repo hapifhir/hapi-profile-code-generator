@@ -3,6 +3,7 @@ package org.cdscollaborative.tools.fhir.codegenerator;
 import static org.junit.Assert.assertEquals;
 
 import org.cdscollaborative.common.utils.graph.Node;
+import org.cdscollaborative.common.utils.io.ResourceLoadingUtils;
 import org.cdscollaborative.model.meta.ClassModel;
 import org.cdscollaborative.tools.fhir.codegenerator.config.CodeGeneratorConfigurator;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
@@ -58,6 +59,15 @@ public class ExtensionGeneratorTest {
 			}
 		}
 		assertEquals(3, complexExtensionCount);
+	}
+	
+	@Test
+	public void testTypeExtension() {
+		String path = "Patient.contact.telecom.extension";
+		assertEquals(CodeGenerationUtils.getPathComponents(path).size(), 4);
+		FhirResourceManager fhirManager = new FhirResourceManager();
+		fhirManager.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("profiles-resources.xml"));
+		fhirManager.getLeafLevelItemType(CodeGenerationUtils.getPathComponents(path));
 	}
 
 }

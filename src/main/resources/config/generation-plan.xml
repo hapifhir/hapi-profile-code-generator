@@ -9,6 +9,7 @@
 	<targetCodeGenerationDirectory>generated-source/java/</targetCodeGenerationDirectory>
 	<extensionRepositories>
 		<extensionRepository>/Users/cnanjo/repository/fhir/trunk/build/publish</extensionRepository>
+		<extensionRepository>/Users/cnanjo/repository/fhir/trunk/build/publish/cqf</extensionRepository>
 	</extensionRepositories>
 	<!--
 	<profileNames>

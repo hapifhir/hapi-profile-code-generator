@@ -2,6 +2,8 @@ package org.cdscollaborative.tools.fhir.codegenerator;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -130,9 +132,9 @@ public class CodeGenerationUtils {
 	 * @param accessors
 	 * @return
 	 */
-	public static JavaInterfaceSource buildJavaInterface(ClassModel interfaceModel) {
+	public static JavaInterfaceSource buildJavaInterface(ClassModel interfaceModel, String interfaceName) {
 		final JavaInterfaceSource javaInterface = Roaster.create(JavaInterfaceSource.class);//Roaster.parse(JavaInterfaceSource.class, "import java.util.Map; public interface myInterface {public void setMeta(Map<String,String> meta);}" );
-		javaInterface.setPackage(interfaceModel.getNamespace()).setName(interfaceModel.getName());
+		javaInterface.setPackage(interfaceModel.getNamespace()).setName(interfaceName);
 		for(Method accessor : interfaceModel.getMethods()) {
 			for(String importString : accessor.getImports()) { //TODO remove when Roaster fixes bug
 				javaInterface.addImport(importString);
@@ -160,14 +162,19 @@ public class CodeGenerationUtils {
 	 * @param accessors
 	 * @return
 	 */
-	public static JavaClassSource buildJavaClass(ClassModel classModel) {
+	public static JavaClassSource buildJavaClass(ClassModel classModel, String adapterName) {
 		final JavaClassSource javaClass = Roaster.create(JavaClassSource.class);
-		javaClass.setPackage(classModel.getNamespace()).setName(classModel.getName());
+		javaClass.setPackage(classModel.getNamespace()).setName(adapterName);
 		for(String classInterface : classModel.getInterfaces()) {
 			javaClass.addInterface(classInterface);
 		}
 		for(ClassField field: classModel.getFields()) {
 			CodeGenerationUtils.addFieldToJavaClass(javaClass, field);
+		}
+		if(classModel.getSupertypes() != null && 
+				classModel.getSupertypes().size() > 0 && 
+				StringUtils.isNotBlank(classModel.getSupertypes().get(0))) { //Java supports only single inheritance
+			javaClass.setSuperType(classModel.getSupertypes().get(0));
 		}
 		for(Method methodDefinition: classModel.getMethods()) {
 			for(String importString : methodDefinition.getImports()) {
@@ -185,7 +192,7 @@ public class CodeGenerationUtils {
 			}
 			methodSource.setBody(methodDefinition.getBody());
 			for(MethodParameter argument : methodDefinition.getParameters()) {
-					methodSource.addParameter(argument.getValue(), argument.getName());
+				methodSource.addParameter(argument.getValue(), argument.getName());
 			}
 		}
 		for(String importString : classModel.getImports()) {
@@ -237,6 +244,25 @@ public class CodeGenerationUtils {
 			suffix = attributePath.substring(prefix.length() + 1);
 		}
 		return suffix;
+	}
+	
+	/**
+	 * Method takes a '.' delimited invocation path and returns a list
+	 * of component split by the '.' delimiter.
+	 * 
+	 * For instance, Patient.contact.telecom.extension will be split
+	 * and returned as list {Patient, contact, telecom, extension}
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static List<String> getPathComponents(String path) {
+		List<String> pathComponents = new ArrayList<String>();
+		if(StringUtils.isNotBlank(path)) {
+			String[] pathArray = path.split("\\.");
+			pathComponents.addAll(Arrays.asList(pathArray));
+		}
+		return pathComponents;
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cdscollaborative.model.meta.Method;
+import org.cdscollaborative.tools.fhir.codegenerator.CodeGenerationUtils;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
 import org.slf4j.Logger;
@@ -118,19 +119,32 @@ public class ReferenceTypeHandler extends BaseMethodGenerator {
 	protected void handleSingleCardinality(List<Method> accessors) {
 		String descriminator = "";
 		String profileUrl = getElement().getTypeFirstRep().getProfileFirstRep().getValueAsString();
-		String resource = FhirResourceManager.getProfileSuffix(profileUrl);
+		boolean isProfiledResource = false;
+		String adapterClass = null;
+		String resourceName = FhirResourceManager.getProfileSuffix(profileUrl);
 		if(getElement().getType().size() > 1) {
-			descriminator = resource;
+			descriminator = resourceName;
 		}
-		//TODO: Eventually, will need to point to logical model resources. Given dependency graph may be tricky.
-		Class<?> resourceClass = getFhirResourceManager().addResourceToIndex(resource);
+		Class<?> resourceClass = getFhirResourceManager().addResourceToIndex(resourceName);
+		if(resourceClass == null) {
+			StructureDefinition profile = getFhirResourceManager().getProfileFromProfileUri(profileUrl);
+			String profileName = CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName());
+			resourceName = FhirResourceManager.getProfileSuffix(profile.getBase());
+			resourceClass = getFhirResourceManager().addResourceToIndex(resourceName);
+			isProfiledResource = (resourceClass != null);
+			adapterClass = getGeneratedCodePackage() + "." + profileName + "Adapter";
+		}
 		if(resourceClass != null) {
-			setFullyQualifiedType(getFhirResourceManager().addResourceToIndex(resource).getCanonicalName());
-		
-			accessors.add(constructGetMethodFromField(getTopLevelCoreAttribute() + descriminator + "Resource", getFullyQualifiedType()).setBody(buildReferenceGetterBody()));
-			accessors.add(constructSetMethodFromField(getTopLevelCoreAttribute() + "Resource", getFullyQualifiedType()).setBody(buildReferenceSetterBody()));
+			setFullyQualifiedType(getFhirResourceManager().addResourceToIndex(resourceName).getCanonicalName());
+			if(!isProfiledResource) {
+				accessors.add(constructGetMethodFromField(getTopLevelCoreAttribute() + descriminator + "Resource", getFullyQualifiedType()).setBody(buildReferenceGetterBody()));
+				accessors.add(constructSetMethodFromField(getTopLevelCoreAttribute() + "Resource", getFullyQualifiedType()).setBody(buildReferenceSetterBody()));
+			} else {
+				accessors.add(constructGetMethodFromField(getTopLevelCoreAttribute() + descriminator + "Resource", adapterClass).setBody(buildProfiledReferenceGetterBody(adapterClass)));
+				accessors.add(constructSetMethodFromField(getTopLevelCoreAttribute() + "Resource", adapterClass).setBody(buildProfiledReferenceSetterBody()));
+			}
 		} else {
-			LOGGER.error("No class found for the following type: " + resource + ". Skipping code generation for " + getTopLevelCoreAttribute());
+			LOGGER.error("No class found for the following type: " + resourceName + ". Skipping code generation for " + getTopLevelCoreAttribute());
 		}
 	}
 	

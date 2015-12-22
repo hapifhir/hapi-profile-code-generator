@@ -1,3 +1,3 @@
-extensionSetterBody(uri) ::= <<
-	adaptedClass.addUndeclaredExtension(false, "<uri>", param);
+extensionSetterBody(rootClassName, uri) ::= <<
+	<rootClassName>.addUndeclaredExtension(false, "<uri>", param);
 >>

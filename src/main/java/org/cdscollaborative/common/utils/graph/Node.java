@@ -62,12 +62,33 @@ public class Node<T> {
 		node.setParent(this);
 	}
 	
+	public boolean childOfNameAlreadyExists(Node<T> node) {
+		boolean childOfNameAlreadyExists = false;
+		for(Node<T> child : children) {
+			if(child.getName().equalsIgnoreCase(node.getName())) {
+				childOfNameAlreadyExists = true;
+			}
+			break;
+		}
+		return childOfNameAlreadyExists;
+	}
+	
+	public void addChildIfNotExist(Node<T> node) {
+		if(!childOfNameAlreadyExists(node)) {
+			addChild(node);
+		}
+	}
+	
 	public Node<T> getFirstChild() {
 		return children.get(0);
 	}
 	
 	public boolean hasChildren() {
 		return children != null && children.size() > 0;
+	}
+	
+	public boolean hasNoChildren() {
+		return !hasChildren();
 	}
 
 	public T getPayload() {
@@ -90,8 +111,64 @@ public class Node<T> {
 		return hasNoParent();
 	}
 	
+	public boolean isNotRoot() {
+		return !isRoot();
+	}
+	
+	public boolean parentIsRoot() {
+		return hasParent() && getParent().isRoot();
+	}
+	
+	public boolean parentIsNotRoot() {
+		return !parentIsRoot();
+	}
+	
 	public boolean isLeaf() {
-		return children == null || children.size() == 0;
+		return hasNoChildren();
+	}
+	
+	public boolean isNotLeaf() {
+		return !isLeaf();
+	}
+	
+	public boolean isInnerNode() {
+		return isNotLeaf();
+	}
+	
+	public boolean isNotInnerNode() {
+		return !isInnerNode();
+	}
+	
+	public boolean isL1() {
+		return parentIsRoot();
+	}
+	
+	public boolean isNotL1() {
+		return !isL1();
+	}
+	
+	public boolean isInnerL1() {
+		return isL1() && isNotLeaf();
+	}
+	
+	public boolean isNotInnerL1() {
+		return isNotL1() || isLeaf();
+	}
+	
+	public boolean isLN() {
+		return parentIsNotRoot();
+	}
+	
+	public boolean isNotLN() {
+		return !isLN();
+	}
+	
+	public boolean isInnerLN() {
+		return isLN() && hasChildren();
+	}
+	
+	public boolean isNotInnerLN() {
+		return !isLN() || !hasChildren();
 	}
 	
 	public String toString() {

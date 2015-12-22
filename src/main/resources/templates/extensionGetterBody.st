@@ -1,5 +1,5 @@
-extensionGetterBody(uri, type, fieldName) ::= <<
-	List\<ca.uhn.fhir.model.api.ExtensionDt\> extensions = adaptedClass
+extensionGetterBody(rootClassName, uri, type, fieldName) ::= <<
+	List\<ca.uhn.fhir.model.api.ExtensionDt\> extensions = <rootClassName>
             .getUndeclaredExtensionsByUrl("<uri>");
       if(extensions == null || extensions.size() \<= 0) {
     	  return null;

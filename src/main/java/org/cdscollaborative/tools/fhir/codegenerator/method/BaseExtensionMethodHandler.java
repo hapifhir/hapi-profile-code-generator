@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.model.FhirExtension;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
+import org.cdscollaborative.tools.fhir.utils.PathUtils;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
@@ -66,16 +67,16 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 	 * @return
 	 */
 	public void handleExtensionElement() {
-		if(getElement().getName() == null || getElement().getPath().contains("extension.extension")) {
-			skipProcessing = true;
-			LOGGER.info("Nested extensions not currently supported. " + getElement().getName());
-			return;
-		}
-		if(getElement().getPath().split("\\.").length > 2) {
-			skipProcessing = true;
-			LOGGER.info("Extensions on types not currently supported. " + getElement().getName());
-			return;
-		}
+//		if(getElement().getName() == null || getElement().getPath().contains("extension.extension")) {
+//			skipProcessing = true;
+//			LOGGER.error("Nested extensions not currently supported. " + getElement().getName());
+//			return;
+//		}
+//		if(getElement().getPath().split("\\.").length > 2) {
+//			skipProcessing = true;
+//			LOGGER.info("Extensions on types not currently supported. " + getElement().getName());
+//			return;
+//		}
 		
 //		if(getElement().getName().indexOf('.') >= 0) {
 //			skipProcessing = true;
@@ -85,27 +86,31 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 		extensionUri = getElement().getTypeFirstRep().getProfileFirstRep().getValueAsString();//TODO How to handle multiple profiles on types
 		FhirExtension extensionDef = getFhirResourceManager().getFhirExtension(extensionUri);
 		extendedElement = FhirResourceManager.shallowCloneElement(getElement());
-		if(extensionDef != null) {
+		if(extensionDef != null) {//Need to gracefully handle case when extensionDef is null
 			if(extendedElement.getMin() == null) {
 				extendedElement.setMin(extensionDef.getLowCardinality());
 			}
 			if(extendedElement.getMax() == null) {
 				extendedElement.setMax(extensionDef.getHighCardinality());
 			}
-			if(extendedElement.getType().size() == 1 
+			if(extendedElement.getType().size() >= 1 && extendedElement.getType().size() <= 2 
 					&& extendedElement.getTypeFirstRep().getCode().equals("Extension")) {
-				extendedElement.setType(extensionDef.getTypes());
-				if(extensionDef.getTypes().size() == 1) {
-					handleType(extensionDef.getTypes().get(0));//TODO Hack until I figure what to do with multi-type attributes. Need a way to chain handlers. Investigate
+				if(extendedElement.getType().size() == 1) {
+					extendedElement.setType(extensionDef.getTypes());
+					if(extensionDef.getTypes().size() == 1) {
+						handleType(extensionDef.getTypes().get(0));//TODO Hack until I figure what to do with multi-type attributes. Need a way to chain handlers. Investigate
+					} else {
+						setFullyQualifiedType(getGeneratedCodePackage() + "." + StringUtils.capitalize(getElement().getName()));
+						isExtendedStructure = true;
+						return;
+					}
 				} else {
-					setFullyQualifiedType(getGeneratedCodePackage() + "." + StringUtils.capitalize(getElement().getName()));
+					setFullyQualifiedType(extendedElement.getType().get(1).getCode());
 					isExtendedStructure = true;
-					return;
 				}
 			}
 			if(extendedElement.getPath() != null) {
-				String prefix = extendedElement.getPath().substring(0, extendedElement.getPath().indexOf('.'));
-				extendedElement.setPath(prefix + "." + extendedElement.getName());
+				extendedElement.setPath(PathUtils.generateExtensionPath(extendedElement.getPath(), extendedElement.getName()));
 			}
 		}
 	}

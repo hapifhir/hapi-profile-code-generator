@@ -105,6 +105,22 @@ public class CodeTemplateUtils {
 	}
 	
 	/**
+	 * Method returning method body for reference-type FHIR attributes.
+	 * 
+	 * @param propertyName - The name of the property
+	 * @param canonicalPath - The full class name/path of the return type
+	 * @return
+	 */
+	public String getProfiledReferenceGetterBody(String propertyName, String adapterClassPath, String canonicalPath) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = groupMain.getInstanceOf("profiledReferenceGetterBody");
+		st.add("propertyName", propertyName);
+		st.add("adapterClassPath", adapterClassPath);
+		st.add("canonicalClassPath", canonicalPath);
+		return st.render();
+	}
+	
+	/**
 	 * Method returning method body for adding item to a list.
 	 * 
 	 * @param className - The class name
@@ -163,6 +179,33 @@ public class CodeTemplateUtils {
 		return st.render();
 	}
 	
+	public String getAdapterGetMethodDelegationWithCastBody(String propertyName, String castTo) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = groupMain.getInstanceOf("getAndCastToExtendedType");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		st.add("castTo", castTo);
+		return st.render();
+	}
+	
+	public String getAdapterGetListMethodDelegationWithCastToListBody(String propertyName, String castTo) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = groupMain.getInstanceOf("getListAndCastToExtendedTypeList");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		st.add("castTo", castTo);
+		return st.render();
+	}
+	
+	public String getAdapterSetListMethodDelegationWithCastToListBody(String propertyName, String castTo) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = groupMain.getInstanceOf("setListAndCastToExtendedTypeList");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		st.add("castTo", castTo);
+		return st.render();
+	}
+	
 	/**
 	 * Sets a reference type in HAPI FHIR.
 	 * 
@@ -172,6 +215,20 @@ public class CodeTemplateUtils {
 	public String getReferenceSetterBody(String propertyName) {
 		propertyName = StringUtils.capitalize(propertyName);
 		ST st = groupMain.getInstanceOf("referenceSetterBody");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+	
+	/**
+	 * Sets a reference type in HAPI FHIR.
+	 * 
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getProfiledReferenceSetterBody(String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = groupMain.getInstanceOf("profiledReferenceSetterBody");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		return st.render();
@@ -250,10 +307,15 @@ public class CodeTemplateUtils {
 	 * 
 	 * @return
 	 */
-	public String getExtensionSetterBody(String uri) {
+	public String getExtensionSetterBody(String rootClassName, String uri) {
 		ST st = groupMain.getInstanceOf("extensionSetterBody");
+		st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		return st.render();
+	}
+	
+	public String getExtensionSetterBody(String uri) {
+		return getExtensionSetterBody("adaptedClass", uri);
 	}
 	
 	/**
@@ -264,12 +326,17 @@ public class CodeTemplateUtils {
 	 * 
 	 * @return
 	 */
-	public String getExtensionGetterBody(String type, String uri, String fieldName) {
+	public String getExtensionGetterBody(String rootClassName, String type, String uri, String fieldName) {
 		ST st = groupMain.getInstanceOf("extensionGetterBody");
+		st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		st.add("type", type);
 		st.add("fieldName", fieldName);
 		return st.render();
+	}
+	
+	public String getExtensionGetterBody(String type, String uri, String fieldName) {
+		return getExtensionGetterBody(type, uri, fieldName);
 	}
 	
 	/**

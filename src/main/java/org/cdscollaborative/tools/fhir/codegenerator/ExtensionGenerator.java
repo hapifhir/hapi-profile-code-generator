@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.cdscollaborative.common.utils.graph.Node;
-import org.cdscollaborative.tools.fhir.utils.FhirExtensionManager;
+import org.cdscollaborative.tools.fhir.utils.ProfileWalker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class ExtensionGenerator {
 	
 	public void processProfile(StructureDefinition profile) {
 		for(ElementDefinitionDt element : profile.getSnapshot().getElement()) {
-			if(FhirExtensionManager.isFhirExtension(element)) {
+			if(ProfileWalker.isFhirExtension(element)) {
 				if(element.getName() == null) {
 					continue;//exclude standard extension definitions
 				}
@@ -52,7 +52,8 @@ public class ExtensionGenerator {
 					} else {
 						Node<ElementDefinitionDt> root = extensionGraphs.get(StringUtils.capitalize(nameComponents[0]));
 						if(root == null) {
-							LOGGER.error("Unknown root for path " + name);
+							System.out.println(extensionGraphs);
+							LOGGER.error("Unknown root for path " + name);//TODO: Need to add logic for adding extensions on types.
 						} else {
 							root.addToPath(name, element);
 						}

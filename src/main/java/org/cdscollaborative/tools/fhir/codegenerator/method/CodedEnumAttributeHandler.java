@@ -7,11 +7,15 @@ import org.apache.commons.lang.StringUtils;
 import org.cdscollaborative.model.meta.Method;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
+import org.cdscollaborative.tools.fhir.utils.PathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 
 /**
@@ -176,23 +180,54 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	public void handleCode() {
 		if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
 				&& getElement().getBinding() != null) {
-			//Binding binding = getElement().getBinding();
-			bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());//TODO Condition[v]erificationStatusEnum
-			enumType = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "CodesEnum";
-			if(classExists(enumType)) {
+			String bindingName = getBindingNameFromValueSetReference();
+			identifyValidEnumerationType(bindingName);
+			if(enumType == null) {
+				bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());
+				identifyValidEnumerationType(bindingName);
+			}
+			if(enumType != null) {
 				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + enumType + ">");
 				imports.add(enumType);
 			} else {
-				enumType = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "Enum";
-				if(classExists(enumType)) {
-					setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + enumType + ">");
-					imports.add(enumType);
-				} else {
-					LOGGER.info("Class " + enumType + " does not exist");
-					enumType = null;
-				}
+				LOGGER.info("No bindings discovered for " + getElement().getPath());
 			}
 		}
+	}
+	
+	public String getBindingNameFromValueSetReference() {
+		Binding binding = getElement().getBinding();
+		String bindingName = null;
+		if(binding != null && binding.getValueSet() != null) {
+			IDatatype valueSet = binding.getValueSet();
+			if(valueSet instanceof ResourceReferenceDt) {
+				String valueSetUri = ((ResourceReferenceDt) valueSet).getReference().getValueAsString();
+				bindingName = PathUtils.getEnumNameFromValueSetBindingUri(valueSetUri);
+			}
+		}
+		return bindingName;
+	}
+	
+	public void identifyValidEnumerationType(String bindingName) {
+		if(bindingName != null) {
+			String enumType1 = getEnumType1(bindingName);
+			String enumType2 = getEnumType2(bindingName);
+			if(classExists(enumType1)) {
+				enumType = enumType1;
+			} else if(classExists(enumType2)) {
+				enumType = enumType2;
+			} else {
+				enumType = null;//Reset enumType
+			}
+		}
+	}
+	
+	public String getEnumType1(String bindingName) {
+		return "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "Enum";
+	}
+	
+	public String getEnumType2(String bindingName) {
+		return "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "CodesEnum";
 	}
 	
 	/**

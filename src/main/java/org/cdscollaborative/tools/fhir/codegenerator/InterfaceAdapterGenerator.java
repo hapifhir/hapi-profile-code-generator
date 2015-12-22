@@ -13,6 +13,7 @@ import org.cdscollaborative.model.meta.ModifierEnum;
 import org.cdscollaborative.tools.fhir.codegenerator.method.IMethodHandler;
 import org.cdscollaborative.tools.fhir.codegenerator.method.MethodHandlerResolver;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
+import org.cdscollaborative.tools.fhir.utils.ProfileWalker;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.Import;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
@@ -64,6 +65,7 @@ public class InterfaceAdapterGenerator {
 	private CodeTemplateUtils templateUtils;
 	private List<String> resourceGenerationPlan;
 	private MethodHandlerResolver resolver;
+	private ProfileWalker profileWalker;
 	
 	/**
 	 * Precondition: 
@@ -177,10 +179,29 @@ public class InterfaceAdapterGenerator {
 		try {
 			String javaSafeProfileName = CodeGenerationUtils.makeIdentifierJavaSafe(profileName);
 			StructureDefinition profile = fhirResourceManager.getProfile(profileName);
-			List<Method> methodDefinitions = generateMethodsFromFhirProfileDefinition(profile);
-			InterfaceAdapterPair interfaceAdapterPair = generateCodeFromFhirProfile(javaSafeProfileName, profile, methodDefinitions);
-			String generatedProfileInterface = cleanUpWorkaroundInterface(interfaceAdapterPair.getResourceInterface(), true);
-			String generatedProfileAdapter = cleanUpWorkaroundClass(interfaceAdapterPair.getResourceAdapter(), true);
+			//List<Method> methodDefinitions = generateMethodsFromFhirProfileDefinition(profile);
+			//InterfaceAdapterPair interfaceAdapterPair = generateCodeFromFhirProfile(javaSafeProfileName, profile, methodDefinitions);
+			//Node<ElementDefinitionDt> root = profileWalker.getRoot();
+			profileWalker = new ProfileWalker(profile);
+			profileWalker.initialize();
+			GenerateLogicalViewCommand command = new GenerateLogicalViewCommand(profile, fhirResourceManager, templateUtils, resolver, "org.socraticgrid.fhir.generated");
+			profileWalker.getRoot().executeCommandDepthFirstPost(command);
+			ClassModel rootModel = command.getClassMap().get(profileWalker.getRoot().getPathFromRoot());
+			System.out.println(rootModel.getName());
+			String resourceName = getUnderlyingFhirCoreResourceName(profile);
+			buildAdapter(rootModel, resourceName, generatedPackage + ".I" + javaSafeProfileName);
+			generateAdapteeGetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+			for(ClassModel model : command.getClassMap().values()) {
+				if(model != rootModel) {
+					String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
+					CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
+				}
+			}
+//			String generatedProfileInterface = cleanUpWorkaroundInterface(interfaceAdapterPair.getResourceInterface(), true);
+//			String generatedProfileAdapter = cleanUpWorkaroundClass(interfaceAdapterPair.getResourceAdapter(), true);
+			String generatedProfileAdapter = cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(rootModel, javaSafeProfileName + "Adapter"), true);
+			String generatedProfileInterface = cleanUpWorkaroundInterface(CodeGenerationUtils.buildJavaInterface(rootModel, "I" + javaSafeProfileName), true);
 			CodeGenerationUtils.buildTargetPackageDirectoryStructure(getDestinationDirectory(), generatedPackage);
 			CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, "I" + javaSafeProfileName, generatedProfileInterface);
 			CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + "Adapter", generatedProfileAdapter);
@@ -349,6 +370,17 @@ public class InterfaceAdapterGenerator {
 		return classSource;
 	}
 	
+	public void buildAdapter(ClassModel classModel, String resourceName, String interfaceName) {
+		classModel.addInterface(interfaceName);
+		ClassField field = new ClassField("adaptedClass");
+		field.setType(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName());
+		field.addModifier(ModifierEnum.PRIVATE);
+		field.setInitializer("new " + fhirResourceManager.getResourceNameToClassMap().get(resourceName).getSimpleName() + "()");
+		classModel.addField(field);
+		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
+	}
+	
 	/**
 	 * Method acts as profile element filter. 
 	 * If it returns true, the element should be filtered out.
@@ -435,7 +467,7 @@ public class InterfaceAdapterGenerator {
 	 * @param cleanup
 	 * @return
 	 */
-	private String cleanUpWorkaroundInterface(JavaInterfaceSource profileInterface, boolean cleanup) {
+	public static String cleanUpWorkaroundInterface(JavaInterfaceSource profileInterface, boolean cleanup) {
 		String profileInterfaceValue = null;
 		if(cleanup) {
 			List<Import> imports = profileInterface.getImports();
@@ -458,7 +490,7 @@ public class InterfaceAdapterGenerator {
 	 * @param cleanup
 	 * @return
 	 */
-	private String cleanUpWorkaroundClass(JavaClassSource adapterClass, boolean cleanup) {
+	public static String cleanUpWorkaroundClass(JavaClassSource adapterClass, boolean cleanup) {
 		String profileInterfaceValue = null;
 		if(cleanup) {
 			List<Import> imports = adapterClass.getImports();

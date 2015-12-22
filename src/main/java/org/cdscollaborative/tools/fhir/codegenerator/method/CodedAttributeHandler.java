@@ -3,13 +3,18 @@ package org.cdscollaborative.tools.fhir.codegenerator.method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.cdscollaborative.model.meta.Method;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
+import org.cdscollaborative.tools.fhir.utils.PathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 
@@ -166,8 +171,19 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 		if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt.class.getName()) 
 				&& getElement().getBinding() != null 
 				&& !isMultipleCardinality()) {
-			//Binding binding = getElement().getBinding();
-			String bindingName = getParentClass() + getElement().getName();//TODO may be Condition[c]ategoryCodesEnum - check case
+			Binding binding = getElement().getBinding();
+			String bindingName = null;
+			if(binding != null && binding.getValueSet() != null) {
+				IDatatype vs = binding.getValueSet();
+				if(vs instanceof ResourceReferenceDt) {
+					String valueSetUri = ((ResourceReferenceDt) vs).getReference().getValueAsString();
+					bindingName = PathUtils.getEnumNameFromValueSetBindingUri(valueSetUri);
+				}
+			}
+			if(bindingName == null) {
+				bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());
+			}
+			//bindingName = getParentClass() + getElement().getName();//TODO may be Condition[c]ategoryCodesEnum - check case
 			String enumClassName1 = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "Enum";
 			String enumClassName2 = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "CodesEnum";
 			if(classExists(enumClassName1)) {

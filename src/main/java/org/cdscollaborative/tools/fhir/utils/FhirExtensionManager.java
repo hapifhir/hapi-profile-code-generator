@@ -63,6 +63,7 @@ public class FhirExtensionManager {
 	
 	public void loadExtensions() {
 		for(String location : profileRepositoryLocations) {
+			System.out.println("Processing profile directory: " + location);
 			File profileDirectory = new File(location);
 			File[] extensions = findExtensionDefinitionFiles(profileDirectory);
 			for(File extensionFile : extensions) {
@@ -111,15 +112,6 @@ public class FhirExtensionManager {
 		    }
 		});
 		return extensions;
-	}
-	
-	public static boolean isFhirExtension(ElementDefinitionDt element) {
-		boolean success = false;
-		Type type = element.getTypeFirstRep();
-		if(type != null && type.getCode() != null && type.getCode().equals("Extension")) {
-			success = true;
-		}
-		return success;
 	}
 
 }

@@ -110,7 +110,7 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 		
 	}
 	
-	private ClassField buildUriField(String name, String extensionDefUri) {
+	private ClassField buildUriField(String name, String extensionDefUri) {//TODO Find a home for this. Also used in GenerateLogicalView
 		return ClassField.buildStaticConstant(name, java.lang.String.class.getCanonicalName(), "\"" + extensionDefUri + "\"");
 	}
 	

@@ -16,4 +16,8 @@ public class MethodParameter {
 	public String getValue() {
 		return value;
 	}
+	
+	public String toString() {
+		return "Parameter: " + name + " = " + value;
+	}
 }

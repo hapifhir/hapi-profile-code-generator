@@ -1,0 +1,1 @@
+getListAndCastToExtendedTypeList(className, propertyName, castTo) ::= "return (List\<<castTo>>)(List\<?>)<className>.get<propertyName>();"

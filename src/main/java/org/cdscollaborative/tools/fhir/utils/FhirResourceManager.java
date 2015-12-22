@@ -2,6 +2,8 @@ package org.cdscollaborative.tools.fhir.utils;
 
 import java.io.File;
 import java.io.Reader;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,18 +45,26 @@ public class FhirResourceManager {
 	private Map<String,String> primitiveMap;
 	private FhirContext ctx;
 	private FhirExtensionManager extensionManager;
-	private Map<String, String> profileUriToResourceMap;
+	private Map<String, String> profileUriToResourceNameMap;
+	private Map<String, StructureDefinition> profileUriToProfileMap;
 	private Map<String, String> profileNameToBaseResourceNameMap;
+	private List<String> generatedType;
 	
 	public FhirResourceManager() {
 		super();
 		resourceNameToClassMap = new HashMap<String,Class<?>>();
 		profileNameToProfileMap = new HashMap<String,StructureDefinition>();
-		profileUriToResourceMap = new HashMap<String, String>();
+		profileUriToResourceNameMap = new HashMap<String, String>();
+		profileUriToProfileMap = new HashMap<String, StructureDefinition>();
 		profileNameToBaseResourceNameMap = new HashMap<String, String>();
+		generatedType = new ArrayList<String>();
 		loadProfileUriToResourceMap();
 		populatePrimitiveMap();
 		ctx = FhirContext.forDstu2();
+	}
+	
+	public StructureDefinition getProfileFromProfileUri(String uri) {
+		return profileUriToProfileMap.get(uri);
 	}
 	
 	/**
@@ -68,6 +78,14 @@ public class FhirResourceManager {
 	
 	public Class<?> getClassNameForResource(String profileName) {
 		return resourceNameToClassMap.get(profileName);
+	}
+	
+	public void addGeneratedType(String classPath) {
+		generatedType.add(classPath);
+	}
+	
+	public boolean generatedTypeExists(String generatedType) {
+		return generatedType.contains(generatedType);
 	}
 
 	/**
@@ -169,6 +187,7 @@ public class FhirResourceManager {
 
 	protected void populateProfileMaps(StructureDefinition profile) {
 		profileNameToProfileMap.put(profile.getName(),profile);
+		profileUriToProfileMap.put(profile.getUrl(), profile);
 		populateProfileToBaseResourceMap(profile);
 	}
 
@@ -226,7 +245,7 @@ public class FhirResourceManager {
 			if(resource != null && ctx.getResourceDefinition(resource) != null) {
 				clazz = ctx.getResourceDefinition(resource).getImplementingClass();
 			} else {
-				LOGGER.error("No implementing class found for " + resourceName,e);
+				LOGGER.info("No implementing class found for " + resourceName,e);
 			}
 		}
 		if(clazz != null && !resourceNameToClassMap.containsKey(resourceName)) {
@@ -265,7 +284,10 @@ public class FhirResourceManager {
 	 */
 	public String getFullyQualifiedJavaType(String type) {
 		String typeClass = primitiveMap.get(type);
-		if(type.equals("DomainResource")) {//TODO Figure how to handle this
+		if(typeClass == null && generatedTypeExists(type)) {
+			typeClass = type;
+		}
+		if(typeClass == null && type.equals("DomainResource")) {//TODO Figure how to handle this
 			typeClass = "ca.uhn.fhir.model.dstu2.resource.BaseResource";
 		}
 		if(typeClass != null) {
@@ -293,6 +315,7 @@ public class FhirResourceManager {
 		primitiveMap.put("base64", ca.uhn.fhir.model.primitive.Base64BinaryDt.class.getName());
 		primitiveMap.put("boolean", ca.uhn.fhir.model.primitive.BooleanDt.class.getName());
 		primitiveMap.put("integer", ca.uhn.fhir.model.primitive.IntegerDt.class.getName());
+		primitiveMap.put("positiveInt", ca.uhn.fhir.model.primitive.PositiveIntDt.class.getName());
 		primitiveMap.put("code", ca.uhn.fhir.model.primitive.CodeDt.class.getName());
 		primitiveMap.put("date", ca.uhn.fhir.model.primitive.DateDt.class.getName());
 		primitiveMap.put("dateTime", ca.uhn.fhir.model.primitive.DateTimeDt.class.getName());
@@ -348,6 +371,7 @@ public class FhirResourceManager {
 		primitiveMap.put("Procedure.Performer", ca.uhn.fhir.model.dstu2.resource.Procedure.Performer.class.getName());
 		primitiveMap.put("Observation.ReferenceRange", ca.uhn.fhir.model.dstu2.resource.Observation.ReferenceRange.class.getName());
 		primitiveMap.put("Observation.Related", ca.uhn.fhir.model.dstu2.resource.Observation.Related.class.getName());
+		primitiveMap.put("Organization.Contact", ca.uhn.fhir.model.dstu2.resource.Organization.Contact.class.getName());
 		primitiveMap.put("Medication.ProductIngredient", ca.uhn.fhir.model.dstu2.resource.Medication.ProductIngredient.class.getName());
 		primitiveMap.put("Medication.ProductBatch", ca.uhn.fhir.model.dstu2.resource.Medication.ProductBatch.class.getName());
 		primitiveMap.put("Medication.Package", ca.uhn.fhir.model.dstu2.resource.Medication.Package.class.getName());
@@ -430,15 +454,15 @@ public class FhirResourceManager {
 	
 	//TODO Temporary hack for now
 	public void loadProfileUriToResourceMap() {
-		profileUriToResourceMap.put("http://hl7.org/fhir/StructureDefinition/Patient", "Patient");
-		profileUriToResourceMap.put("http://hl7.org/fhir/StructureDefinition/Observation", "Observation");
-		profileUriToResourceMap.put("http://hl7.org/fhir/StructureDefinition/Condition", "Condition");
-		profileUriToResourceMap.put("http://hl7.org/fhir/StructureDefinition/Encounter", "Encounter");
-		profileUriToResourceMap.put("http://hl7.org/fhir/StructureDefinition/Specimen", "Specimen");
+		profileUriToResourceNameMap.put("http://hl7.org/fhir/StructureDefinition/Patient", "Patient");
+		profileUriToResourceNameMap.put("http://hl7.org/fhir/StructureDefinition/Observation", "Observation");
+		profileUriToResourceNameMap.put("http://hl7.org/fhir/StructureDefinition/Condition", "Condition");
+		profileUriToResourceNameMap.put("http://hl7.org/fhir/StructureDefinition/Encounter", "Encounter");
+		profileUriToResourceNameMap.put("http://hl7.org/fhir/StructureDefinition/Specimen", "Specimen");
 	}
 	
 	public String getResource(String profileUri) {
-		return profileUriToResourceMap.get(profileUri);
+		return profileUriToResourceNameMap.get(profileUri);
 	}
 	
 	/**
@@ -547,6 +571,45 @@ public class FhirResourceManager {
 	}
 	
 	/**
+	 * Method takes an ordered list of path components and returns the type of the
+	 * last non-extension item on the path.For instance, if the path is Patient.contact.telecom.extension, 
+	 * the input to this method will be the list {Patient, contact, telecom, extension} and
+	 * this method will return the return type for Patient.getContact().getTelecom(). If the item has 
+	 * multiple cardinality and thus a List<T> is returned instead of the type 'T' directly, 
+	 * the type of 'T' will be returned instead.
+	 * 
+	 * @param canonicalPath
+	 * @return
+	 */
+	
+	public String getLeafLevelItemType(List<String> canonicalPath) {
+		String resourceName = canonicalPath.get(0);
+		Class<?> lastClass = ctx.getResourceDefinition(resourceName).getImplementingClass();
+		String methodType = null;
+		for(int index = 1; index < canonicalPath.size(); index++) {
+			if(canonicalPath.get(index).equals("extension")) {
+				break;
+			} else {
+				try {
+					String methodName = "get" + StringUtils.capitalize(canonicalPath.get(index));
+					Method method = lastClass.getDeclaredMethod(methodName);
+					lastClass = method.getReturnType();
+					methodType = method.getReturnType().getName();
+					if(lastClass.getName().equals("java.util.List")) {
+						methodType  = ((ParameterizedType)method.getGenericReturnType()).getActualTypeArguments()[0].getTypeName();
+						lastClass = Class.forName(methodType);
+					}
+					System.out.println(methodType);
+				} catch(Exception e) {
+					e.printStackTrace();
+					throw new RuntimeException("Invalid path: " + canonicalPath);
+				}
+			}
+		}
+		return methodType;
+	}
+	
+	/**
 	 * Method performs a shallow clone of the element and, when multi-type,
 	 * replaces the type collection with a collection of a single type.
 	 * 
@@ -597,7 +660,9 @@ public class FhirResourceManager {
 		clonedElement.setName(element.getNameElement());
 		clonedElement.setNameReference(element.getNameReferenceElement());
 		clonedElement.setPath(element.getPathElement());
-		clonedElement.setType(element.getType());
+		List<Type> clonedTypes = new ArrayList<Type>();//Should do for all lists
+		clonedTypes.addAll(element.getType());
+		clonedElement.setType(clonedTypes);
 		clonedElement.setMin(element.getMinElement());
 		clonedElement.setMax(element.getMaxElement());
 		clonedElement.setBinding(element.getBinding());
