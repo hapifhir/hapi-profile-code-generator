@@ -42,3 +42,7 @@ limitations under the License.
 
 * Repo owner or admin
 * Other community or team contact
+* 
+### What's next ###
+
+* Handle multitype attributes such as Goal Detail
