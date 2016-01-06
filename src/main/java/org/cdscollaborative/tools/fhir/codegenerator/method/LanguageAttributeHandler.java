@@ -67,8 +67,7 @@ public class LanguageAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		String typeString = type.getCode();
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
 	}
 	
 	/**

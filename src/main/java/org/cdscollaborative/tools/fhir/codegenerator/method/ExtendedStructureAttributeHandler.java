@@ -6,6 +6,7 @@ import java.util.List;
 import org.cdscollaborative.model.meta.Method;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
+import org.cdscollaborative.tools.fhir.utils.PathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,8 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 public class ExtendedStructureAttributeHandler extends BaseExtensionMethodHandler {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(ExtendedStructureAttributeHandler.class);
+	
+	private boolean unsupported = false;
 	
 	public ExtendedStructureAttributeHandler(FhirResourceManager manager, CodeTemplateUtils template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
@@ -64,6 +67,9 @@ public class ExtendedStructureAttributeHandler extends BaseExtensionMethodHandle
 	public List<Method> buildCorrespondingMethods() {
 		try {
 			List<Method> methods = new ArrayList<Method>();
+			if(getExtendedElement().getType().get(0).getCode() != null && getExtendedElement().getType().get(0).getCode().equals("unsupported")) {//TODO add support for multi-typed attributes
+				unsupported = true;
+			}
 			if(!appliesTo(getProfile(), getElement()) || ignoreField() || isSkipProcessing()) {
 				return methods;
 			} else {
@@ -108,9 +114,14 @@ public class ExtendedStructureAttributeHandler extends BaseExtensionMethodHandle
 	 * @param accessors
 	 */
 	protected void handleSingleCardinality(List<Method> accessors) {
-		String attributeName = getElement().getName().split("\\.")[1];
-		accessors.add(constructGetMethodFromField(attributeName, getFullyQualifiedType()).setBody(buildExtendedTypeGetterBody(getFullyQualifiedType(), getExtensionUri())));
-		accessors.add(constructSetMethodFromField(attributeName, getFullyQualifiedType()).setBody(buildExtendedTypeSetterBody(getExtensionUri())));
+		String attributeName = PathUtils.getLastPathComponent(getElement().getName());
+		if(!unsupported) {
+			accessors.add(constructGetMethodFromField(attributeName, getFullyQualifiedType()).setBody(buildExtendedTypeGetterBody(getFullyQualifiedType(), getExtensionUri())));
+			accessors.add(constructSetMethodFromField(attributeName, getFullyQualifiedType()).setBody(buildExtendedTypeSetterBody(getExtensionUri())));
+		} else {
+			accessors.add(constructGetMethodFromField(attributeName, getFullyQualifiedType()).setBody(buildUnsupportedGetter()));
+			accessors.add(constructSetMethodFromField(attributeName, getFullyQualifiedType()).setBody(buildUnsupportedSetter()));
+		}
 	}
 	
 	/**
@@ -135,6 +146,7 @@ public class ExtendedStructureAttributeHandler extends BaseExtensionMethodHandle
 	 */
 	protected void handleMultipleCardinality(List<Method> accessors) {
 		//TODO Not implemented yet
+		throw new UnsupportedOperationException("Operation is currently unsupported for multiple cardinality element " + getExtendedElement().getName());
 	}
 	
 	/**

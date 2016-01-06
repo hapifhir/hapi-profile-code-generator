@@ -121,4 +121,19 @@ public class MethodHandlerResolver {
 		}
 		return handler;
 	}
+	
+	/**
+	 * Creates and initializes a new handler
+	 * 
+	 * @param profile
+	 * @param element
+	 * @param generatedCodePackage
+	 * @return
+	 */
+	public UserDefinedExtensionTypeHandler buildUserDefinedExtensionTypeHandler(StructureDefinition profile, ElementDefinitionDt element, String generatedCodePackage) {
+		UserDefinedExtensionTypeHandler handler = new UserDefinedExtensionTypeHandler(fhirResourceManager, codeTemplateUtils, profile, element);
+		handler.setGeneratedCodePackage(generatedCodePackage);
+		handler.initialize();
+		return handler;
+	}
 }

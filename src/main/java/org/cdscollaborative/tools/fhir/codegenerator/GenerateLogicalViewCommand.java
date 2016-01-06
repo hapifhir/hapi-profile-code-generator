@@ -16,9 +16,13 @@ import org.cdscollaborative.tools.fhir.codegenerator.method.ExtendedStructureAtt
 import org.cdscollaborative.tools.fhir.codegenerator.method.IMethodHandler;
 import org.cdscollaborative.tools.fhir.codegenerator.method.MethodHandlerResolver;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
+import org.cdscollaborative.tools.fhir.utils.PathUtils;
 import org.cdscollaborative.tools.fhir.utils.ProfileWalker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 
@@ -30,6 +34,8 @@ import ca.uhn.fhir.model.primitive.UriDt;
  *
  */
 public class GenerateLogicalViewCommand implements CommandInterface<ElementDefinitionDt> {
+	
+	public static final Logger LOGGER = LoggerFactory.getLogger(FhirResourceManager.class);
 	
 	private MethodHandlerResolver resolver;
 	private FhirResourceManager fhirResourceManager;
@@ -59,11 +65,18 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	
 	@Override
 	public void execute(Node<ElementDefinitionDt> node) {
-		boolean found = node.getPayload().getPath() != null && node.getPayload().getPath().equalsIgnoreCase("Organization.contact");
-		if(found) {
-			System.out.println("Found!");
+		boolean found = false;
+		if(node.getPayload() != null) {
+			found = node.getPayload().getName() != null && (node.getPayload().getName().contains("isActiveIngredient"));
 		}
-		handleNode(node);
+		if(found) {
+			LOGGER.debug("Found!");
+		}
+		try {
+			handleNode(node);
+		} catch(Exception e) {
+			LOGGER.error("Error processing node: " + node.getPathFromRoot() + ". Skipping element " + node.getPayload().getPath(), e);
+		}
 	}
 	
 	/*************************
@@ -143,12 +156,17 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		}
 	}
 	
+	/**
+	 * Method handles 'user defined extension types elements'. That is, extensions that contain themselves extensions.
+	 * An example of such node might be a nationality UDT extension on Patient which contains a 'code' attribute.
+	 * 
+	 * @param node
+	 */
 	public void handleInnerNonRootExtensionNode(Node<ElementDefinitionDt> node) {
 		buildExtendedParentClass(node);
 		ElementDefinitionDt clone = FhirResourceManager.shallowCloneElement(node.getPayload());
-		//clone.getType().clear();
 		clone.addType().setCode(generatedCodePackage + "." + CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName());
-		List<Method> methods = handleStructureDefinitionElement(clone, false);
+		List<Method> methods = handleUserDefinedExtensionType(clone, false);
 		ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 		rootClass.getMethods().addAll(methods);
 	}
@@ -170,10 +188,12 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 */
 	public void handleExtensionLeafNode(Node<ElementDefinitionDt> node) {
 		if(ProfileWalker.isFhirExtension(node.getParent().getPayload())) { // A leaf extension on an extension ...
+			if(node.getPayload().getTypeFirstRep().getProfileFirstRep().getValueAsString() == null) { // FHIR profiles are all over the place on this. Sometimes a profile is given with an anchor. At other times, nothing is provided and you have to figure this out. Yuck!
+				node.getPayload().getTypeFirstRep().getProfileFirstRep().setValue(node.getParent().getPayload().getTypeFirstRep().getProfileFirstRep().getValueAsString() + "#" + PathUtils.getLastPathComponent(node.getPayload().getName()));
+			}
 			ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 			//String parentClassName = StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getParent().getName()));
-			String type = node.getPayload().getTypeFirstRep().getCode();
-			type = fhirResourceManager.getFullyQualifiedJavaType(type);
+			String type = fhirResourceManager.getFullyQualifiedJavaType(node.getPayload().getTypeFirstRep());
 			ExtendedStructureAttributeHandler handler = new ExtendedStructureAttributeHandler(fhirResourceManager, templateUtils, profile, node.getPayload());
 			handler.initialize();
 			List<Method> methods = handler.buildCorrespondingMethods();//FhirMethodGenerator.generateAccessorMethodsForExtendedTypes(profile, node.getPayload(), parentClassName, fhirResourceManager, extensionDefUri);
@@ -189,7 +209,16 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 				parentClass.getMethods().addAll(extensionMethods);
 				if(parentClass.getSupertypes() == null || parentClass.getSupertypes().size() == 0) {
 					parentClass.addImport("java.util.List"); 
-					parentClass.addSupertype(fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep().getCode()));
+					String supertype = fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
+					if(supertype.equals("BackboneElement")) {
+						String code = node.getParent().getParent().getName() + "." + node.getParent().getName();
+						Type type = new Type();
+						type.setCode(code);
+						supertype = fhirResourceManager.getFullyQualifiedJavaType(type);
+						System.out.println("Supertype: " + supertype);
+					}
+					parentClass.addImport("ca.uhn.fhir.model.dstu2.resource.*");//Why not just import 'supertype'?
+					parentClass.addSupertype(supertype);
 				}
 			}
 		}
@@ -207,9 +236,6 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		if(node.isLeaf() && isNotExtensionNode(node)) {
 			if(node.parentIsRoot()) { // A leaf element on root
 				UriDt profile = node.getPayload().getTypeFirstRep().getProfileFirstRep();
-				if(profile != null && profile.getValueAsString() != null && profile.getValueAsString().equals("http://hl7.org/fhir/StructureDefinition/organization-qicore-qicore-organization")) {
-					System.out.println(node.getPayload().getTypeFirstRep().getProfileFirstRep());
-				}
 				List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false);
 				ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 				rootClass.getMethods().addAll(methods);
@@ -225,10 +251,8 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 * @param node
 	 */
 	public void handleInnerL1Node(Node<ElementDefinitionDt> node) {
-		System.out.println("---> " + node.getPathFromRoot());
 		ClassModel currentClass = retrieveClassModel(node, node.getName());
 		if(currentClass != null && currentClass.getSupertypes() != null && currentClass.getSupertypes().size() > 0) {
-			System.out.println("------> Need to add getter and setter for new extended type " + currentClass.getNamespace() + "." + currentClass.getName());
 			//Clone the payload
 			ElementDefinitionDt clone = FhirResourceManager.shallowCloneElement(node.getPayload());
 			//Set new type
@@ -238,7 +262,14 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			//Rest is the same
 			ExtendedBackboneElementHandler handler = new ExtendedBackboneElementHandler(fhirResourceManager, templateUtils, profile, clone);
 			handler.initialize();
-			handler.setExtendedSupertype(node.getPayload().getTypeFirstRep().getCode());
+			String supertype = node.getPayload().getTypeFirstRep().getCode();
+			if(supertype != null && supertype.equals("BackboneElement")) {
+				Type type = new Type();
+				type.setCode(handler.getBackboneElementName());
+				handler.setExtendedSupertype(type);
+			} else {
+				handler.setExtendedSupertype(node.getPayload().getTypeFirstRep());
+			}
 			List<Method> methods = handler.buildCorrespondingMethods();
 			ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 			rootClass.getMethods().addAll(methods);
@@ -304,13 +335,21 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 * Helper Methods
 	 *************************/
 	
+	public List<Method> handleUserDefinedExtensionType(ElementDefinitionDt element, boolean addExtensionsToThis) {
+		IMethodHandler handler = resolver.buildUserDefinedExtensionTypeHandler(profile, element, generatedCodePackage);
+		return handler.buildCorrespondingMethods();
+	}
+	
 	public List<Method> handleStructureDefinitionElement(ElementDefinitionDt element, boolean addExtensionsToThis) {
 		List<Method> methodDefinitions = new ArrayList<>();
 		IMethodHandler handler = resolver.identifyHandler(profile, element, generatedCodePackage);
 		if(handler != null) {
 			handler.setGeneratedCodePackage(generatedCodePackage);
-			if(handler instanceof ExtendedAttributeHandler) {//TODO Don't resolve. Just make it so.
+			if(handler instanceof ExtendedAttributeHandler) {//TODO Fix this ugliness
 				((ExtendedAttributeHandler)handler).setAddExtensionsToThis(addExtensionsToThis);
+				if(addExtensionsToThis) {
+					((ExtendedAttributeHandler)handler).setExtendedStructure(true);
+				}
 			}
 			methodDefinitions.addAll(handler.buildCorrespondingMethods());
 		}
@@ -318,7 +357,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	}
 	
 	public void buildExtendedParentClass(Node<ElementDefinitionDt> node) {
-		System.out.println("Create a class for: " + node.getName());
+		LOGGER.info("Creating a new class for: " + node.getName());
 		String extensionDefUri = node.getPayload().getTypeFirstRep().getProfileFirstRep().getValueAsString();
 		ClassModel classModel = retrieveClassModel(node, node.getName());//StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getName())));
 		classModel.setNamespace(generatedCodePackage);

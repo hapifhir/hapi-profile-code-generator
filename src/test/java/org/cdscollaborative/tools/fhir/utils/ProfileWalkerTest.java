@@ -46,53 +46,53 @@ public class ProfileWalkerTest {
 	public void tearDown() throws Exception {
 	}
 
-	@Test
-	public void testProfileWalkerIndexing() {
-		try {
-			
-			//A profile should be set
-			assertNotNull(profileWalker.getProfile());
-			
-			//Each element must be retrievable and index key must be unique
-			List<ElementDefinitionDt> elements = profileWalker.getProfile().getSnapshot().getElement();
-			for(ElementDefinitionDt element: elements) {
-				if(!ProfileWalker.isRootElement(element) && !ProfileWalker.isProfileMetaElement(profileWalker.getRootElement().getPath(), element)) {
-					assertNotNull(profileWalker.getFromElementIndex(ProfileWalker.generateElementSignature(element)));
-				}
-			}
-			
-			//There should be four meta elements in this StructureDefinition
-			System.out.println(profileWalker.getMetaElementIndex());
-			assertEquals(profileWalker.getMetaElementIndex().size(), 15);
-			
-			//There should be a root element in this profile and it is 'Patient'
-			assertNotNull(profileWalker.getRootElement());
-			assertEquals(profileWalker.getRootElement().getPath(), "Patient");
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-			fail();
-		}
-	}
+//	@Test
+//	public void testProfileWalkerIndexing() {
+//		try {
+//			
+//			//A profile should be set
+//			assertNotNull(profileWalker.getProfile());
+//			
+//			//Each element must be retrievable and index key must be unique
+//			List<ElementDefinitionDt> elements = profileWalker.getProfile().getSnapshot().getElement();
+//			for(ElementDefinitionDt element: elements) {
+//				if(!ProfileWalker.isRootElement(element) && !ProfileWalker.isProfileMetaElement(profileWalker.getRootElement().getPath(), element)) {
+//					assertNotNull(profileWalker.getFromElementIndex(ProfileWalker.generateElementSignature(element)));
+//				}
+//			}
+//			
+//			//There should be four meta elements in this StructureDefinition
+//			System.out.println(profileWalker.getMetaElementIndex());
+//			assertEquals(profileWalker.getMetaElementIndex().size(), 15);
+//			
+//			//There should be a root element in this profile and it is 'Patient'
+//			assertNotNull(profileWalker.getRootElement());
+//			assertEquals(profileWalker.getRootElement().getPath(), "Patient");
+//			
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//			fail();
+//		}
+//	}
 	
-	@Test
-	public void testPathRewriting() {
-		String path = ProfileWalker.getModifiedExtensionPath("Patient.demographics.extension.extension", "nationality.code");
-		assertEquals(path, "Patient.demographics.nationality.code");
-		path = ProfileWalker.getModifiedExtensionPath("Patient.contact.extension","preferred");
-		assertEquals(path, "Patient.contact.preferred");
-	}
-	
-	@Test
-	public void testProfileWalkerCodeGeneration() {
-		Node<ElementDefinitionDt> root = profileWalker.getRoot();
-		StructureDefinition profile = profileWalker.getProfile();
-		GenerateLogicalViewCommand command = new GenerateLogicalViewCommand(profile, fhirResourceManager, templateUtils, resolver, "org.socraticgrid.fhir.generated");
-		root.executeCommandDepthFirstPost(command);
-		for(ClassModel model : command.getClassMap().values()) {
-			System.out.println("Printing class " + model.getName());
-			System.out.println(InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model), true));
-			//System.out.println(InterfaceAdapterGenerator.cleanUpWorkaroundInterface(CodeGenerationUtils.buildJavaInterface(model), true));
-		}
-	}
+//	@Test
+//	public void testPathRewriting() {
+//		String path = ProfileWalker.getModifiedExtensionPath("Patient.demographics.extension.extension", "nationality.code");
+//		assertEquals(path, "Patient.demographics.nationality.code");
+//		path = ProfileWalker.getModifiedExtensionPath("Patient.contact.extension","preferred");
+//		assertEquals(path, "Patient.contact.preferred");
+//	}
+//	
+//	@Test
+//	public void testProfileWalkerCodeGeneration() {
+//		Node<ElementDefinitionDt> root = profileWalker.getRoot();
+//		StructureDefinition profile = profileWalker.getProfile();
+//		GenerateLogicalViewCommand command = new GenerateLogicalViewCommand(profile, fhirResourceManager, templateUtils, resolver, "org.socraticgrid.fhir.generated");
+//		root.executeCommandDepthFirstPost(command);
+//		for(ClassModel model : command.getClassMap().values()) {
+//			System.out.println("Printing class " + model.getName());
+//			System.out.println(InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model), true));
+//			//System.out.println(InterfaceAdapterGenerator.cleanUpWorkaroundInterface(CodeGenerationUtils.buildJavaInterface(model), true));
+//		}
+//	}
 }

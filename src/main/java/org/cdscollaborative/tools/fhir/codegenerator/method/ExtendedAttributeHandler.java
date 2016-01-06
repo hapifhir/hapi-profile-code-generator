@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.cdscollaborative.model.meta.Method;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
-import org.cdscollaborative.tools.fhir.model.FhirExtension;
+import org.cdscollaborative.tools.fhir.model.FhirExtensionDefinition;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
 import org.cdscollaborative.tools.fhir.utils.PathUtils;
 import org.slf4j.Logger;
@@ -147,12 +147,16 @@ public class ExtendedAttributeHandler extends BaseExtensionMethodHandler {
 	 * @param accessors
 	 */
 	protected void handleMultipleCardinality(List<Method> accessors) {
+		String callee = "adaptedClass";
+		if(addExtensionsToThis) {
+			callee = "this";
+		}
 		if(isExtendedStructure()) {
-			accessors.add(constructGetMethodForMultiCardinalityField(getExtendedElement().getName(),getFullyQualifiedType()).setBody(buildExtendedStructureListGetterBody(getFullyQualifiedType(), getExtensionUri())));
-			accessors.add(constructSetMethodForMultiCardinalityField(getExtendedElement().getName(),getFullyQualifiedType()).setBody(buildExtendedStructureListSetterBody()));
+			accessors.add(constructGetMethodForMultiCardinalityField(getExtendedElement().getName(),getFullyQualifiedType()).setBody(buildExtendedStructureListGetterBody(callee, getFullyQualifiedType(), getExtensionUri())));
+			accessors.add(constructSetMethodForMultiCardinalityField(getExtendedElement().getName(),getFullyQualifiedType()).setBody(buildExtendedStructureListSetterBody(callee, getExtensionUri())));
 		} else {
-			accessors.add(constructGetMethodForMultiCardinalityField(getExtendedElement().getName(),getFullyQualifiedType()).setBody(buildExtensionListGetterBody(getFullyQualifiedType(), getExtensionUri())));
-			accessors.add(constructSetMethodForMultiCardinalityField(getExtendedElement().getName(),getFullyQualifiedType()).setBody(buildExtensionListSetterBody(getFullyQualifiedType(), getExtensionUri())));
+			accessors.add(constructGetMethodForMultiCardinalityField(PathUtils.getLastPathComponent(getExtendedElement().getName()),getFullyQualifiedType()).setBody(buildExtensionListGetterBody(getFullyQualifiedType(), getExtensionUri())));
+			accessors.add(constructSetMethodForMultiCardinalityField(PathUtils.getLastPathComponent(getExtendedElement().getName()),getFullyQualifiedType()).setBody(buildExtensionListSetterBody(getFullyQualifiedType(), getExtensionUri())));
 		}
 	}
 	

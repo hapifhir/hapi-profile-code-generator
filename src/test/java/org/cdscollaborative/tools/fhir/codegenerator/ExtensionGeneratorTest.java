@@ -50,13 +50,13 @@ public class ExtensionGeneratorTest {
 				System.out.println(node.getName() + ": " + node.getChildren());
 				assertEquals(3, node.getChildren().size());
 			}
-			if(node.hasChildren()) {
-				ClassModel classModel = command.getClassModels().get(node.getName());
-				JavaClassSource source = CodeGenerationUtils.buildJavaClass(classModel);
-				CodeGenerationUtils.writeJavaClassFile("generated-source/java", "org.socraticgrid.fhir.generated", classModel.getName(), source.toString());
-				System.out.println(source);
-				
-			}
+//			if(node.hasChildren()) {
+//				ClassModel classModel = command.getClassModels().get(node.getName());
+//				JavaClassSource source = CodeGenerationUtils.buildJavaClass(classModel);
+//				CodeGenerationUtils.writeJavaClassFile("generated-source/java", "org.socraticgrid.fhir.generated", classModel.getName(), source.toString());
+//				System.out.println(source);
+//				
+//			}
 		}
 		assertEquals(3, complexExtensionCount);
 	}

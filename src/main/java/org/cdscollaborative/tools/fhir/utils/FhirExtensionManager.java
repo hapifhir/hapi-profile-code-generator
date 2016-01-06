@@ -1,23 +1,15 @@
 package org.cdscollaborative.tools.fhir.utils;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.cdscollaborative.tools.fhir.model.FhirExtension;
+import org.cdscollaborative.tools.fhir.model.FhirExtensionDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.parser.IParser;
 
 /**
  * Class manages FHIR extensions and acts like an in-memory FHIR extension registry.
@@ -30,12 +22,12 @@ public class FhirExtensionManager {
 	public static final Logger LOGGER = LoggerFactory.getLogger(FhirExtensionManager.class);
 	
 	private List<String> standardFhirNamespaces;
-	private Map<String, FhirExtension> extensionRegistry;
+	private Map<String, FhirExtensionDefinition> extensionRegistry;
 	private List<String> profileRepositoryLocations;
 
 	public FhirExtensionManager() {
 		standardFhirNamespaces = new ArrayList<String>();
-		extensionRegistry = new HashMap<String, FhirExtension>();
+		extensionRegistry = new HashMap<String, FhirExtensionDefinition>();
 		profileRepositoryLocations = new ArrayList<String>();
 	}
 	
@@ -63,14 +55,14 @@ public class FhirExtensionManager {
 	
 	public void loadExtensions() {
 		for(String location : profileRepositoryLocations) {
-			System.out.println("Processing profile directory: " + location);
+			LOGGER.info("Processing profile directory: " + location);
 			File profileDirectory = new File(location);
 			File[] extensions = findExtensionDefinitionFiles(profileDirectory);
 			for(File extensionFile : extensions) {
-				FhirExtension extensionDef = loadExtension(extensionFile);
+				FhirExtensionDefinition extensionDef = FhirExtensionDefinition.loadExtension(extensionFile);
 				if(extensionDef != null) {
-					LOGGER.info("Adding extension: " + extensionDef.getUri());//TODO Fill in later
-					extensionRegistry.put(extensionDef.getUri(), extensionDef);
+					LOGGER.info("Adding extension: " + extensionDef.getProfileUrl());//TODO Fill in later
+					extensionRegistry.put(extensionDef.getProfileUrl(), extensionDef);
 				}
 			}
 		}
@@ -84,27 +76,12 @@ public class FhirExtensionManager {
 		return extensionRegistry.containsKey(uri);
 	}
 	
-	public FhirExtension getFromRegistry(String uri) {
+	public FhirExtensionDefinition getFromRegistry(String uri) {
 		return extensionRegistry.get(uri);
 	}
 	
-	public FhirExtension loadExtension(File extensionFile) {
-		FhirExtension extension = null;
-		try(FileReader reader = new FileReader(extensionFile)) {
-			FhirContext context = FhirContext.forDstu2();
-			IParser parser = context.newXmlParser();
-			IResource resource = (IResource) parser.parseResource(reader);
-			if(resource instanceof StructureDefinition) {
-				extension = FhirExtension.populateFromStructureDefinition((StructureDefinition)resource);
-			}
-		} catch(Exception e) {
-			LOGGER.error("Error loading or parsing extension file", e);
-			throw new RuntimeException("Error loading or parsing extension file", e);
-		}
-		return extension;
-	}
-	
 	protected File[] findExtensionDefinitionFiles(File profileDirectory) {
+		LOGGER.debug("Profile directory processed: " + profileDirectory);
 		File [] extensions = profileDirectory.listFiles(new FilenameFilter() {
 		    @Override
 		    public boolean accept(File dir, String name) {

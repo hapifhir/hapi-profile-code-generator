@@ -166,6 +166,31 @@ public class CodeTemplateUtils {
 	}
 	
 	/**
+	 * Method delegating to the adapter's class setter.
+	 * 
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getUserDefinedExtensionTypeGetterBody(String type, String fieldUri) {
+		ST st = groupMain.getInstanceOf("userDefinedExtensionTypeGetterBody");
+		st.add("type", type);
+		st.add("fieldUri", fieldUri);
+		return st.render();
+	}
+	
+	/**
+	 * Method delegating to the adapter's class setter.
+	 * 
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getUserDefinedExtensionTypeSetterBody(String type) {
+		ST st = groupMain.getInstanceOf("userDefinedExtensionTypeSetterBody");
+		st.add("type", type);
+		return st.render();
+	}
+	
+	/**
 	 * Method delegating to the adapter's class getter.
 	 * 
 	 * @param propertyName - The name of the property
@@ -429,15 +454,30 @@ public class CodeTemplateUtils {
 		return st.render();
 	}
 	
-	public String getExtendedStructureListGetterBody(String type, String uri) {
+	public String getExtendedStructureListGetterBody(String callee, String type, String uri) {
 		ST st = groupMain.getInstanceOf("extendedStructureListGetterBody");
+		st.add("callee", callee);
 		st.add("type", type);
 		st.add("uri", uri);
 		return st.render();
 	}
 	
-	public String getExtendedStructureListSetterBody() {
+	public String getExtendedStructureListSetterBody(String callee, String uri) {
 		ST st = groupMain.getInstanceOf("extendedStructureListSetterBody");
+		st.add("callee", callee);
+		st.add("uri", uri);
+		return st.render();
+	}
+	
+
+	public String getUnsupportedGetter() {
+		ST st = groupMain.getInstanceOf("unsupportedGetter");
+		return st.render();
+	}
+	
+
+	public String getUnsupportedSetter() {
+		ST st = groupMain.getInstanceOf("unsupportedSetter");
 		return st.render();
 	}
 }

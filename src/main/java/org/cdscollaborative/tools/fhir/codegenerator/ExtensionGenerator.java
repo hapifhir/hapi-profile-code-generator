@@ -52,7 +52,6 @@ public class ExtensionGenerator {
 					} else {
 						Node<ElementDefinitionDt> root = extensionGraphs.get(StringUtils.capitalize(nameComponents[0]));
 						if(root == null) {
-							System.out.println(extensionGraphs);
 							LOGGER.error("Unknown root for path " + name);//TODO: Need to add logic for adding extensions on types.
 						} else {
 							root.addToPath(name, element);

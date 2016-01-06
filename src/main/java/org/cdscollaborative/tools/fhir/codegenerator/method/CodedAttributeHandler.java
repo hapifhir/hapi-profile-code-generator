@@ -162,13 +162,20 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		String typeString = type.getCode();
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
 		handleCodeableConcept();
 	}
 	
 	public void handleCodeableConcept() {
-		if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt.class.getName()) 
+		String override = getFhirResourceManager().getCodeableConceptOverride(getElement().getPath());
+		if(override != null) { //Enumerated type does not follow convention in naming
+			if(override.equals("ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt")) {
+				setFullyQualifiedType(override);
+			} else {
+				setFullyQualifiedType("ca.uhn.fhir.model.dstu2.composite.BoundCodeableConceptDt<" + override + ">");
+			}
+			imports.add(override);
+		} else if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt.class.getName()) 
 				&& getElement().getBinding() != null 
 				&& !isMultipleCardinality()) {
 			Binding binding = getElement().getBinding();

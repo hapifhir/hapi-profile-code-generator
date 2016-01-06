@@ -11,6 +11,7 @@ import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stringtemplate.v4.ST;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
@@ -98,6 +99,10 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 */
 	public void setFhirResourceManager(FhirResourceManager fhirResourceManager) {
 		this.fhirResourceManager = fhirResourceManager;
+	}
+	
+	public String getBackboneElementName() {
+		return getResourceName() + "." + StringUtils.capitalize(getTopLevelCoreAttribute());
 	}
 	
 	/**
@@ -267,7 +272,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 
 	/**
 	 * Initialization method that must be called after the object is
-	 * constructed. Initialize is responsible for populating the state
+	 * constructed. Initialize() is responsible for populating the state
 	 * of the handler based on the metadata supplied by the ElementDefinitionDt
 	 * instance. This metadata is used to guide the generation of method
 	 * definitions.
@@ -307,6 +312,9 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 			if(FhirResourceManager.isMultivaluedAttribute(suffix)) {
 				suffix = FhirResourceManager.cleanMultiValuedAttributeName(suffix);
 			}
+		}
+		if(suffix != null && suffix.equalsIgnoreCase("class")) {
+			suffix = suffix + "Element"; //Class is a reserved word in java.
 		}
 		topLevelCoreAttribute = suffix;
 	}
@@ -473,6 +481,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 		String listType = "List<" + type + ">";
 		Method method = Method.constructNoArgMethod(buildGetterName(fieldName), listType);
 		method.addImport("java.util.List");
+		method.addImport(type);
 		return method;
 	}
 	
@@ -717,11 +726,27 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 		return template.getExtendedTypeSetterBody(fieldUri);
 	}
 	
-	public String buildExtendedStructureListGetterBody(String type, String uri) {
-		return template.getExtendedStructureListGetterBody(type, uri);
+	public String buildExtendedStructureListGetterBody(String callee, String type, String uri) {
+		return template.getExtendedStructureListGetterBody(callee, type, uri);
 	}
 	
-	public String buildExtendedStructureListSetterBody() {
-		return template.getExtendedStructureListSetterBody();
+	public String buildExtendedStructureListSetterBody(String callee, String uri) {
+		return template.getExtendedStructureListSetterBody(callee, uri);
+	}
+	
+	public String buildUserDefinedExtensionTypeGetterBody(String fullyQualifiedType, String extensionUri) {
+		return template.getUserDefinedExtensionTypeGetterBody(fullyQualifiedType, extensionUri);
+	}
+	
+	public String buildUserDefinedExtensionTypeSetterBody(String fullyQualifiedType) {
+		return template.getUserDefinedExtensionTypeSetterBody(fullyQualifiedType);
+	}
+	
+	public String buildUnsupportedGetter() {
+		return template.getUnsupportedGetter();
+	}
+
+	public String buildUnsupportedSetter() {
+		return template.getUnsupportedSetter();
 	}
 }

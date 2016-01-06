@@ -192,7 +192,11 @@ public class CodeGenerationUtils {
 			}
 			methodSource.setBody(methodDefinition.getBody());
 			for(MethodParameter argument : methodDefinition.getParameters()) {
-				methodSource.addParameter(argument.getValue(), argument.getName());
+				try {
+					methodSource.addParameter(argument.getValue(), argument.getName());
+				} catch(Exception e) {
+					LOGGER.error("Error adding method parameter " + argument.getName() + " on method " + methodDefinition.getName() + " to class " + classModel.getName(), e);
+				}
 			}
 		}
 		for(String importString : classModel.getImports()) {

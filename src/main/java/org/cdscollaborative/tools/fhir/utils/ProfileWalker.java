@@ -3,9 +3,9 @@ package org.cdscollaborative.tools.fhir.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.cdscollaborative.common.utils.graph.Node;
-import org.cdscollaborative.tools.fhir.codegenerator.method.MethodHandlerResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
@@ -13,16 +13,20 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 
 public class ProfileWalker {
 	
+	public static final Logger LOGGER = LoggerFactory.getLogger(ProfileWalker.class);
+	
 	private StructureDefinition profile;
 	private ElementDefinitionDt rootElement;
 	private Map<String, ElementDefinitionDt> elementIndex;
 	private Map<String, ElementDefinitionDt> metaElementIndex;
+	private Map<String, ElementDefinitionDt> valueReferenceElementIndex;
 	private Node<ElementDefinitionDt> root;
 	
 	public ProfileWalker(StructureDefinition profile) {
 		this.profile = profile;
 		this.elementIndex = new HashMap<String, ElementDefinitionDt>();
 		this.metaElementIndex = new HashMap<String, ElementDefinitionDt>();
+		this.valueReferenceElementIndex = new HashMap<String, ElementDefinitionDt>();
 	}
 	
 	/**
@@ -30,6 +34,8 @@ public class ProfileWalker {
 	 * graph.
 	 */
 	public void initialize() {
+		StructureDefinitionPreprocessor preprocessor = new StructureDefinitionPreprocessor(profile);
+		preprocessor.processElements();
 		populateElementIndices();
 		populateElementGraph();
 	}
@@ -45,12 +51,15 @@ public class ProfileWalker {
 		for(ElementDefinitionDt element : profile.getSnapshot().getElement()) {
 			if(isRootElement(element)) {
 				rootElement = element;
-			} else if(isProfileMetaElement(rootElement.getPath(), element)) {
+			} else if(StructureDefinitionPreprocessor.isProfileMetaElement(element)) {
 				addToMetaElementIndex(element);
+			} else if(isValueRefElement(element)) {
+				addToValueRefElementIndex(element);
 			} else {
 				addToElementIndex(element);
 			}
 		}
+		processValueRefElements();
 	}
 	
 	/**
@@ -62,9 +71,20 @@ public class ProfileWalker {
 		root = new Node<ElementDefinitionDt>(rootElement.getPath());
 		root.setPayload(rootElement);
 		for(ElementDefinitionDt element : elementIndex.values()) {
-			String path = getModifiedExtensionPath(element.getPath(), element.getName());
+			String path = PathUtils.generateExtensionPath(element.getPath(), element.getName());
+			LOGGER.debug(path);
+			if(path.contains("Patient.clinicalTrial")) {
+				System.out.println("Stop here");
+			}
 			root.addToPath(path, element);
 		}
+	}
+	
+	protected void processValueRefElements() {
+		//TODO Implement
+		//For each value ref, path = DiagnosticReport.locationPerformed.valueReference, name = DiagnosticReport.extension.valueReference
+		//  Get corresponding element name = DiagnosticReport.locationPerformed
+		//  Replace type.profile with valueRef's profile
 	}
 	
 	/**
@@ -96,8 +116,7 @@ public class ProfileWalker {
 	public void addToElementIndex(ElementDefinitionDt element) {
 		String key = generateElementSignature(element);
 		if(elementIndex.get(key) != null) {
-			//throw new RuntimeException("Key for element " + key + " already exists in index and is not unique");
-			System.out.println("Key for element " + key + " already exists in index and is not unique");
+			LOGGER.error("Key for element " + key + " already exists in index and is not unique");
 		}
 		elementIndex.put(key, element);
 	}
@@ -110,11 +129,15 @@ public class ProfileWalker {
 	 */
 	public void addToMetaElementIndex(ElementDefinitionDt element) {
 		String key = element.getPath();
-		if(isProfileMetaElement(getRootElement().getPath(), element)) {
+		if(StructureDefinitionPreprocessor.isProfileMetaElement(element)) {
 			metaElementIndex.put(key, element);
 		} else {
 			throw new RuntimeException(element.getPath() + " is not a meta element");
 		}
+	}
+	
+	public void addToValueRefElementIndex(ElementDefinitionDt element) {
+		valueReferenceElementIndex.put(generateElementSignature(element), element);
 	}
 	
 	/****************************************************
@@ -257,31 +280,14 @@ public class ProfileWalker {
 		return !path.contains(".");
 	}
 	
-	/**
-	 * Method will flag all StructureDefinition elements that are metadata definitions.
-	 * These includes:
-	 * <ul>
-	 * 	<li>Resource.extension.id
-	 *  <li>Resource.extension.extension
-	 *  <li>Resource.extension.url
-	 *  <li>Resource.extension.value[x]
-	 * </ul>
-	 * 
-	 * @param pathRoot
-	 * @param element
-	 * @return
-	 */
-	public static boolean isProfileMetaElement(String pathRoot, ElementDefinitionDt element) {
-		boolean isMeta = false;
+	public static boolean isValueRefElement(ElementDefinitionDt element) {
+		boolean valueRefElement = false;
 		String path = element.getPath();
-		isMeta = (path.indexOf(".extension") > 0 ||
-				 path.indexOf(".modifierExtension") > 0 ||
-				 path.indexOf(".extension.id") > 0 ||
-				 path.indexOf(".extension.extension") > 0 ||
-				 path.indexOf(".extension.url") > 0 ||
-				 path.indexOf(".extension.value[x]") > 0 ) &&
-				 element.getName() == null;
-		return isMeta;
+		if(path != null && path.endsWith("valueReference")) {
+			valueRefElement = true;
+			LOGGER.info("Processing ValueReference " + path);
+		}
+		return valueRefElement;
 	}
 	
 	/**
@@ -293,45 +299,5 @@ public class ProfileWalker {
 	public static String generateElementSignature(ElementDefinitionDt element) {
 		String pathAndName = element.getPath() + ": " + element.getName();
 		return pathAndName;
-	}
-	
-	/**
-	 * Method replaces the 'extension' string in a path with the actual name of
-	 * the extension. For instance, if the name of Patient.extension is race, the
-	 * returned path will be Patient.race.
-	 * <p>
-	 * When extending a type or backbone element in FHIR, the type or backbone element
-	 * appears in the name: E.g., Patient.telecom.extension may have the name 'telecom.
-	 * preferred'. In this case, the path will not duplicate telecom but will be:
-	 * <p>
-	 * <code>
-	 * Patient.telecom.preferred
-	 *</code>
-	 *rather than
-	 * <code>
-	 * Patient.telecom.telecom.preferred
-	 *</code>
-	 *</p>
-	 * 
-	 * 
-	 * @param path
-	 * @param name
-	 * @return
-	 */
-	public static String getModifiedExtensionPath(String path, String name) {
-		String newPath = path;
-		if(path.indexOf("extension") > 0 && name != null) {
-			newPath = path.substring(0, path.indexOf("extension"));
-			String prefix = null;
-			if(name.indexOf('.') > 0) {
-				prefix = name.substring(0,name.indexOf('.'));
-			}
-			if(StringUtils.isNotBlank(prefix) && newPath.endsWith(prefix + ".")) {
-				newPath += name.substring(name.indexOf('.') + 1);
-			} else {
-				newPath += name;
-			}
-		}
-		return newPath;
 	}
 }

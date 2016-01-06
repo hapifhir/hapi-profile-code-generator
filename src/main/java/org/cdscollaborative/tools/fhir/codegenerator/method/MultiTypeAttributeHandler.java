@@ -163,8 +163,7 @@ public class MultiTypeAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public String getFullyQualifiedType(Type type) {
-		String typeString = type.getCode();
-		return getFhirResourceManager().getFullyQualifiedJavaType(typeString);
+		return getFhirResourceManager().getFullyQualifiedJavaType(type);
 	}
 	
 	/**

@@ -187,7 +187,6 @@ public class InterfaceAdapterGenerator {
 			GenerateLogicalViewCommand command = new GenerateLogicalViewCommand(profile, fhirResourceManager, templateUtils, resolver, "org.socraticgrid.fhir.generated");
 			profileWalker.getRoot().executeCommandDepthFirstPost(command);
 			ClassModel rootModel = command.getClassMap().get(profileWalker.getRoot().getPathFromRoot());
-			System.out.println(rootModel.getName());
 			String resourceName = getUnderlyingFhirCoreResourceName(profile);
 			buildAdapter(rootModel, resourceName, generatedPackage + ".I" + javaSafeProfileName);
 			generateAdapteeGetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
@@ -239,37 +238,37 @@ public class InterfaceAdapterGenerator {
 //		return methodDefinitions;
 //	}
 	
-	public List<Method> generateMethodsFromFhirProfileDefinition(StructureDefinition profile) {
- 		List<Method> methodDefinitions = new ArrayList<Method>();
-		generateExtendedTypes(profile);
-		List<ElementDefinitionDt> elements = profile.getSnapshot().getElement();
-		for(ElementDefinitionDt element: elements) {
-			if(skipProcessing(element)) {
-				continue;
-			}
-			handleElement(profile, methodDefinitions, element);
-		}
-		return methodDefinitions;
-	}
+//	public List<Method> generateMethodsFromFhirProfileDefinition(StructureDefinition profile) {
+// 		List<Method> methodDefinitions = new ArrayList<Method>();
+//		generateExtendedTypes(profile);
+//		List<ElementDefinitionDt> elements = profile.getSnapshot().getElement();
+//		for(ElementDefinitionDt element: elements) {
+//			if(skipProcessing(element)) {
+//				continue;
+//			}
+//			handleElement(profile, methodDefinitions, element);
+//		}
+//		return methodDefinitions;
+//	}
 	
-	public void generateExtendedTypes(StructureDefinition profile) {
-		ExtensionGenerator generator = new ExtensionGenerator();
-		generator.processProfile(profile);
-		for(Node<ElementDefinitionDt> node: generator.getExtensionGraphs().values()) {
-			ElementCommand command = new ElementCommand(profile);
-			command.setTemplate(templateUtils);
-			command.setFhirResourceManager(fhirResourceManager);
-			node.executeCommandBreadthFirst(command);
-			if(node.hasChildren()) {
-				ClassModel classModel = command.getClassModels().get(node.getName());
-				JavaClassSource source = CodeGenerationUtils.buildJavaClass(classModel);
-				//TODO remove hard coding
-				CodeGenerationUtils.writeJavaClassFile("generated-source/java", "org.socraticgrid.fhir.generated", classModel.getName(), source.toString());
-				//System.out.println(source);
-				
-			}
-		}
-	}
+//	public void generateExtendedTypes(StructureDefinition profile) {
+//		ExtensionGenerator generator = new ExtensionGenerator();
+//		generator.processProfile(profile);
+//		for(Node<ElementDefinitionDt> node: generator.getExtensionGraphs().values()) {
+//			ElementCommand command = new ElementCommand(profile);
+//			command.setTemplate(templateUtils);
+//			command.setFhirResourceManager(fhirResourceManager);
+//			node.executeCommandBreadthFirst(command);
+//			if(node.hasChildren()) {
+//				ClassModel classModel = command.getClassModels().get(node.getName());
+//				JavaClassSource source = CodeGenerationUtils.buildJavaClass(classModel);
+//				//TODO remove hard coding
+//				CodeGenerationUtils.writeJavaClassFile("generated-source/java", "org.socraticgrid.fhir.generated", classModel.getName(), source.toString());
+//				//System.out.println(source);
+//				
+//			}
+//		}
+//	}
 	
 	/**
 	 * Method generates corresponding methods for element argument.
@@ -300,17 +299,17 @@ public class InterfaceAdapterGenerator {
 	 * @param profile
 	 * @return
 	 */
-	public InterfaceAdapterPair generateCodeFromFhirProfile(String safeProfileName, StructureDefinition profile, List<Method> methodDefinitions) {
-		String resourceName = getUnderlyingFhirCoreResourceName(profile);
-		generateAdapteeGetter(methodDefinitions, fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-		generateAdapteeSetter(methodDefinitions, fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-		String interfaceName = "I" + safeProfileName;
-		String className = safeProfileName + "Adapter";
-		JavaInterfaceSource interfaceSource = buildLogicalInterface(interfaceName, resourceName, methodDefinitions);
-		JavaClassSource classSource = buildAdapter(className, resourceName, methodDefinitions, generatedPackage + "." + interfaceName);
-		InterfaceAdapterPair implementation = new InterfaceAdapterPair(interfaceSource, classSource);
-		return implementation;
-	}
+//	public InterfaceAdapterPair generateCodeFromFhirProfile(String safeProfileName, StructureDefinition profile, List<Method> methodDefinitions) {
+//		String resourceName = getUnderlyingFhirCoreResourceName(profile);
+//		generateAdapteeGetter(methodDefinitions, fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+//		generateAdapteeSetter(methodDefinitions, fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+//		String interfaceName = "I" + safeProfileName;
+//		String className = safeProfileName + "Adapter";
+//		JavaInterfaceSource interfaceSource = buildLogicalInterface(interfaceName, resourceName, methodDefinitions);
+//		JavaClassSource classSource = buildAdapter(className, resourceName, methodDefinitions, generatedPackage + "." + interfaceName);
+//		InterfaceAdapterPair implementation = new InterfaceAdapterPair(interfaceSource, classSource);
+//		return implementation;
+//	}
 	
 	/**
 	 * Method returns the name of the profile and, if the name of the profile does not correspond to a core 
@@ -337,14 +336,14 @@ public class InterfaceAdapterGenerator {
 	 * @param methodDefinitions
 	 * @return
 	 */
-	public JavaInterfaceSource buildLogicalInterface(String interfaceName, String resourceName, List<Method> methodDefinitions) {
-		ClassModel classModel = new ClassModel(generatedPackage, interfaceName);
-		classModel.getMethods().addAll(methodDefinitions);
-		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
-		JavaInterfaceSource interfaceSource = CodeGenerationUtils.buildJavaInterface(classModel);
-		return interfaceSource;
-	}
+//	public JavaInterfaceSource buildLogicalInterface(String interfaceName, String resourceName, List<Method> methodDefinitions) {
+//		ClassModel classModel = new ClassModel(generatedPackage, interfaceName);
+//		classModel.getMethods().addAll(methodDefinitions);
+//		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+//		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
+//		JavaInterfaceSource interfaceSource = CodeGenerationUtils.buildJavaInterface(classModel);
+//		return interfaceSource;
+//	}
 	
 	/**
 	 * Method builds a Java Adapter for this profile (represented as a name and set of method definitions)
@@ -355,20 +354,20 @@ public class InterfaceAdapterGenerator {
 	 * @param interfaceSource
 	 * @return
 	 */
-	public JavaClassSource buildAdapter(String className, String resourceName, List<Method> methodDefinitions, String anInterface) {
-		ClassModel classModel = new ClassModel(generatedPackage, className);
-		classModel.addInterface(anInterface);
-		classModel.getMethods().addAll(methodDefinitions);
-		ClassField field = new ClassField("adaptedClass");
-		field.setType(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName());
-		field.addModifier(ModifierEnum.PRIVATE);
-		field.setInitializer("new " + fhirResourceManager.getResourceNameToClassMap().get(resourceName).getSimpleName() + "()");
-		classModel.addField(field);
-		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
-		JavaClassSource classSource = CodeGenerationUtils.buildJavaClass(classModel);
-		return classSource;
-	}
+//	public JavaClassSource buildAdapter(String className, String resourceName, List<Method> methodDefinitions, String anInterface) {
+//		ClassModel classModel = new ClassModel(generatedPackage, className);
+//		classModel.addInterface(anInterface);
+//		classModel.getMethods().addAll(methodDefinitions);
+//		ClassField field = new ClassField("adaptedClass");
+//		field.setType(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName());
+//		field.addModifier(ModifierEnum.PRIVATE);
+//		field.setInitializer("new " + fhirResourceManager.getResourceNameToClassMap().get(resourceName).getSimpleName() + "()");
+//		classModel.addField(field);
+//		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+//		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
+//		JavaClassSource classSource = CodeGenerationUtils.buildJavaClass(classModel);
+//		return classSource;
+//	}
 	
 	public void buildAdapter(ClassModel classModel, String resourceName, String interfaceName) {
 		classModel.addInterface(interfaceName);

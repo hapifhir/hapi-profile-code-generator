@@ -14,6 +14,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -27,6 +30,8 @@ import org.xml.sax.InputSource;
  *
  */
 public class XmlUtils {
+	
+	public static final Logger LOGGER = LoggerFactory.getLogger(XmlUtils.class);
 	
 	/**
 	 * Method returns a Document node from an input stream to a valid XML document resource.
@@ -79,7 +84,7 @@ public class XmlUtils {
 			 t.setOutputProperty(OutputKeys.INDENT, "yes");
 			 t.transform(new DOMSource(node), new StreamResult(sw));
 		} catch (TransformerException te) {
-		 System.out.println("nodeToString Transformer Exception");
+			throw new XmlParsingException("nodeToString Transformer Exception", te);
 		}
 		return sw.toString();
 	}

@@ -1,9 +1,12 @@
-extendedStructureListSetterBody() ::= <<
+extendedStructureListSetterBody(callee, uri) ::= <<
       if (param != null && param.size() \> 0)
       {
          for (int index = 0; index \< param.size(); index++)
          {
-            adaptedClass.addUndeclaredExtension(param.get(index).getRootObjectExtension());
+            ca.uhn.fhir.model.api.ExtensionDt extension = new ca.uhn.fhir.model.api.ExtensionDt();
+            extension.setUrl("<uri>");
+            extension.setValue(param.get(index));
+        	 <callee>.addUndeclaredExtension(extension);
          }
       }
 >>

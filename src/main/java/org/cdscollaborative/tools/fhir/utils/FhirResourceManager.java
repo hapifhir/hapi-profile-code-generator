@@ -13,7 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.cdscollaborative.common.utils.io.ResourceLoadingUtils;
 import org.cdscollaborative.tools.fhir.codegenerator.config.CodeGeneratorConfigurator;
-import org.cdscollaborative.tools.fhir.model.FhirExtension;
+import org.cdscollaborative.tools.fhir.model.FhirExtensionDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +48,8 @@ public class FhirResourceManager {
 	private Map<String, String> profileUriToResourceNameMap;
 	private Map<String, StructureDefinition> profileUriToProfileMap;
 	private Map<String, String> profileNameToBaseResourceNameMap;
+	private Map<String, String> codeableConceptEnumTypeOverride;
+	private Map<String, String> codeEnumTypeOverride;
 	private List<String> generatedType;
 	
 	public FhirResourceManager() {
@@ -57,9 +59,13 @@ public class FhirResourceManager {
 		profileUriToResourceNameMap = new HashMap<String, String>();
 		profileUriToProfileMap = new HashMap<String, StructureDefinition>();
 		profileNameToBaseResourceNameMap = new HashMap<String, String>();
+		codeableConceptEnumTypeOverride = new HashMap<String, String>();
+		codeEnumTypeOverride = new HashMap<String, String>();
 		generatedType = new ArrayList<String>();
 		loadProfileUriToResourceMap();
 		populatePrimitiveMap();
+		populateCodeableConceptEnumTypeOverrides();
+		populateCodeEnumTypeOverrides();
 		ctx = FhirContext.forDstu2();
 	}
 	
@@ -241,7 +247,6 @@ public class FhirResourceManager {
 		} catch(Exception e) {
 			LOGGER.info(resourceName + " not found! Trying base resource.");
 			String resource = profileNameToBaseResourceNameMap.get(resourceName);
-			System.out.println(resource);
 			if(resource != null && ctx.getResourceDefinition(resource) != null) {
 				clazz = ctx.getResourceDefinition(resource).getImplementingClass();
 			} else {
@@ -270,8 +275,24 @@ public class FhirResourceManager {
 		this.extensionManager = extensionManager;
 	}
 	
-	public FhirExtension getFhirExtension(String uri) {
+	public FhirExtensionDefinition getFhirExtension(String uri) {
 		return extensionManager.getFromRegistry(uri);
+	}
+	
+	/**
+	 * Method returns the fully qualified Java class name
+	 * for the type argument. If the type is not recognized,
+	 * an exception will be thrown.
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public String getFullyQualifiedJavaType(Type type) {
+		String profile = null;
+		if(type.getProfileFirstRep() != null) {
+			profile = type.getProfileFirstRep().getValueAsString();
+		}
+		return getFullyQualifiedJavaType(type.getCode(), profile); //TODO Handle multi-profiles later
 	}
 
 	/**
@@ -282,28 +303,53 @@ public class FhirResourceManager {
 	 * @param type
 	 * @return
 	 */
-	public String getFullyQualifiedJavaType(String type) {
-		String typeClass = primitiveMap.get(type);
-		if(typeClass == null && generatedTypeExists(type)) {
-			typeClass = type;
+	public String getFullyQualifiedJavaType(String typeCode, String typeProfile) {
+		String typeClass = primitiveMap.get(typeCode);
+		if(typeClass != null) {
+			typeClass = handlePrimitiveSpecializations(typeClass, typeProfile);
 		}
-		if(typeClass == null && type.equals("DomainResource")) {//TODO Figure how to handle this
+		if(typeClass == null && generatedTypeExists(typeCode)) {
+			typeClass = typeCode;
+		}
+		if(typeClass == null && typeCode.equals("DomainResource")) {//TODO Figure how to handle this
 			typeClass = "ca.uhn.fhir.model.dstu2.resource.BaseResource";
 		}
 		if(typeClass != null) {
 			return typeClass;
-		} else if(type.equals("*")){
+		} else if(typeCode.equals("*")){
 			throw new RuntimeException("Invalid type: *"); //TODO Handle at a later time
 		} else {
-			RuntimeResourceDefinition def = ctx.getResourceDefinition(type);
+			RuntimeResourceDefinition def = ctx.getResourceDefinition(typeCode);
 			if(def == null) {
-				throw new RuntimeException("Unknown type " + type);
+				throw new RuntimeException("Unknown type " + typeCode);
 			} else {
 				typeClass = def.getImplementingClass().getName();
-				primitiveMap.put(type, typeClass);
+				primitiveMap.put(typeCode, typeClass);
 			}
 		}
 		return typeClass;
+	}
+	
+	//TODO Handle more elegantly during refactoring
+	public String handlePrimitiveSpecializations(String primitiveType, String primitiveProfile) {
+		String type = primitiveType;
+		if(primitiveProfile != null) {
+			if(primitiveType.equals(ca.uhn.fhir.model.dstu2.composite.QuantityDt.class.getName()) && primitiveProfile.equals("http://hl7.org/fhir/StructureDefinition/SimpleQuantity")) {
+				type = ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt.class.getName();
+			} else if(primitiveType.equals(ca.uhn.fhir.model.dstu2.composite.QuantityDt.class.getName()) && primitiveProfile.equals("http://hl7.org/fhir/StructureDefinition/Duration")) {
+				type = ca.uhn.fhir.model.dstu2.composite.DurationDt.class.getName();
+			}
+			
+		}
+		return type;
+	}
+	
+	public String getCodeableConceptOverride(String path) {
+		return codeableConceptEnumTypeOverride.get(path);
+	}
+	
+	public String getCodeOverride(String path) {
+		return codeEnumTypeOverride.get(path);
 	}
 	
 	/**
@@ -329,6 +375,7 @@ public class FhirResourceManager {
 		primitiveMap.put("uri", ca.uhn.fhir.model.primitive.UriDt.class.getName());
 		primitiveMap.put("xhtml", ca.uhn.fhir.model.primitive.XhtmlDt.class.getName());
 		primitiveMap.put("Resource", ca.uhn.fhir.model.dstu2.composite.ContainedDt.class.getName());
+		primitiveMap.put("Annotation", ca.uhn.fhir.model.dstu2.composite.AnnotationDt.class.getName());
 		primitiveMap.put("Narrative", ca.uhn.fhir.model.dstu2.composite.NarrativeDt.class.getName());
 		primitiveMap.put("ResourceReference", ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt.class.getName());
 		primitiveMap.put("CodeableConcept", ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt.class.getName());
@@ -349,14 +396,13 @@ public class FhirResourceManager {
 		primitiveMap.put("HumanName", ca.uhn.fhir.model.dstu2.composite.HumanNameDt.class.getName());
 		primitiveMap.put("Identifier", ca.uhn.fhir.model.dstu2.composite.IdentifierDt.class.getName());
 		primitiveMap.put("Money", ca.uhn.fhir.model.dstu2.composite.MoneyDt.class.getName());
-		primitiveMap.put("PeriodDt", ca.uhn.fhir.model.dstu2.composite.PeriodDt.class.getName());
+		primitiveMap.put("Period", ca.uhn.fhir.model.dstu2.composite.PeriodDt.class.getName());
 		primitiveMap.put("Quantity", ca.uhn.fhir.model.dstu2.composite.QuantityDt.class.getName());
 		primitiveMap.put("Range", ca.uhn.fhir.model.dstu2.composite.RangeDt.class.getName());
 		primitiveMap.put("Ratio", ca.uhn.fhir.model.dstu2.composite.RatioDt.class.getName());
 		primitiveMap.put("Reference", ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt.class.getName());
 		primitiveMap.put("SampledData", ca.uhn.fhir.model.dstu2.composite.SampledDataDt.class.getName());
 		primitiveMap.put("Timing", ca.uhn.fhir.model.dstu2.composite.TimingDt.class.getName());
-		primitiveMap.put("Period", ca.uhn.fhir.model.dstu2.composite.TimingDt.class.getName());
 		primitiveMap.put("Timing.Repeat", ca.uhn.fhir.model.dstu2.composite.TimingDt.Repeat.class.getName());
 		primitiveMap.put("Extension", ca.uhn.fhir.model.api.ExtensionDt.class.getName());
 		primitiveMap.put("MedicationPrescription.DosageInstruction", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DosageInstruction.class.getName());
@@ -381,6 +427,52 @@ public class FhirResourceManager {
 		primitiveMap.put("Patient.Communication", ca.uhn.fhir.model.dstu2.resource.Patient.Communication.class.getName());
 		primitiveMap.put("Patient.Link", ca.uhn.fhir.model.dstu2.resource.Patient.Link.class.getName());
 		primitiveMap.put("Observation.Component", ca.uhn.fhir.model.dstu2.resource.Observation.Component.class.getName());
+		primitiveMap.put("DiagnosticOrder.Item", ca.uhn.fhir.model.dstu2.resource.DiagnosticOrder.Item.class.getName());
+		primitiveMap.put("AllergyIntolerance.Reaction", ca.uhn.fhir.model.dstu2.resource.AllergyIntolerance.Reaction.class.getName());
+		primitiveMap.put("DiagnosticOrder.Event", ca.uhn.fhir.model.dstu2.resource.DiagnosticOrder.Event.class.getName());
+		primitiveMap.put("DiagnosticReport.Image", ca.uhn.fhir.model.dstu2.resource.DiagnosticReport.Image.class.getName());
+		primitiveMap.put("Encounter.Hospitalization", ca.uhn.fhir.model.dstu2.resource.Encounter.Hospitalization.class.getName());
+		primitiveMap.put("Encounter.StatusHistory", ca.uhn.fhir.model.dstu2.resource.Encounter.StatusHistory.class.getName());
+		primitiveMap.put("Encounter.Participant", ca.uhn.fhir.model.dstu2.resource.Encounter.Participant.class.getName());
+		primitiveMap.put("Encounter.Location", ca.uhn.fhir.model.dstu2.resource.Encounter.Location.class.getName());
+		primitiveMap.put("Goal.Outcome", ca.uhn.fhir.model.dstu2.resource.Goal.Outcome.class.getName());
+		primitiveMap.put("MedicationDispense.Substitution", ca.uhn.fhir.model.dstu2.resource.MedicationDispense.Substitution.class.getName());
+		primitiveMap.put("MedicationDispense.DosageInstruction", ca.uhn.fhir.model.dstu2.resource.MedicationDispense.DosageInstruction.class.getName());
+		primitiveMap.put("MedicationOrder.DosageInstruction", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DosageInstruction.class.getName());
+		primitiveMap.put("MedicationOrder.DispenseRequest", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DispenseRequest.class.getName());
+		primitiveMap.put("MedicationOrder.Substitution", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.Substitution.class.getName());
+		primitiveMap.put("MedicationStatement.Dosage", ca.uhn.fhir.model.dstu2.resource.MedicationStatement.Dosage.class.getName());
+		primitiveMap.put("Immunization.Explanation", ca.uhn.fhir.model.dstu2.resource.Immunization.Explanation.class.getName());
+		primitiveMap.put("Immunization.VaccinationProtocol", ca.uhn.fhir.model.dstu2.resource.Immunization.VaccinationProtocol.class.getName());
+		primitiveMap.put("Immunization.Reaction", ca.uhn.fhir.model.dstu2.resource.Immunization.Reaction.class.getName());
+		primitiveMap.put("Practitioner.Qualification", ca.uhn.fhir.model.dstu2.resource.Practitioner.Qualification.class.getName());
+		primitiveMap.put("Procedure.FocalDevice", ca.uhn.fhir.model.dstu2.resource.Procedure.FocalDevice.class.getName());
+		primitiveMap.put("Substance.Ingredient", ca.uhn.fhir.model.dstu2.resource.Substance.Ingredient.class.getName());
+		primitiveMap.put("Specimen.Treatment", ca.uhn.fhir.model.dstu2.resource.Specimen.Treatment.class.getName());
+		primitiveMap.put("Specimen.Collection", ca.uhn.fhir.model.dstu2.resource.Specimen.Collection.class.getName());
+		primitiveMap.put("Specimen.Container", ca.uhn.fhir.model.dstu2.resource.Specimen.Container.class.getName());
+		primitiveMap.put("Substance.Instance", ca.uhn.fhir.model.dstu2.resource.Substance.Instance.class.getName());
+		primitiveMap.put("Practitioner.PractitionerRole", ca.uhn.fhir.model.dstu2.resource.Practitioner.PractitionerRole.class.getName());
+		primitiveMap.put("Location.Position", ca.uhn.fhir.model.dstu2.resource.Location.Position.class.getName());
+		primitiveMap.put("Product.Ingredient", ca.uhn.fhir.model.dstu2.resource.Medication.ProductIngredient.class.getName());
+	}
+	
+	/**
+	 * TODO Discuss with James Agnew
+	 */
+	public void populateCodeableConceptEnumTypeOverrides() {
+		codeableConceptEnumTypeOverride.put("CommunicationRequest.priority", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
+		codeableConceptEnumTypeOverride.put("Encounter.priority", "ca.uhn.fhir.model.dstu2.valueset.PriorityCodesEnum");
+		codeableConceptEnumTypeOverride.put("Location.type", "ca.uhn.fhir.model.dstu2.valueset.LocationTypeEnum");
+		codeableConceptEnumTypeOverride.put("ReferralRequest.specialty", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
+		codeableConceptEnumTypeOverride.put("ReferralRequest.priority", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
+	}
+	
+	/**
+	 * TODO Discuss with James Agnew
+	 */
+	public void populateCodeEnumTypeOverrides() {
+		codeEnumTypeOverride.put("ReferralRequest.status", "ca.uhn.fhir.model.dstu2.valueset.ReferralStatusEnum");
 	}
 	
 	/**
@@ -599,7 +691,6 @@ public class FhirResourceManager {
 						methodType  = ((ParameterizedType)method.getGenericReturnType()).getActualTypeArguments()[0].getTypeName();
 						lastClass = Class.forName(methodType);
 					}
-					System.out.println(methodType);
 				} catch(Exception e) {
 					e.printStackTrace();
 					throw new RuntimeException("Invalid path: " + canonicalPath);

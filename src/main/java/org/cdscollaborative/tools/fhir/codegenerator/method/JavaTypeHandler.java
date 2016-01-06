@@ -177,8 +177,7 @@ public class JavaTypeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		String typeString = type.getCode();
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
 		javaType = getFhirResourceManager().getPrimitiveEquivalent(getFullyQualifiedType());
 	}
 	

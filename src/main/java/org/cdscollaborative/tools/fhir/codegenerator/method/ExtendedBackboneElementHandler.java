@@ -27,7 +27,7 @@ public class ExtendedBackboneElementHandler extends BaseMethodGenerator {
 	 * TODO Fix if there is a more elegant way of doing this.
 	 * @param supertype
 	 */
-	public void setExtendedSupertype(String supertype) {
+	public void setExtendedSupertype(Type supertype) {
 		this.extendedSupertype = getFhirResourceManager().getFullyQualifiedJavaType(supertype);
 	}
 
@@ -65,15 +65,13 @@ public class ExtendedBackboneElementHandler extends BaseMethodGenerator {
 	
 	protected void handleMultipleCardinality(List<Method> accessors) {
 		String methodBody = buildDelegatedSetterWithCastToExtendedTypeListBody(getTopLevelCoreAttribute(), this.extendedSupertype);
-		System.out.println(methodBody);
 		accessors.add(constructGetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType()).setBody(buildDelegatedGetterWithCastToExtendedTypeListBody(getTopLevelCoreAttribute(), getElement().getTypeFirstRep().getCode())));
 		accessors.add(constructSetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType()).setBody(methodBody));
 		accessors.add(constructAddMethod(getTopLevelCoreAttribute(), getFullyQualifiedType()).setBody(buildDefaultAddBody(getTopLevelCoreAttribute())));
 	}
 	
 	public void handleType(Type type) {
-		String typeString = type.getCode();
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
 	}
 	
 	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {

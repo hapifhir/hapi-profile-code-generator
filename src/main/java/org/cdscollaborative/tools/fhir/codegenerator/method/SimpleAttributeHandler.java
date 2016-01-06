@@ -154,7 +154,11 @@ public class SimpleAttributeHandler extends BaseMethodGenerator {
 		if(typeString != null && typeString.equals("BackboneElement")) {
 			typeString = getResourceName() + "." + StringUtils.capitalize(getTopLevelCoreAttribute());
 		}
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString));
+		String typeProfile = null;
+		if(type.getProfileFirstRep() != null) {
+			typeProfile =  type.getProfileFirstRep().getValueAsString();
+		}
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString, typeProfile));
 	}
 	
 	/**

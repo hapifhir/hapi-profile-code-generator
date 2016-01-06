@@ -10,7 +10,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PathUtils {
 	
-	private static String delimiter = ".";
+	private static final String delimiter = ".";
+	private static final String extensionPrefixDelimiter = "-"; 
 	
 	/**
 	 * Method takes an extension path such as:
@@ -52,32 +53,39 @@ public class PathUtils {
 	 * Patient.birthDate.verification
 	 * </code>
 	 * <p>
+	 * Preconditions: elementPath and elementName are not null. If either or both are null,
+	 * the original path is returned.
+	 * 
 	 * @param elementPath
 	 * @param elementName
 	 * @return
 	 */
 	public static String generateExtensionPath(String elementPath, String elementName) {
-		String[] pathComponents = elementPath.split("\\" + delimiter);
-		String[] nameComponents = elementName.split("\\" + delimiter);
-		StringBuilder prefix = new StringBuilder();
-		int nameIndex = 0;
-		for(String pathComponent : pathComponents) {
-			if(!pathComponent.equals("extension")) {
-				prefix.append(pathComponent).append(delimiter);
-				if(pathComponent.equals(nameComponents[nameIndex])) {//There is overlap somehow.
-					nameIndex += 1;
-				} else {
-					nameIndex = 0;
+		String newPath = elementPath;
+		if(elementPath.indexOf("extension") > 0 && elementName != null) {
+			String[] pathComponents = elementPath.split("\\" + delimiter);
+			String[] nameComponents = elementName.split("\\" + delimiter);
+			StringBuilder prefix = new StringBuilder();
+			int nameIndex = 0;
+			for(String pathComponent : pathComponents) {
+				if(!pathComponent.equals("extension")) {
+					prefix.append(pathComponent).append(delimiter);
+					if(pathComponent.equals(nameComponents[nameIndex])) {//There is overlap somehow.
+						nameIndex += 1;
+					} else {
+						nameIndex = 0;
+					}
 				}
 			}
-		}
-		for(int i = nameIndex; i< nameComponents.length; i++) {
-			prefix.append(nameComponents[i]);
-			if(i < nameComponents.length - 1) {
-				prefix.append(delimiter);
+			for(int i = nameIndex; i< nameComponents.length; i++) {
+				prefix.append(nameComponents[i]);
+				if(i < nameComponents.length - 1) {
+					prefix.append(delimiter);
+				}
 			}
+			newPath = prefix.toString();
 		}
-		return prefix.toString();
+		return newPath;
 	}
 	
 	/**
@@ -133,7 +141,7 @@ public class PathUtils {
 	 */
 	public static String getEnumNameFromValueSetBindingUri(String valueSetBindingUri) {
 		String returnValue = null;
-		if(!StringUtils.isBlank(valueSetBindingUri)) {
+		if(StringUtils.isNotBlank(valueSetBindingUri)) {
 			if(valueSetBindingUri.indexOf('/') >= 0 && valueSetBindingUri.substring(valueSetBindingUri.lastIndexOf('/')).length() > 1) {
 				String suffix = valueSetBindingUri.substring(valueSetBindingUri.lastIndexOf('/') + 1);
 				String[] components = suffix.split("-");
@@ -148,5 +156,107 @@ public class PathUtils {
 			returnValue = valueSetBindingUri;
 		}
 		return returnValue;
+	}
+	
+	/**
+	 * Method returns the number of extension levels in path.
+	 * Patient.race has 0 extension levels.
+	 * Patient.extension.extension has 2 levels.
+	 * @param path
+	 * @return
+	 */
+	public static int getExtensionLevelInPath(String path) {
+		return StringUtils.countMatches(path, ".extension");
+	}
+	
+	public static String getNonExtensionRootPath(String path) {
+		if(StringUtils.isNotBlank(path) && path.indexOf(".extension") >= 0) {
+			return path.substring(0, path.indexOf(".extension"));
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Returns the path for the parent component. For instance,
+	 * if the path is Patient.clinicalTrial.NCT, this method
+	 * will return the path Patient.clinicalTrial.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static String getPathPrefix(String path) {
+		if(StringUtils.isBlank(path) || path.indexOf('.') < 0) {
+			return path;
+		} else {
+			return path.substring(0, path.lastIndexOf('.'));
+		}
+	}
+	
+	/**
+	 * Returns the extension path from a path that may have
+	 * an anchor. For instance, the path:
+	 * 
+	 * http://hl7.org/fhir/StructureDefinition/patient-clinicalTrial#NCT
+	 * 
+	 * will be returned as:
+	 * 
+	 * http://hl7.org/fhir/StructureDefinition/patient-clinicalTrial
+	 * @return
+	 */
+	public static String getExtensionRootPath(String path) {
+		if(StringUtils.isBlank(path) || path.indexOf('#') < 0) {
+			return path;
+		} else {
+			return path.substring(0, path.lastIndexOf('#'));
+		}
+	}
+	
+	
+	/**
+	 * Returns the anchor from a path that may have
+	 * an anchor. For instance, the path:
+	 * 
+	 * http://hl7.org/fhir/StructureDefinition/patient-clinicalTrial#NCT
+	 * 
+	 * will be returned as:
+	 * 
+	 * NCT
+	 * 
+	 * @return
+	 */
+	public static String getExtensionAnchor(String path) {
+		if(StringUtils.isBlank(path) || path.indexOf('#') < 0) {
+			return null;
+		} else {
+			return path.substring(path.lastIndexOf('#') + 1);
+		}
+	}
+	
+	public static String getExtensionName(String path) {
+		String name = getExtensionAnchor(path);
+		if(name == null) {
+			name = getLastResourcePathComponent(path);
+		}
+		return name;
+	}
+	
+	/**
+	 * Returns the last part of a '/' delimited path:
+	 * 
+	 * http://hl7.org/fhir/StructureDefinition/patient-clinicalTrial
+	 * 
+	 * will be returned as:
+	 * 
+	 * patient-clinicalTrial
+	 * 
+	 * @return
+	 */
+	public static String getLastResourcePathComponent(String path) {
+		if(StringUtils.isBlank(path) || path.indexOf('/') < 0) {
+			return null;
+		} else {
+			return path.substring(path.lastIndexOf('/') + 1);
+		}
 	}
 }

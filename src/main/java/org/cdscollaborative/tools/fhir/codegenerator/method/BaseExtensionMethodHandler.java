@@ -2,7 +2,7 @@ package org.cdscollaborative.tools.fhir.codegenerator.method;
 
 import org.apache.commons.lang3.StringUtils;
 import org.cdscollaborative.tools.fhir.codegenerator.CodeTemplateUtils;
-import org.cdscollaborative.tools.fhir.model.FhirExtension;
+import org.cdscollaborative.tools.fhir.model.FhirExtensionDefinition;
 import org.cdscollaborative.tools.fhir.utils.FhirResourceManager;
 import org.cdscollaborative.tools.fhir.utils.PathUtils;
 
@@ -67,52 +67,62 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 	 * @return
 	 */
 	public void handleExtensionElement() {
-//		if(getElement().getName() == null || getElement().getPath().contains("extension.extension")) {
-//			skipProcessing = true;
-//			LOGGER.error("Nested extensions not currently supported. " + getElement().getName());
-//			return;
-//		}
-//		if(getElement().getPath().split("\\.").length > 2) {
-//			skipProcessing = true;
-//			LOGGER.info("Extensions on types not currently supported. " + getElement().getName());
-//			return;
-//		}
-		
-//		if(getElement().getName().indexOf('.') >= 0) {
-//			skipProcessing = true;
-//			LOGGER.info("Extensions on extensions not currently supported. " + getElement().getName());
-//			return;
-//		}
 		extensionUri = getElement().getTypeFirstRep().getProfileFirstRep().getValueAsString();//TODO How to handle multiple profiles on types
-		FhirExtension extensionDef = getFhirResourceManager().getFhirExtension(extensionUri);
-		extendedElement = FhirResourceManager.shallowCloneElement(getElement());
-		if(extensionDef != null) {//Need to gracefully handle case when extensionDef is null
-			if(extendedElement.getMin() == null) {
-				extendedElement.setMin(extensionDef.getLowCardinality());
-			}
-			if(extendedElement.getMax() == null) {
-				extendedElement.setMax(extensionDef.getHighCardinality());
-			}
-			if(extendedElement.getType().size() >= 1 && extendedElement.getType().size() <= 2 
-					&& extendedElement.getTypeFirstRep().getCode().equals("Extension")) {
-				if(extendedElement.getType().size() == 1) {
-					extendedElement.setType(extensionDef.getTypes());
-					if(extensionDef.getTypes().size() == 1) {
-						handleType(extensionDef.getTypes().get(0));//TODO Hack until I figure what to do with multi-type attributes. Need a way to chain handlers. Investigate
-					} else {
-						setFullyQualifiedType(getGeneratedCodePackage() + "." + StringUtils.capitalize(getElement().getName()));
-						isExtendedStructure = true;
-						return;
-					}
-				} else {
-					setFullyQualifiedType(extendedElement.getType().get(1).getCode());
-					isExtendedStructure = true;
-				}
-			}
+		FhirExtensionDefinition extensionDef = getFhirResourceManager().getFhirExtension(PathUtils.getExtensionRootPath(extensionUri));
+		if(extensionDef == null) {
+			LOGGER.error(extensionUri + " for element " + getElement().getName() + " has no associated extension registered");
+		}
+		String extensionName = PathUtils.getExtensionName(extensionUri);
+		extendedElement = extensionDef.getExtensionByName(extensionName);
+		if(extendedElement == null) {
+			LOGGER.error("Error processing " + extensionUri + " no extension definition found. Check URI or extension directories");
+		}
+		//Handle extended structure types. If it is an extended structure, it will have its own type. Set that as the type:
+		if(getElement().getType().size() == 2 && getElement().getType().get(1).getCode().contains(getGeneratedCodePackage())) {
+			extendedElement.setType(getElement().getType());//Override the extension type with the type of the class we will create for the extended structure
+		}
+		if(extensionName != null && extensionName.contains("-")) {
+			extensionName = extensionName.substring(extensionName.lastIndexOf('-') + 1);
+			extendedElement.setName(extensionName);
+		}
+		extendedElement = FhirResourceManager.shallowCloneElement(extendedElement);
+		if(extendedElement.getName() != null && extendedElement.getName().equals("Goal.target")) {
+			//System.out.println("HERE");
+		}
+		if(extendedElement.getType().size() == 1) {
+			handleType(extendedElement.getTypeFirstRep());
+		} else if(extendedElement.getType().size() == 0){
+				setFullyQualifiedType(getGeneratedCodePackage() + "." + StringUtils.capitalize(getElement().getName()));
+				return;
+		} else if(extendedElement.getType().size() == 2) {//TODO Is this done because index 0 is extension and index 1 is a type? Fix this behavior for legitimate multitypes given new logic. LOGIC IS WRONG.
+			handleType(extendedElement.getType().get(1));
+		} else {
+			//TODO Implement support for multi-type attributes
+			LOGGER.error("Multitype attribute " + extendedElement.getName() + " encountered but not yet handled in code");
+			extendedElement.getType().clear();
+			extendedElement.getTypeFirstRep().setCode("unsupported");
+		}
+//		if(extensionDef != null) {//Need to gracefully handle case when extensionDef is null
+//			if(extendedElement.getType().size() >= 1 && extendedElement.getType().size() <= 2 
+//					&& extendedElement.getTypeFirstRep().getCode().equals("Extension")) {
+//				if(extendedElement.getType().size() == 1) {
+//					extendedElement.setType(extensionDef.getTypes());
+//					if(extensionDef.getTypes().size() == 1) {
+//						handleType(extensionDef.getTypes().get(0));//TODO Hack until I figure what to do with multi-type attributes. Need a way to chain handlers. Investigate
+//					} else {
+//						setFullyQualifiedType(getGeneratedCodePackage() + "." + StringUtils.capitalize(getElement().getName()));
+//						isExtendedStructure = true;
+//						return;
+//					}
+//				} else {
+//					setFullyQualifiedType(extendedElement.getType().get(1).getCode());
+//					isExtendedStructure = true;
+//				}
+//			}
+			//Do I still need this?
 			if(extendedElement.getPath() != null) {
 				extendedElement.setPath(PathUtils.generateExtensionPath(extendedElement.getPath(), extendedElement.getName()));
 			}
-		}
 	}
 	
 	/**
@@ -121,8 +131,7 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		String typeString = type.getCode();
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
 	}
 
 }

@@ -172,20 +172,28 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		String typeString = type.getCode();
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(typeString));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
 		handleCode();
 	}
 	
 	public void handleCode() {
-		if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
+		String override = getFhirResourceManager().getCodeOverride(getElement().getPath());
+		if(override != null) { //Enumerated type does not follow convention in naming
+			if(override.equals("ca.uhn.fhir.model.dstu2.composite.CodeDt")) {
+				setFullyQualifiedType(override);
+			} else {
+				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + override + ">");
+			}
+			imports.add(override);
+		} else if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
 				&& getElement().getBinding() != null) {
-			String bindingName = getBindingNameFromValueSetReference();
+			bindingName = getBindingNameFromValueSetReference();
 			identifyValidEnumerationType(bindingName);
 			if(enumType == null) {
 				bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());
 				identifyValidEnumerationType(bindingName);
 			}
+			bindingName = enumType;
 			if(enumType != null) {
 				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + enumType + ">");
 				imports.add(enumType);
