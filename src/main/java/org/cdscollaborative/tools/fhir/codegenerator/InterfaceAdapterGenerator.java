@@ -58,6 +58,7 @@ public class InterfaceAdapterGenerator {
 	//public static final String profilePrefix = "http://hl7.org/fhir/StructureDefinition/";
 	public static final Logger LOGGER = LoggerFactory.getLogger(InterfaceAdapterGenerator.class);
 	public static final String DEFAULT_DESTINATION_DIRECTORY = "generated-source/java/";
+	public static final String ADAPTER_FIELD_NAME = "adaptedClass";
 	
 	private String generatedPackage;
 	private String destinationDirectory;
@@ -189,6 +190,7 @@ public class InterfaceAdapterGenerator {
 			ClassModel rootModel = command.getClassMap().get(profileWalker.getRoot().getPathFromRoot());
 			String resourceName = getUnderlyingFhirCoreResourceName(profile);
 			buildAdapter(rootModel, resourceName, generatedPackage + ".I" + javaSafeProfileName);
+			generateConstructors(javaSafeProfileName + "Adapter", fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName(), rootModel.getMethods() );
 			generateAdapteeGetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			for(ClassModel model : command.getClassMap().values()) {
@@ -374,7 +376,7 @@ public class InterfaceAdapterGenerator {
 		ClassField field = new ClassField("adaptedClass");
 		field.setType(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName());
 		field.addModifier(ModifierEnum.PRIVATE);
-		field.setInitializer("new " + fhirResourceManager.getResourceNameToClassMap().get(resourceName).getSimpleName() + "()");
+		//field.setInitializer("new " + fhirResourceManager.getResourceNameToClassMap().get(resourceName).getSimpleName() + "()");
 		classModel.addField(field);
 		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
@@ -396,6 +398,26 @@ public class InterfaceAdapterGenerator {
 	}
 	
 	/**
+	 * Generates Adapter constructors
+	 * 
+	 * @param constructorName
+	 * @param adapterType
+	 * @param accessors
+	 */
+	protected void generateConstructors(String constructorName, String adapterType, List<Method> accessors) {
+		Method noArgConstructor = new Method();
+		noArgConstructor.isConstructor(true);
+		noArgConstructor.setBody(this.templateUtils.getInitializeVariableStatement(ADAPTER_FIELD_NAME, adapterType));
+		accessors.add(0, noArgConstructor);
+		
+		Method singleArgConstructor = new Method();
+		singleArgConstructor.addParameter("adaptee", adapterType);
+		singleArgConstructor.isConstructor(true);
+		singleArgConstructor.setBody(this.templateUtils.getAssignVariableStatement(ADAPTER_FIELD_NAME, "adaptee"));
+		accessors.add(1, singleArgConstructor);
+	}
+	
+	/**
 	 * Method generates accessor to underlying HAPI FHIR Adapter
 	 * 
 	 * @param accessors
@@ -406,7 +428,7 @@ public class InterfaceAdapterGenerator {
 		method.setName("getAdaptee");
 		method.setReturnType(resourcePath);
 		method.setBody("return adaptedClass;");
-		accessors.add(method);
+		accessors.add(2, method);
 	}
 	
 	/**
@@ -422,7 +444,7 @@ public class InterfaceAdapterGenerator {
 		params.add(new MethodParameter("param", resourcePath));
 		method.setParameters(params);
 		method.setBody("this.adaptedClass = param;");
-		accessors.add(method);
+		accessors.add(3, method);
 	}
 	
 	/**

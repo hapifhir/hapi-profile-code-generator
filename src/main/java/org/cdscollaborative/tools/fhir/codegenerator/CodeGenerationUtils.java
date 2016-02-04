@@ -136,6 +136,9 @@ public class CodeGenerationUtils {
 		final JavaInterfaceSource javaInterface = Roaster.create(JavaInterfaceSource.class);//Roaster.parse(JavaInterfaceSource.class, "import java.util.Map; public interface myInterface {public void setMeta(Map<String,String> meta);}" );
 		javaInterface.setPackage(interfaceModel.getNamespace()).setName(interfaceName);
 		for(Method accessor : interfaceModel.getMethods()) {
+			if(accessor.isConstructor()) {//Interfaces don't specify constructors
+				continue;
+			}
 			for(String importString : accessor.getImports()) { //TODO remove when Roaster fixes bug
 				javaInterface.addImport(importString);
 			}
@@ -184,7 +187,7 @@ public class CodeGenerationUtils {
 			if(methodDefinition.isConstructor()) {
 				methodSource.setConstructor(true);
 			}
-			if(StringUtils.isNotBlank(methodDefinition.getName())) {
+			if(StringUtils.isNotBlank(methodDefinition.getName()) && !methodDefinition.isConstructor()) {
 				methodSource.setName(methodDefinition.getName());
 			}
 			if(StringUtils.isNotBlank(methodDefinition.getReturnType())) {

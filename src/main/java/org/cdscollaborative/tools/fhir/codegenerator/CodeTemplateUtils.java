@@ -480,4 +480,31 @@ public class CodeTemplateUtils {
 		ST st = groupMain.getInstanceOf("unsupportedSetter");
 		return st.render();
 	}
+	
+	/**************************************************************
+	 * Generic Code Generation Functions
+	 * ************************************************************/
+	
+	/**
+	 * Template for initializing an instance variable to the fieldType argument
+	 * using the 'new' operator.
+	 * 
+	 * @param fieldName The instance field name
+	 * @param fieldType The type argument to the 'new' operator
+	 * 
+	 * @return
+	 */
+	public String getInitializeVariableStatement(String fieldName, String fieldType) {
+		ST st = groupMain.getInstanceOf("initializeVariable");
+		st.add("fieldName", fieldName);
+		st.add("fieldType", fieldType);
+		return st.render();
+	}
+	
+	public String getAssignVariableStatement(String fieldName, String argName) {
+		ST st = groupMain.getInstanceOf("assignVariable");
+		st.add("fieldName", fieldName);
+		st.add("argName", argName);
+		return st.render();
+	}
 }
