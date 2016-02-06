@@ -1,58 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.socraticgrid.tools</groupId>
-	<artifactId>logicalviewgenerator</artifactId>
+	<groupId>ca.uhn.hapi.fhir</groupId>
+	<artifactId>hapi-fhir-codegen-tools</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Logical View Generator</name>
 	<description>CDS facade on FHIR</description>
+	<packaging>pom</packaging>
 	<properties>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<hapi.fhir.version>1.4-SNAPSHOT</hapi.fhir.version>
 	</properties>
     <dependencies>
-        <!--
-        <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-base</artifactId>
-            <version>${hapi.fhir.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-structures-dstu2.1</artifactId>
-            <version>${hapi.fhir.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ca.uhn.hapi.fhir</groupId>
-            <artifactId>hapi-fhir-structures-hl7org-dstu2</artifactId>
-            <version>${hapi.fhir.version}</version>
-        </dependency>
-		-->
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>hapi-fhir-base</artifactId>
-			<version>1.3</version>
-		</dependency>
-		<dependency>
-			<groupId>ca.uhn.hapi.fhir</groupId>
-			<artifactId>hapi-fhir-structures-dstu2</artifactId>
-			<version>1.3</version>
-		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.forge.roaster</groupId>
-			<artifactId>roaster-api</artifactId>
-			<version>2.13.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.forge.roaster</groupId>
-			<artifactId>roaster-jdt</artifactId>
-			<version>2.11.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -68,16 +32,6 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-access</artifactId>
 			<version>1.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>stringtemplate</artifactId>
-			<version>4.0.2</version>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -157,4 +111,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	<modules>
+		<module>common-fhir</module>
+		<module>common-lib</module>
+		<module>common-codegen</module>
+		<module>hapi-fhir-codegen</module>
+	</modules>
 </project>

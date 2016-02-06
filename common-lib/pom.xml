@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>ca.uhn.hapi.fhir</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+		<artifactId>hapi-fhir-codegen-tools</artifactId>
+	</parent>
+	<artifactId>common-lib</artifactId>
+	<name>Common Utilities</name>
+	<description>This module holds common utilities that may be used by two or more modules and that represent core structures and behavior not specific to any given domain. Generally these fall under static utility libraries and general structure of use in any number of contexts.</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+	</dependencies>
+</project>

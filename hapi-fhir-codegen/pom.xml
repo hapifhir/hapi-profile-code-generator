@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>ca.uhn.hapi.fhir</groupId>
+    <artifactId>hapi-fhir-codegen-tools</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>hapi-fhir-codegen</artifactId>
+  <name>HAPI FHIR Code Generation Tools</name>
+  <description>HAPI FHIR Code Generation Tools</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>ca.uhn.hapi.fhir</groupId>
+  		<artifactId>common-fhir</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>ca.uhn.hapi.fhir</groupId>
+  		<artifactId>common-codegen</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
+</project>
