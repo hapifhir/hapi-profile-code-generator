@@ -108,4 +108,6 @@ public interface IReferralRequest
    public IReferralRequest addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 }

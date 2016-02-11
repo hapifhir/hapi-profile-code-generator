@@ -11,7 +11,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
 import ca.uhn.fhir.utils.common.xml.XmlUtils;
 import ca.uhn.fhir.utils.fhir.FhirExtensionManager;
 
@@ -268,7 +267,7 @@ public class CodeGeneratorConfigurator {
 	 */
 	public static InterfaceAdapterGenerator buildInterfaceAdapterGenerator(
 			CodeGeneratorConfigurator config, FhirResourceManager resourceLoader) {
-		CodeTemplateUtils templateUtils = new CodeTemplateUtils().initialize();
+		MethodBodyGenerator templateUtils = new MethodBodyGenerator().initialize();
 		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator(
 				config.getGeneratedCodePackage(), resourceLoader, templateUtils);
 		generator.setResourceLoadingPlan(config.getProfileNameList());

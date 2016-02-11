@@ -47,6 +47,8 @@ public interface IQICoreEncounter
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public Encounter.Hospitalization getHospitalization();
 
    public IQICoreEncounter setHospitalization(Encounter.Hospitalization param);
@@ -68,6 +70,8 @@ public interface IQICoreEncounter
 
    public Encounter.Participant addParticipant();
 
+   public Encounter.Participant getParticipantFirstRep();
+
    public List<Encounter.StatusHistory> getStatusHistory();
 
    public IQICoreEncounter setStatusHistory(List<Encounter.StatusHistory> param);
@@ -75,6 +79,8 @@ public interface IQICoreEncounter
    public IQICoreEncounter addStatusHistory(Encounter.StatusHistory param);
 
    public Encounter.StatusHistory addStatusHistory();
+
+   public Encounter.StatusHistory getStatusHistoryFirstRep();
 
    public ContainedDt getContained();
 
@@ -95,6 +101,8 @@ public interface IQICoreEncounter
    public IQICoreEncounter addLocation(Encounter.Location param);
 
    public Encounter.Location addLocation();
+
+   public Encounter.Location getLocationFirstRep();
 
    public Appointment getAppointmentResource();
 

@@ -111,6 +111,11 @@ public class MedicationStatementAdapter implements IMedicationStatement
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public StringDt getNoteElement()
    {
       return adaptedClass.getNoteElement();
@@ -155,6 +160,11 @@ public class MedicationStatementAdapter implements IMedicationStatement
       ca.uhn.fhir.model.dstu2.resource.MedicationStatement.Dosage item = new ca.uhn.fhir.model.dstu2.resource.MedicationStatement.Dosage();
       adaptedClass.addDosage(item);
       return item;
+   }
+
+   public MedicationStatement.Dosage getDosageFirstRep()
+   {
+      return adaptedClass.getDosageFirstRep();
    }
 
    public DateTimeDt getDateAssertedElement()

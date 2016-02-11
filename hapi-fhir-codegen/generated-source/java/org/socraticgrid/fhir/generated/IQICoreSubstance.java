@@ -34,6 +34,8 @@ public interface IQICoreSubstance
 
    public Substance.Ingredient addIngredient();
 
+   public Substance.Ingredient getIngredientFirstRep();
+
    public IdDt getId();
 
    public IQICoreSubstance setId(IdDt param);
@@ -46,6 +48,8 @@ public interface IQICoreSubstance
 
    public Substance.Instance addInstance();
 
+   public Substance.Instance getInstanceFirstRep();
+
    public List<IdentifierDt> getIdentifier();
 
    public IQICoreSubstance setIdentifier(List<IdentifierDt> param);
@@ -53,6 +57,8 @@ public interface IQICoreSubstance
    public IQICoreSubstance addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public NarrativeDt getText();
 

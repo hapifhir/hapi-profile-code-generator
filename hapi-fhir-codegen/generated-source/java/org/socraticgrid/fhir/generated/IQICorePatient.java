@@ -41,6 +41,8 @@ public interface IQICorePatient
 
    public AttachmentDt addPhoto();
 
+   public AttachmentDt getPhotoFirstRep();
+
    public List<Patient.Contact> getContact();
 
    public IQICorePatient setContact(List<Patient.Contact> param);
@@ -48,6 +50,8 @@ public interface IQICorePatient
    public IQICorePatient addContact(Patient.Contact param);
 
    public Patient.Contact addContact();
+
+   public Patient.Contact getContactFirstRep();
 
    public String getGender();
 
@@ -119,6 +123,8 @@ public interface IQICorePatient
 
    public Patient.Communication addCommunication();
 
+   public Patient.Communication getCommunicationFirstRep();
+
    public DateTimeDt getBirthTime();
 
    public IQICorePatient setBirthTime(DateTimeDt param);
@@ -130,6 +136,8 @@ public interface IQICorePatient
    public IQICorePatient addName(HumanNameDt param);
 
    public HumanNameDt addName();
+
+   public HumanNameDt getNameFirstRep();
 
    public List<CodeableConceptDt> getDisability();
 
@@ -146,6 +154,8 @@ public interface IQICorePatient
    public IQICorePatient addLink(Patient.Link param);
 
    public Patient.Link addLink();
+
+   public Patient.Link getLinkFirstRep();
 
    public NarrativeDt getText();
 
@@ -183,6 +193,8 @@ public interface IQICorePatient
    public IQICorePatient addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public IdDt getId();
 

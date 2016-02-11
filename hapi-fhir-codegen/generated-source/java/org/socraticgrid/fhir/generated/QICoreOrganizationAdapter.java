@@ -87,6 +87,11 @@ public class QICoreOrganizationAdapter implements IQICoreOrganization
       return item;
    }
 
+   public AddressDt getAddressFirstRep()
+   {
+      return adaptedClass.getAddressFirstRep();
+   }
+
    public StringDt getNameElement()
    {
       return adaptedClass.getNameElement();
@@ -131,6 +136,11 @@ public class QICoreOrganizationAdapter implements IQICoreOrganization
       ca.uhn.fhir.model.dstu2.resource.Organization.Contact item = new ca.uhn.fhir.model.dstu2.resource.Organization.Contact();
       adaptedClass.addContact(item);
       return item;
+   }
+
+   public Organization.Contact getContactFirstRep()
+   {
+      return adaptedClass.getContactFirstRep();
    }
 
    public BooleanDt getActiveElement()
@@ -191,6 +201,11 @@ public class QICoreOrganizationAdapter implements IQICoreOrganization
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public BoundCodeableConceptDt<OrganizationTypeEnum> getType()
    {
       return adaptedClass.getType();
@@ -236,6 +251,11 @@ public class QICoreOrganizationAdapter implements IQICoreOrganization
       ca.uhn.fhir.model.dstu2.composite.ContactPointDt item = new ca.uhn.fhir.model.dstu2.composite.ContactPointDt();
       adaptedClass.addTelecom(item);
       return item;
+   }
+
+   public ContactPointDt getTelecomFirstRep()
+   {
+      return adaptedClass.getTelecomFirstRep();
    }
 
    public ContainedDt getContained()

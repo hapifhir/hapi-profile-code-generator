@@ -115,6 +115,11 @@ public class GoalAdapter implements IGoal
       return item;
    }
 
+   public Goal.Outcome getOutcomeFirstRep()
+   {
+      return adaptedClass.getOutcomeFirstRep();
+   }
+
    public IdDt getId()
    {
       return adaptedClass.getId();
@@ -148,6 +153,11 @@ public class GoalAdapter implements IGoal
       ca.uhn.fhir.model.dstu2.composite.AnnotationDt item = new ca.uhn.fhir.model.dstu2.composite.AnnotationDt();
       adaptedClass.addNote(item);
       return item;
+   }
+
+   public AnnotationDt getNoteFirstRep()
+   {
+      return adaptedClass.getNoteFirstRep();
    }
 
    public DateDt getTargetDateElement()
@@ -244,6 +254,11 @@ public class GoalAdapter implements IGoal
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public DateDt getStatusDateElement()

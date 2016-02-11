@@ -34,6 +34,8 @@ public interface IDiagnosticOrder
 
    public DiagnosticOrder.Event addEvent();
 
+   public DiagnosticOrder.Event getEventFirstRep();
+
    public NarrativeDt getText();
 
    public IDiagnosticOrder setText(NarrativeDt param);
@@ -76,6 +78,8 @@ public interface IDiagnosticOrder
 
    public DiagnosticOrder.Item addItem();
 
+   public DiagnosticOrder.Item getItemFirstRep();
+
    public List<IdentifierDt> getIdentifier();
 
    public IDiagnosticOrder setIdentifier(List<IdentifierDt> param);
@@ -84,6 +88,8 @@ public interface IDiagnosticOrder
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public List<AnnotationDt> getNote();
 
    public IDiagnosticOrder setNote(List<AnnotationDt> param);
@@ -91,6 +97,8 @@ public interface IDiagnosticOrder
    public IDiagnosticOrder addNote(AnnotationDt param);
 
    public AnnotationDt addNote();
+
+   public AnnotationDt getNoteFirstRep();
 
    public IdDt getId();
 

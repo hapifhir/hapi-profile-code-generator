@@ -73,6 +73,11 @@ public class QICoreConditionAdapter implements IQICoreCondition
       return item;
    }
 
+   public Condition.Evidence getEvidenceFirstRep()
+   {
+      return adaptedClass.getEvidenceFirstRep();
+   }
+
    public BoundCodeableConceptDt<ConditionCategoryCodesEnum> getCategory()
    {
       return adaptedClass.getCategory();
@@ -419,6 +424,11 @@ public class QICoreConditionAdapter implements IQICoreCondition
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public String getClinicalStatus()

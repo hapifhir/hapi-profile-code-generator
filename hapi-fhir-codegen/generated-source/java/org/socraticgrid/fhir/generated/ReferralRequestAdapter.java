@@ -296,4 +296,9 @@ public class ReferralRequestAdapter implements IReferralRequest
       adaptedClass.addIdentifier(item);
       return item;
    }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
 }

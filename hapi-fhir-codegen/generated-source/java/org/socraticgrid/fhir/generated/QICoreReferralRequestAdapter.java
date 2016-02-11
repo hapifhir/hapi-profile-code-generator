@@ -332,4 +332,9 @@ public class QICoreReferralRequestAdapter implements IQICoreReferralRequest
       adaptedClass.addIdentifier(item);
       return item;
    }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
 }

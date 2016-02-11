@@ -99,6 +99,8 @@ public interface IQICoreMedicationAdministration
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public QICoreEncounterAdapter getEncounterResource();
 
    public IQICoreMedicationAdministration setEncounterResource(

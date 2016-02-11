@@ -120,6 +120,11 @@ public class QICoreCommunicationRequestAdapter implements IQICoreCommunicationRe
       return item;
    }
 
+   public CommunicationRequest.Payload getPayloadFirstRep()
+   {
+      return adaptedClass.getPayloadFirstRep();
+   }
+
    public CodeableConceptDt getPriority()
    {
       return adaptedClass.getPriority();
@@ -254,6 +259,11 @@ public class QICoreCommunicationRequestAdapter implements IQICoreCommunicationRe
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public CodeableConceptDt getCategory()

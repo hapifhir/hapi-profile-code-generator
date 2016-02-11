@@ -171,6 +171,11 @@ public class ImmunizationAdapter implements IImmunization
       return item;
    }
 
+   public Immunization.VaccinationProtocol getVaccinationProtocolFirstRep()
+   {
+      return adaptedClass.getVaccinationProtocolFirstRep();
+   }
+
    public List<Immunization.Reaction> getReaction()
    {
       return adaptedClass.getReaction();
@@ -193,6 +198,11 @@ public class ImmunizationAdapter implements IImmunization
       ca.uhn.fhir.model.dstu2.resource.Immunization.Reaction item = new ca.uhn.fhir.model.dstu2.resource.Immunization.Reaction();
       adaptedClass.addReaction(item);
       return item;
+   }
+
+   public Immunization.Reaction getReactionFirstRep()
+   {
+      return adaptedClass.getReactionFirstRep();
    }
 
    public NarrativeDt getText()
@@ -422,6 +432,11 @@ public class ImmunizationAdapter implements IImmunization
       return item;
    }
 
+   public AnnotationDt getNoteFirstRep()
+   {
+      return adaptedClass.getNoteFirstRep();
+   }
+
    public IdDt getId()
    {
       return adaptedClass.getId();
@@ -496,5 +511,10 @@ public class ImmunizationAdapter implements IImmunization
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 }

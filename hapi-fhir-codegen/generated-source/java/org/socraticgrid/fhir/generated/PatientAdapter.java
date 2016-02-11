@@ -73,6 +73,11 @@ public class PatientAdapter implements IPatient
       return item;
    }
 
+   public AttachmentDt getPhotoFirstRep()
+   {
+      return adaptedClass.getPhotoFirstRep();
+   }
+
    public List<Patient.Contact> getContact()
    {
       return adaptedClass.getContact();
@@ -97,6 +102,11 @@ public class PatientAdapter implements IPatient
       return item;
    }
 
+   public Patient.Contact getContactFirstRep()
+   {
+      return adaptedClass.getContactFirstRep();
+   }
+
    public List<Patient.Communication> getCommunication()
    {
       return adaptedClass.getCommunication();
@@ -119,6 +129,11 @@ public class PatientAdapter implements IPatient
       ca.uhn.fhir.model.dstu2.resource.Patient.Communication item = new ca.uhn.fhir.model.dstu2.resource.Patient.Communication();
       adaptedClass.addCommunication(item);
       return item;
+   }
+
+   public Patient.Communication getCommunicationFirstRep()
+   {
+      return adaptedClass.getCommunicationFirstRep();
    }
 
    public NarrativeDt getText()
@@ -338,6 +353,11 @@ public class PatientAdapter implements IPatient
       return item;
    }
 
+   public Patient.Link getLinkFirstRep()
+   {
+      return adaptedClass.getLinkFirstRep();
+   }
+
    public List<ContactPointDt> getTelecom()
    {
       return adaptedClass.getTelecom();
@@ -362,6 +382,11 @@ public class PatientAdapter implements IPatient
       return item;
    }
 
+   public ContactPointDt getTelecomFirstRep()
+   {
+      return adaptedClass.getTelecomFirstRep();
+   }
+
    public List<AddressDt> getAddress()
    {
       return adaptedClass.getAddress();
@@ -384,6 +409,11 @@ public class PatientAdapter implements IPatient
       ca.uhn.fhir.model.dstu2.composite.AddressDt item = new ca.uhn.fhir.model.dstu2.composite.AddressDt();
       adaptedClass.addAddress(item);
       return item;
+   }
+
+   public AddressDt getAddressFirstRep()
+   {
+      return adaptedClass.getAddressFirstRep();
    }
 
    public BooleanDt getActiveElement()
@@ -433,6 +463,11 @@ public class PatientAdapter implements IPatient
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public IdDt getId()
    {
       return adaptedClass.getId();
@@ -466,6 +501,11 @@ public class PatientAdapter implements IPatient
       ca.uhn.fhir.model.dstu2.composite.HumanNameDt item = new ca.uhn.fhir.model.dstu2.composite.HumanNameDt();
       adaptedClass.addName(item);
       return item;
+   }
+
+   public HumanNameDt getNameFirstRep()
+   {
+      return adaptedClass.getNameFirstRep();
    }
 
    public ContainedDt getContained()

@@ -42,6 +42,8 @@ public interface IObservation
 
    public Observation.Related addRelated();
 
+   public Observation.Related getRelatedFirstRep();
+
    public List<Observation.Component> getComponent();
 
    public IObservation setComponent(List<Observation.Component> param);
@@ -49,6 +51,8 @@ public interface IObservation
    public IObservation addComponent(Observation.Component param);
 
    public Observation.Component addComponent();
+
+   public Observation.Component getComponentFirstRep();
 
    public NarrativeDt getText();
 
@@ -62,6 +66,8 @@ public interface IObservation
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public List<Observation.ReferenceRange> getReferenceRange();
 
    public IObservation setReferenceRange(List<Observation.ReferenceRange> param);
@@ -69,6 +75,8 @@ public interface IObservation
    public IObservation addReferenceRange(Observation.ReferenceRange param);
 
    public Observation.ReferenceRange addReferenceRange();
+
+   public Observation.ReferenceRange getReferenceRangeFirstRep();
 
    public CodeableConceptDt getCode();
 

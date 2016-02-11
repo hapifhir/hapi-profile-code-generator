@@ -94,6 +94,11 @@ public class QICoreGoalAdapter implements IQICoreGoal
       return item;
    }
 
+   public AnnotationDt getNoteFirstRep()
+   {
+      return adaptedClass.getNoteFirstRep();
+   }
+
    public List<Goal.Outcome> getOutcome()
    {
       return adaptedClass.getOutcome();
@@ -118,6 +123,11 @@ public class QICoreGoalAdapter implements IQICoreGoal
       return item;
    }
 
+   public Goal.Outcome getOutcomeFirstRep()
+   {
+      return adaptedClass.getOutcomeFirstRep();
+   }
+
    public List<IdentifierDt> getIdentifier()
    {
       return adaptedClass.getIdentifier();
@@ -140,6 +150,11 @@ public class QICoreGoalAdapter implements IQICoreGoal
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public List<QICoreGoalTarget> getTarget() {

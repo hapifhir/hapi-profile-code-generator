@@ -36,6 +36,8 @@ public interface ICommunication
 
    public Communication.Payload addPayload();
 
+   public Communication.Payload getPayloadFirstRep();
+
    public DateTimeDt getSentElement();
 
    public Date getSent();
@@ -83,6 +85,8 @@ public interface ICommunication
    public ICommunication addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public DateTimeDt getReceivedElement();
 

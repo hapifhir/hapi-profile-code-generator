@@ -36,6 +36,8 @@ public interface IQICoreProcedureRequest
 
    public AnnotationDt addNotes();
 
+   public AnnotationDt getNotesFirstRep();
+
    public IdDt getId();
 
    public IQICoreProcedureRequest setId(IdDt param);
@@ -115,6 +117,8 @@ public interface IQICoreProcedureRequest
    public IQICoreProcedureRequest addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public BooleanDt getAsNeededBooleanElement();
 

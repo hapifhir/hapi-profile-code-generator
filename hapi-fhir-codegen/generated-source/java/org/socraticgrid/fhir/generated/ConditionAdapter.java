@@ -75,6 +75,11 @@ public class ConditionAdapter implements ICondition
       return item;
    }
 
+   public Condition.Evidence getEvidenceFirstRep()
+   {
+      return adaptedClass.getEvidenceFirstRep();
+   }
+
    public BoundCodeableConceptDt<ConditionCategoryCodesEnum> getCategory()
    {
       return adaptedClass.getCategory();
@@ -385,6 +390,11 @@ public class ConditionAdapter implements ICondition
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public String getClinicalStatus()

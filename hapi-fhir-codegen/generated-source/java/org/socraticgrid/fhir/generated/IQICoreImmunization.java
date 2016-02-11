@@ -65,6 +65,8 @@ public interface IQICoreImmunization
 
    public Immunization.VaccinationProtocol addVaccinationProtocol();
 
+   public Immunization.VaccinationProtocol getVaccinationProtocolFirstRep();
+
    public List<Immunization.Reaction> getReaction();
 
    public IQICoreImmunization setReaction(List<Immunization.Reaction> param);
@@ -72,6 +74,8 @@ public interface IQICoreImmunization
    public IQICoreImmunization addReaction(Immunization.Reaction param);
 
    public Immunization.Reaction addReaction();
+
+   public Immunization.Reaction getReactionFirstRep();
 
    public NarrativeDt getText();
 
@@ -147,6 +151,8 @@ public interface IQICoreImmunization
 
    public AnnotationDt addNote();
 
+   public AnnotationDt getNoteFirstRep();
+
    public IdDt getId();
 
    public IQICoreImmunization setId(IdDt param);
@@ -171,4 +177,6 @@ public interface IQICoreImmunization
    public IQICoreImmunization addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 }

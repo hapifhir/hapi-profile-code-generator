@@ -71,6 +71,11 @@ public class MedicationOrderAdapter implements IMedicationOrder
       return item;
    }
 
+   public MedicationOrder.DosageInstruction getDosageInstructionFirstRep()
+   {
+      return adaptedClass.getDosageInstructionFirstRep();
+   }
+
    public Practitioner getPrescriberResource()
    {
       if (adaptedClass.getPrescriber().getResource() instanceof ca.uhn.fhir.model.dstu2.resource.Practitioner)
@@ -409,6 +414,11 @@ public class MedicationOrderAdapter implements IMedicationOrder
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public CodeableConceptDt getReasonEnded()

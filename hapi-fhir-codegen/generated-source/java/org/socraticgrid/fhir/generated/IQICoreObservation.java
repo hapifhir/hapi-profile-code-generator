@@ -40,6 +40,8 @@ public interface IQICoreObservation
 
    public Observation.Related addRelated();
 
+   public Observation.Related getRelatedFirstRep();
+
    public List<Observation.Component> getComponent();
 
    public IQICoreObservation setComponent(List<Observation.Component> param);
@@ -47,6 +49,8 @@ public interface IQICoreObservation
    public IQICoreObservation addComponent(Observation.Component param);
 
    public Observation.Component addComponent();
+
+   public Observation.Component getComponentFirstRep();
 
    public NarrativeDt getText();
 
@@ -60,6 +64,8 @@ public interface IQICoreObservation
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public List<Observation.ReferenceRange> getReferenceRange();
 
    public IQICoreObservation setReferenceRange(
@@ -68,6 +74,8 @@ public interface IQICoreObservation
    public IQICoreObservation addReferenceRange(Observation.ReferenceRange param);
 
    public Observation.ReferenceRange addReferenceRange();
+
+   public Observation.ReferenceRange getReferenceRangeFirstRep();
 
    public CodeableConceptDt getCode();
 

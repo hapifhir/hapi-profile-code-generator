@@ -70,6 +70,8 @@ public interface IMedicationDispense
 
    public MedicationDispense.DosageInstruction addDosageInstruction();
 
+   public MedicationDispense.DosageInstruction getDosageInstructionFirstRep();
+
    public ContainedDt getContained();
 
    public IMedicationDispense setContained(ContainedDt param);

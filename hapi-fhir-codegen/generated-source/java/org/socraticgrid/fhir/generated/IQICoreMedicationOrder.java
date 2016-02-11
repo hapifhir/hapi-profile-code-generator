@@ -139,6 +139,8 @@ public interface IQICoreMedicationOrder
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public CodeableConceptDt getReasonEnded();
 
    public IQICoreMedicationOrder setReasonEnded(CodeableConceptDt param);

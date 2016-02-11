@@ -76,6 +76,11 @@ public class QICorePatientAdapter implements IQICorePatient
       return item;
    }
 
+   public AttachmentDt getPhotoFirstRep()
+   {
+      return adaptedClass.getPhotoFirstRep();
+   }
+
    public List<Patient.Contact> getContact()
    {
       return adaptedClass.getContact();
@@ -98,6 +103,11 @@ public class QICorePatientAdapter implements IQICorePatient
       ca.uhn.fhir.model.dstu2.resource.Patient.Contact item = new ca.uhn.fhir.model.dstu2.resource.Patient.Contact();
       adaptedClass.addContact(item);
       return item;
+   }
+
+   public Patient.Contact getContactFirstRep()
+   {
+      return adaptedClass.getContactFirstRep();
    }
 
    public String getGender()
@@ -366,6 +376,11 @@ public class QICorePatientAdapter implements IQICorePatient
       return item;
    }
 
+   public Patient.Communication getCommunicationFirstRep()
+   {
+      return adaptedClass.getCommunicationFirstRep();
+   }
+
    public DateTimeDt getBirthTime()
    {
       List<ca.uhn.fhir.model.api.ExtensionDt> extensions = adaptedClass
@@ -416,6 +431,11 @@ public class QICorePatientAdapter implements IQICorePatient
       ca.uhn.fhir.model.dstu2.composite.HumanNameDt item = new ca.uhn.fhir.model.dstu2.composite.HumanNameDt();
       adaptedClass.addName(item);
       return item;
+   }
+
+   public HumanNameDt getNameFirstRep()
+   {
+      return adaptedClass.getNameFirstRep();
    }
 
    public List<CodeableConceptDt> getDisability() {
@@ -496,6 +516,11 @@ public class QICorePatientAdapter implements IQICorePatient
       ca.uhn.fhir.model.dstu2.resource.Patient.Link item = new ca.uhn.fhir.model.dstu2.resource.Patient.Link();
       adaptedClass.addLink(item);
       return item;
+   }
+
+   public Patient.Link getLinkFirstRep()
+   {
+      return adaptedClass.getLinkFirstRep();
    }
 
    public NarrativeDt getText()
@@ -634,6 +659,11 @@ public class QICorePatientAdapter implements IQICorePatient
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public IdDt getId()

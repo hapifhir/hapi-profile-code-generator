@@ -44,6 +44,8 @@ public interface IMedicationStatement
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public StringDt getNoteElement();
 
    public String getNote();
@@ -59,6 +61,8 @@ public interface IMedicationStatement
    public IMedicationStatement addDosage(MedicationStatement.Dosage param);
 
    public MedicationStatement.Dosage addDosage();
+
+   public MedicationStatement.Dosage getDosageFirstRep();
 
    public DateTimeDt getDateAssertedElement();
 

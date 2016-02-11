@@ -171,6 +171,11 @@ public class MedicationDispenseAdapter implements IMedicationDispense
       return item;
    }
 
+   public MedicationDispense.DosageInstruction getDosageInstructionFirstRep()
+   {
+      return adaptedClass.getDosageInstructionFirstRep();
+   }
+
    public ContainedDt getContained()
    {
       return adaptedClass.getContained();

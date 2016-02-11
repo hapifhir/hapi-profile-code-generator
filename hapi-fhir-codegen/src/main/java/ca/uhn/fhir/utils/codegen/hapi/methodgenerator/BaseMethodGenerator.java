@@ -11,7 +11,7 @@ import org.stringtemplate.v4.ST;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
 import ca.uhn.fhir.utils.common.metamodel.Cardinality;
@@ -31,7 +31,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	private String topLevelCoreAttribute;
 	private boolean isMultivaluedType;
 	private String fullyQualifiedType;
-	private CodeTemplateUtils template;
+	private MethodBodyGenerator template;
 	private String generatedCodePackage;
 
 	/**
@@ -40,7 +40,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * @param profile
 	 * @param element
 	 */
-	public BaseMethodGenerator(FhirResourceManager manager, CodeTemplateUtils template, StructureDefinition profile, ElementDefinitionDt element) {
+	public BaseMethodGenerator(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		this.fhirResourceManager = manager;
 		this.template = template;
 		this.profile = profile;
@@ -225,7 +225,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * 
 	 * @return
 	 */
-	public CodeTemplateUtils getTemplate() {
+	public MethodBodyGenerator getTemplate() {
 		return template;
 	}
 	
@@ -234,7 +234,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * 
 	 * @param template
 	 */
-	public void setTemplate(CodeTemplateUtils template) {
+	public void setTemplate(MethodBodyGenerator template) {
 		this.template = template;
 	}
 	
@@ -422,6 +422,16 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	}
 	
 	/**
+	 * Builds getParamFirstRep signature name using the JavaBean convention
+	 * 
+	 * @param fieldName
+	 * @return
+	 */
+	public String buildGetterFirstRepName(String fieldName) {
+		return "get" + StringUtils.capitalize(fieldName) + "FirstRep";
+	}
+	
+	/**
 	 * Constructs a setter method for the given field name and parameters
 	 * using the java bean convention.
 	 * 
@@ -445,6 +455,17 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 */
 	public Method constructGetMethodFromField(String fieldName, String type) {
 		return Method.constructNoArgMethod(buildGetterName(fieldName), type);
+	}
+	
+	/**
+	 * Construct a getterXFirstRep() method for the given field name and type.
+	 * 
+	 * @param fieldName
+	 * @param type
+	 * @return
+	 */
+	public Method constructGetFirstRepMethodFromField(String fieldName, String type) {
+		return Method.constructNoArgMethod(this.buildGetterFirstRepName(fieldName), type);
 	}
 	
 	/**
@@ -623,6 +644,19 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 */
 	public String buildDelegatedSetterBody(String propertyName) {
 		return template.getAdapterSetMethodDelegationBody(propertyName);
+	}
+	
+	/**
+	 * <pre>
+	 * <code>
+	 * adaptedClass.get{PropertyName}FirstRep();
+	 * </code>
+	 * </pre>
+	 * @param propertyName
+	 * @return
+	 */
+	public String buildGetFirstRepInvocation(String propertyName) {
+		return template.getFirstRepInvocationBody(propertyName);
 	}
 	
 	/**

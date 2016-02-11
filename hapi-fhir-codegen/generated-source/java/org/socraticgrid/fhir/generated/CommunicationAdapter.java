@@ -78,6 +78,11 @@ public class CommunicationAdapter implements ICommunication
       return item;
    }
 
+   public Communication.Payload getPayloadFirstRep()
+   {
+      return adaptedClass.getPayloadFirstRep();
+   }
+
    public DateTimeDt getSentElement()
    {
       return adaptedClass.getSentElement();
@@ -236,6 +241,11 @@ public class CommunicationAdapter implements ICommunication
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public DateTimeDt getReceivedElement()

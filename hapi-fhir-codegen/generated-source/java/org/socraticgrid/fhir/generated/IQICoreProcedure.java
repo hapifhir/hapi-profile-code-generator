@@ -41,6 +41,8 @@ public interface IQICoreProcedure
 
    public Procedure.FocalDevice addFocalDevice();
 
+   public Procedure.FocalDevice getFocalDeviceFirstRep();
+
    public List<IdentifierDt> getIdentifier();
 
    public IQICoreProcedure setIdentifier(List<IdentifierDt> param);
@@ -48,6 +50,8 @@ public interface IQICoreProcedure
    public IQICoreProcedure addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public CodeableConceptDt getCategory();
 
@@ -73,6 +77,8 @@ public interface IQICoreProcedure
 
    public Procedure.Performer addPerformer();
 
+   public Procedure.Performer getPerformerFirstRep();
+
    public List<AnnotationDt> getNotes();
 
    public IQICoreProcedure setNotes(List<AnnotationDt> param);
@@ -80,6 +86,8 @@ public interface IQICoreProcedure
    public IQICoreProcedure addNotes(AnnotationDt param);
 
    public AnnotationDt addNotes();
+
+   public AnnotationDt getNotesFirstRep();
 
    public NarrativeDt getText();
 

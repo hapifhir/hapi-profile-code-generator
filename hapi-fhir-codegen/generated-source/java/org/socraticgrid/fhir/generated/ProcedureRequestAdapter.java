@@ -71,6 +71,11 @@ public class ProcedureRequestAdapter implements IProcedureRequest
       return item;
    }
 
+   public AnnotationDt getNotesFirstRep()
+   {
+      return adaptedClass.getNotesFirstRep();
+   }
+
    public IdDt getId()
    {
       return adaptedClass.getId();
@@ -327,6 +332,11 @@ public class ProcedureRequestAdapter implements IProcedureRequest
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public BooleanDt getAsNeededBooleanElement()

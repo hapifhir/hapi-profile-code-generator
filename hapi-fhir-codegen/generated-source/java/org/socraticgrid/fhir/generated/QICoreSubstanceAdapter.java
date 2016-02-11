@@ -84,6 +84,11 @@ public class QICoreSubstanceAdapter implements IQICoreSubstance
       return item;
    }
 
+   public Substance.Ingredient getIngredientFirstRep()
+   {
+      return adaptedClass.getIngredientFirstRep();
+   }
+
    public IdDt getId()
    {
       return adaptedClass.getId();
@@ -119,6 +124,11 @@ public class QICoreSubstanceAdapter implements IQICoreSubstance
       return item;
    }
 
+   public Substance.Instance getInstanceFirstRep()
+   {
+      return adaptedClass.getInstanceFirstRep();
+   }
+
    public List<IdentifierDt> getIdentifier()
    {
       return adaptedClass.getIdentifier();
@@ -141,6 +151,11 @@ public class QICoreSubstanceAdapter implements IQICoreSubstance
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public NarrativeDt getText()

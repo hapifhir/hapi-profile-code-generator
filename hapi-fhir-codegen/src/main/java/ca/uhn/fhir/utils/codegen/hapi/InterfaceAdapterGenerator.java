@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.MethodHandlerResolver;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
 import ca.uhn.fhir.utils.common.metamodel.ClassField;
@@ -63,7 +62,7 @@ public class InterfaceAdapterGenerator {
 	private String generatedPackage;
 	private String destinationDirectory;
 	private FhirResourceManager fhirResourceManager;
-	private CodeTemplateUtils templateUtils;
+	private MethodBodyGenerator templateUtils;
 	private List<String> resourceGenerationPlan;
 	private MethodHandlerResolver resolver;
 	private ProfileWalker profileWalker;
@@ -80,7 +79,7 @@ public class InterfaceAdapterGenerator {
 	 * @param fhirResourceManager A FHIR Resource Manager required to access profiles and extensions for code generation
 	 * @param templateUtils The Code Template Utility used for code generation
 	 */
-	public InterfaceAdapterGenerator(String generatedPackage, FhirResourceManager fhirResourceManager, CodeTemplateUtils templateUtils) {
+	public InterfaceAdapterGenerator(String generatedPackage, FhirResourceManager fhirResourceManager, MethodBodyGenerator templateUtils) {
 		this.generatedPackage = generatedPackage;
 		this.templateUtils = templateUtils;
 		this.resourceGenerationPlan = new ArrayList<String>();
@@ -194,7 +193,7 @@ public class InterfaceAdapterGenerator {
 			generateAdapteeGetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			for(ClassModel model : command.getClassMap().values()) {
-				if(model != rootModel) {
+				if(model != rootModel && model.getMethods().size() > 0) {
 					String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
 					CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
 				}

@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedStructureAttributeHandler;
 import ca.uhn.fhir.utils.common.graph.CommandInterface;
 import ca.uhn.fhir.utils.common.graph.Node;
@@ -20,7 +19,7 @@ import ca.uhn.fhir.utils.common.metamodel.Method;
 public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 	
 	private FhirResourceManager fhirResourceManager;
-	private CodeTemplateUtils template;
+	private MethodBodyGenerator template;
 	private StructureDefinition profile;
 	private Map<String, ClassModel> classModels;
 	
@@ -57,11 +56,11 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 		this.classModels = classModels;
 	}
 	
-	public CodeTemplateUtils getTemplate() {
+	public MethodBodyGenerator getTemplate() {
 		return template;
 	}
 
-	public void setTemplate(CodeTemplateUtils template) {
+	public void setTemplate(MethodBodyGenerator template) {
 		this.template = template;
 	}
 

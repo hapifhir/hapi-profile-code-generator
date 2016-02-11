@@ -69,6 +69,8 @@ public interface IQICoreAdverseEvent
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public List<PeriodDt> getPeriod();
 
    public IQICoreAdverseEvent setPeriod(List<PeriodDt> param);

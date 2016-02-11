@@ -38,6 +38,8 @@ public interface IPatient
 
    public AttachmentDt addPhoto();
 
+   public AttachmentDt getPhotoFirstRep();
+
    public List<Patient.Contact> getContact();
 
    public IPatient setContact(List<Patient.Contact> param);
@@ -46,6 +48,8 @@ public interface IPatient
 
    public Patient.Contact addContact();
 
+   public Patient.Contact getContactFirstRep();
+
    public List<Patient.Communication> getCommunication();
 
    public IPatient setCommunication(List<Patient.Communication> param);
@@ -53,6 +57,8 @@ public interface IPatient
    public IPatient addCommunication(Patient.Communication param);
 
    public Patient.Communication addCommunication();
+
+   public Patient.Communication getCommunicationFirstRep();
 
    public NarrativeDt getText();
 
@@ -115,6 +121,8 @@ public interface IPatient
 
    public Patient.Link addLink();
 
+   public Patient.Link getLinkFirstRep();
+
    public List<ContactPointDt> getTelecom();
 
    public IPatient setTelecom(List<ContactPointDt> param);
@@ -123,6 +131,8 @@ public interface IPatient
 
    public ContactPointDt addTelecom();
 
+   public ContactPointDt getTelecomFirstRep();
+
    public List<AddressDt> getAddress();
 
    public IPatient setAddress(List<AddressDt> param);
@@ -130,6 +140,8 @@ public interface IPatient
    public IPatient addAddress(AddressDt param);
 
    public AddressDt addAddress();
+
+   public AddressDt getAddressFirstRep();
 
    public BooleanDt getActiveElement();
 
@@ -147,6 +159,8 @@ public interface IPatient
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public IdDt getId();
 
    public IPatient setId(IdDt param);
@@ -158,6 +172,8 @@ public interface IPatient
    public IPatient addName(HumanNameDt param);
 
    public HumanNameDt addName();
+
+   public HumanNameDt getNameFirstRep();
 
    public ContainedDt getContained();
 

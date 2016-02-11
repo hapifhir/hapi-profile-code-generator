@@ -104,6 +104,11 @@ public class EncounterAdapter implements IEncounter
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public Encounter.Hospitalization getHospitalization()
    {
       return adaptedClass.getHospitalization();
@@ -158,6 +163,11 @@ public class EncounterAdapter implements IEncounter
       return item;
    }
 
+   public Encounter.StatusHistory getStatusHistoryFirstRep()
+   {
+      return adaptedClass.getStatusHistoryFirstRep();
+   }
+
    public List<Encounter.Participant> getParticipant()
    {
       return adaptedClass.getParticipant();
@@ -182,6 +192,11 @@ public class EncounterAdapter implements IEncounter
       return item;
    }
 
+   public Encounter.Participant getParticipantFirstRep()
+   {
+      return adaptedClass.getParticipantFirstRep();
+   }
+
    public List<Encounter.Location> getLocation()
    {
       return adaptedClass.getLocation();
@@ -204,6 +219,11 @@ public class EncounterAdapter implements IEncounter
       ca.uhn.fhir.model.dstu2.resource.Encounter.Location item = new ca.uhn.fhir.model.dstu2.resource.Encounter.Location();
       adaptedClass.addLocation(item);
       return item;
+   }
+
+   public Encounter.Location getLocationFirstRep()
+   {
+      return adaptedClass.getLocationFirstRep();
    }
 
    public Organization getServiceProviderResource()

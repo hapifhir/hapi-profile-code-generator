@@ -33,6 +33,8 @@ public interface ISpecimen
 
    public Specimen.Treatment addTreatment();
 
+   public Specimen.Treatment getTreatmentFirstRep();
+
    public CodeDt getLanguage();
 
    public ISpecimen setLanguage(CodeDt param);
@@ -48,6 +50,8 @@ public interface ISpecimen
    public ISpecimen addContainer(Specimen.Container param);
 
    public Specimen.Container addContainer();
+
+   public Specimen.Container getContainerFirstRep();
 
    public IdentifierDt getAccessionIdentifier();
 
@@ -88,4 +92,6 @@ public interface ISpecimen
    public ISpecimen addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 }

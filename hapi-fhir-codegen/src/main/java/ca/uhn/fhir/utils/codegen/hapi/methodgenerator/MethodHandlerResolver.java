@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
 
@@ -23,7 +23,7 @@ public class MethodHandlerResolver {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MethodHandlerResolver.class);
 	
 	private FhirResourceManager fhirResourceManager;
-	private CodeTemplateUtils codeTemplateUtils;
+	private MethodBodyGenerator codeTemplateUtils;
 	
 	/**
 	 * Constructor passing configuration resources to the resolver instance.
@@ -31,7 +31,7 @@ public class MethodHandlerResolver {
 	 * @param fhirResourceManager
 	 * @param codeTemplateUtils
 	 */
-	public MethodHandlerResolver(FhirResourceManager fhirResourceManager, CodeTemplateUtils codeTemplateUtils) {
+	public MethodHandlerResolver(FhirResourceManager fhirResourceManager, MethodBodyGenerator codeTemplateUtils) {
 		this.fhirResourceManager = fhirResourceManager;
 		this.codeTemplateUtils = codeTemplateUtils;
 	}
@@ -59,7 +59,7 @@ public class MethodHandlerResolver {
 	 * 
 	 * @return
 	 */
-	public CodeTemplateUtils getTemplate() {
+	public MethodBodyGenerator getTemplate() {
 		return codeTemplateUtils;
 	}
 	
@@ -68,7 +68,7 @@ public class MethodHandlerResolver {
 	 * 
 	 * @param codeTemplateUtils
 	 */
-	public void setTemplate(CodeTemplateUtils codeTemplateUtils) {
+	public void setTemplate(MethodBodyGenerator codeTemplateUtils) {
 		this.codeTemplateUtils = codeTemplateUtils;
 	}
 	

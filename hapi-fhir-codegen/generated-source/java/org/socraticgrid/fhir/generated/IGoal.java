@@ -51,6 +51,8 @@ public interface IGoal
 
    public Goal.Outcome addOutcome();
 
+   public Goal.Outcome getOutcomeFirstRep();
+
    public IdDt getId();
 
    public IGoal setId(IdDt param);
@@ -62,6 +64,8 @@ public interface IGoal
    public IGoal addNote(AnnotationDt param);
 
    public AnnotationDt addNote();
+
+   public AnnotationDt getNoteFirstRep();
 
    public DateDt getTargetDateElement();
 
@@ -87,6 +91,8 @@ public interface IGoal
    public IGoal addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public DateDt getStatusDateElement();
 

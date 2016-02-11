@@ -34,6 +34,8 @@ public interface IAllergyIntolerance
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public String getType();
 
    public IAllergyIntolerance setType(String param);
@@ -55,6 +57,8 @@ public interface IAllergyIntolerance
    public IAllergyIntolerance addReaction(AllergyIntolerance.Reaction param);
 
    public AllergyIntolerance.Reaction addReaction();
+
+   public AllergyIntolerance.Reaction getReactionFirstRep();
 
    public String getCriticality();
 

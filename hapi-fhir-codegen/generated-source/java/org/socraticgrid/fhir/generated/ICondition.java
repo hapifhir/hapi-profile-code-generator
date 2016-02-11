@@ -40,6 +40,8 @@ public interface ICondition
 
    public Condition.Evidence addEvidence();
 
+   public Condition.Evidence getEvidenceFirstRep();
+
    public BoundCodeableConceptDt<ConditionCategoryCodesEnum> getCategory();
 
    public ICondition setCategory(
@@ -116,6 +118,8 @@ public interface ICondition
    public ICondition addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public String getClinicalStatus();
 

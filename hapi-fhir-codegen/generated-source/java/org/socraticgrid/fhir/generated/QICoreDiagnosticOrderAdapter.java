@@ -88,6 +88,11 @@ public class QICoreDiagnosticOrderAdapter implements IQICoreDiagnosticOrder
       return item;
    }
 
+   public DiagnosticOrder.Event getEventFirstRep()
+   {
+      return adaptedClass.getEventFirstRep();
+   }
+
    public NarrativeDt getText()
    {
       return adaptedClass.getText();
@@ -244,6 +249,11 @@ public class QICoreDiagnosticOrderAdapter implements IQICoreDiagnosticOrder
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public CodeableConceptDt getReasonRejected()
    {
       List<ca.uhn.fhir.model.api.ExtensionDt> extensions = adaptedClass
@@ -296,6 +306,11 @@ public class QICoreDiagnosticOrderAdapter implements IQICoreDiagnosticOrder
       ca.uhn.fhir.model.dstu2.composite.AnnotationDt item = new ca.uhn.fhir.model.dstu2.composite.AnnotationDt();
       adaptedClass.addNote(item);
       return item;
+   }
+
+   public AnnotationDt getNoteFirstRep()
+   {
+      return adaptedClass.getNoteFirstRep();
    }
 
    public IdDt getId()

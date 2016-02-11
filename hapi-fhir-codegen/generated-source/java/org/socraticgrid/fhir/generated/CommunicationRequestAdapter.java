@@ -90,6 +90,11 @@ public class CommunicationRequestAdapter implements ICommunicationRequest
       return item;
    }
 
+   public CommunicationRequest.Payload getPayloadFirstRep()
+   {
+      return adaptedClass.getPayloadFirstRep();
+   }
+
    public CodeableConceptDt getPriority()
    {
       return adaptedClass.getPriority();
@@ -220,6 +225,11 @@ public class CommunicationRequestAdapter implements ICommunicationRequest
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public CodeableConceptDt getCategory()

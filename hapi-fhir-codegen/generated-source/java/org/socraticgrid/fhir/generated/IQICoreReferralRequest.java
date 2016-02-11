@@ -112,4 +112,6 @@ public interface IQICoreReferralRequest
    public IQICoreReferralRequest addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 }

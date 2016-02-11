@@ -36,6 +36,8 @@ public interface IMedicationOrder
 
    public MedicationOrder.DosageInstruction addDosageInstruction();
 
+   public MedicationOrder.DosageInstruction getDosageInstructionFirstRep();
+
    public Practitioner getPrescriberResource();
 
    public IMedicationOrder setPrescriberResource(Practitioner param);
@@ -133,6 +135,8 @@ public interface IMedicationOrder
    public IMedicationOrder addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public CodeableConceptDt getReasonEnded();
 

@@ -105,6 +105,11 @@ public class QICoreEncounterAdapter implements IQICoreEncounter
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public Encounter.Hospitalization getHospitalization()
    {
       return adaptedClass.getHospitalization();
@@ -197,6 +202,11 @@ public class QICoreEncounterAdapter implements IQICoreEncounter
       return item;
    }
 
+   public Encounter.Participant getParticipantFirstRep()
+   {
+      return adaptedClass.getParticipantFirstRep();
+   }
+
    public List<Encounter.StatusHistory> getStatusHistory()
    {
       return adaptedClass.getStatusHistory();
@@ -219,6 +229,11 @@ public class QICoreEncounterAdapter implements IQICoreEncounter
       ca.uhn.fhir.model.dstu2.resource.Encounter.StatusHistory item = new ca.uhn.fhir.model.dstu2.resource.Encounter.StatusHistory();
       adaptedClass.addStatusHistory(item);
       return item;
+   }
+
+   public Encounter.StatusHistory getStatusHistoryFirstRep()
+   {
+      return adaptedClass.getStatusHistoryFirstRep();
    }
 
    public ContainedDt getContained()
@@ -276,6 +291,11 @@ public class QICoreEncounterAdapter implements IQICoreEncounter
       ca.uhn.fhir.model.dstu2.resource.Encounter.Location item = new ca.uhn.fhir.model.dstu2.resource.Encounter.Location();
       adaptedClass.addLocation(item);
       return item;
+   }
+
+   public Encounter.Location getLocationFirstRep()
+   {
+      return adaptedClass.getLocationFirstRep();
    }
 
    public Appointment getAppointmentResource()

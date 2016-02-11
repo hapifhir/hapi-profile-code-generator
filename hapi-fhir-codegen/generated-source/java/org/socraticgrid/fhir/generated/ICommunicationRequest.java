@@ -41,6 +41,8 @@ public interface ICommunicationRequest
 
    public CommunicationRequest.Payload addPayload();
 
+   public CommunicationRequest.Payload getPayloadFirstRep();
+
    public CodeableConceptDt getPriority();
 
    public ICommunicationRequest setPriority(CodeableConceptDt param);
@@ -81,6 +83,8 @@ public interface ICommunicationRequest
    public ICommunicationRequest addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public CodeableConceptDt getCategory();
 

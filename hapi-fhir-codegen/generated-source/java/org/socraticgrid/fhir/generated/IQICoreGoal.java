@@ -44,6 +44,8 @@ public interface IQICoreGoal
 
    public AnnotationDt addNote();
 
+   public AnnotationDt getNoteFirstRep();
+
    public List<Goal.Outcome> getOutcome();
 
    public IQICoreGoal setOutcome(List<Goal.Outcome> param);
@@ -52,6 +54,8 @@ public interface IQICoreGoal
 
    public Goal.Outcome addOutcome();
 
+   public Goal.Outcome getOutcomeFirstRep();
+
    public List<IdentifierDt> getIdentifier();
 
    public IQICoreGoal setIdentifier(List<IdentifierDt> param);
@@ -59,6 +63,8 @@ public interface IQICoreGoal
    public IQICoreGoal addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public List<QICoreGoalTarget> getTarget();
 

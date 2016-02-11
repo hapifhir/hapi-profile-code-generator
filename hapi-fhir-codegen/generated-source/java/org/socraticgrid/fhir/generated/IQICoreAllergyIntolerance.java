@@ -34,6 +34,8 @@ public interface IQICoreAllergyIntolerance
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public String getType();
 
    public IQICoreAllergyIntolerance setType(String param);

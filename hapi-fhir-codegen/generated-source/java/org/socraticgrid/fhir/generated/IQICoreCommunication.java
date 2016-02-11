@@ -34,6 +34,8 @@ public interface IQICoreCommunication
 
    public Communication.Payload addPayload();
 
+   public Communication.Payload getPayloadFirstRep();
+
    public DateTimeDt getSentElement();
 
    public Date getSent();
@@ -88,6 +90,8 @@ public interface IQICoreCommunication
    public IQICoreCommunication addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public DateTimeDt getReceivedElement();
 

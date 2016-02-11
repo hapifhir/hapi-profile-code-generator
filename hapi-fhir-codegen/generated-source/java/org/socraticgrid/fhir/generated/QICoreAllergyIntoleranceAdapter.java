@@ -69,6 +69,11 @@ public class QICoreAllergyIntoleranceAdapter implements IQICoreAllergyIntoleranc
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public String getType()
    {
       return adaptedClass.getType();

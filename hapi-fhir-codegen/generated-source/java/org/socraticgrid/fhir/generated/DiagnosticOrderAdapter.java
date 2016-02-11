@@ -84,6 +84,11 @@ public class DiagnosticOrderAdapter implements IDiagnosticOrder
       return item;
    }
 
+   public DiagnosticOrder.Event getEventFirstRep()
+   {
+      return adaptedClass.getEventFirstRep();
+   }
+
    public NarrativeDt getText()
    {
       return adaptedClass.getText();
@@ -210,6 +215,11 @@ public class DiagnosticOrderAdapter implements IDiagnosticOrder
       return item;
    }
 
+   public DiagnosticOrder.Item getItemFirstRep()
+   {
+      return adaptedClass.getItemFirstRep();
+   }
+
    public List<IdentifierDt> getIdentifier()
    {
       return adaptedClass.getIdentifier();
@@ -234,6 +244,11 @@ public class DiagnosticOrderAdapter implements IDiagnosticOrder
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public List<AnnotationDt> getNote()
    {
       return adaptedClass.getNote();
@@ -256,6 +271,11 @@ public class DiagnosticOrderAdapter implements IDiagnosticOrder
       ca.uhn.fhir.model.dstu2.composite.AnnotationDt item = new ca.uhn.fhir.model.dstu2.composite.AnnotationDt();
       adaptedClass.addNote(item);
       return item;
+   }
+
+   public AnnotationDt getNoteFirstRep()
+   {
+      return adaptedClass.getNoteFirstRep();
    }
 
    public IdDt getId()

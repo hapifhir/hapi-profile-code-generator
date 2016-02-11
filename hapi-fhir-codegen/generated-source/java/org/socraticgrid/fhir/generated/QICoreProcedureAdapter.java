@@ -101,6 +101,11 @@ public class QICoreProcedureAdapter implements IQICoreProcedure
       return item;
    }
 
+   public Procedure.FocalDevice getFocalDeviceFirstRep()
+   {
+      return adaptedClass.getFocalDeviceFirstRep();
+   }
+
    public List<IdentifierDt> getIdentifier()
    {
       return adaptedClass.getIdentifier();
@@ -123,6 +128,11 @@ public class QICoreProcedureAdapter implements IQICoreProcedure
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public CodeableConceptDt getCategory()
@@ -221,6 +231,11 @@ public class QICoreProcedureAdapter implements IQICoreProcedure
       return item;
    }
 
+   public Procedure.Performer getPerformerFirstRep()
+   {
+      return adaptedClass.getPerformerFirstRep();
+   }
+
    public List<AnnotationDt> getNotes()
    {
       return adaptedClass.getNotes();
@@ -243,6 +258,11 @@ public class QICoreProcedureAdapter implements IQICoreProcedure
       ca.uhn.fhir.model.dstu2.composite.AnnotationDt item = new ca.uhn.fhir.model.dstu2.composite.AnnotationDt();
       adaptedClass.addNotes(item);
       return item;
+   }
+
+   public AnnotationDt getNotesFirstRep()
+   {
+      return adaptedClass.getNotesFirstRep();
    }
 
    public NarrativeDt getText()

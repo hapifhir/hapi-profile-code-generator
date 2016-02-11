@@ -69,6 +69,8 @@ public interface IImmunization
 
    public Immunization.VaccinationProtocol addVaccinationProtocol();
 
+   public Immunization.VaccinationProtocol getVaccinationProtocolFirstRep();
+
    public List<Immunization.Reaction> getReaction();
 
    public IImmunization setReaction(List<Immunization.Reaction> param);
@@ -76,6 +78,8 @@ public interface IImmunization
    public IImmunization addReaction(Immunization.Reaction param);
 
    public Immunization.Reaction addReaction();
+
+   public Immunization.Reaction getReactionFirstRep();
 
    public NarrativeDt getText();
 
@@ -150,6 +154,8 @@ public interface IImmunization
 
    public AnnotationDt addNote();
 
+   public AnnotationDt getNoteFirstRep();
+
    public IdDt getId();
 
    public IImmunization setId(IdDt param);
@@ -173,4 +179,6 @@ public interface IImmunization
    public IImmunization addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 }

@@ -41,6 +41,8 @@ public interface IPractitioner
 
    public ContactPointDt addTelecom();
 
+   public ContactPointDt getTelecomFirstRep();
+
    public List<Practitioner.Qualification> getQualification();
 
    public IPractitioner setQualification(List<Practitioner.Qualification> param);
@@ -48,6 +50,8 @@ public interface IPractitioner
    public IPractitioner addQualification(Practitioner.Qualification param);
 
    public Practitioner.Qualification addQualification();
+
+   public Practitioner.Qualification getQualificationFirstRep();
 
    public HumanNameDt getName();
 
@@ -78,6 +82,8 @@ public interface IPractitioner
 
    public Practitioner.PractitionerRole addPractitionerRole();
 
+   public Practitioner.PractitionerRole getPractitionerRoleFirstRep();
+
    public List<AddressDt> getAddress();
 
    public IPractitioner setAddress(List<AddressDt> param);
@@ -85,6 +91,8 @@ public interface IPractitioner
    public IPractitioner addAddress(AddressDt param);
 
    public AddressDt addAddress();
+
+   public AddressDt getAddressFirstRep();
 
    public IdDt getId();
 
@@ -97,6 +105,8 @@ public interface IPractitioner
    public IPractitioner addPhoto(AttachmentDt param);
 
    public AttachmentDt addPhoto();
+
+   public AttachmentDt getPhotoFirstRep();
 
    public String getGender();
 
@@ -113,6 +123,8 @@ public interface IPractitioner
    public IPractitioner addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public ContainedDt getContained();
 

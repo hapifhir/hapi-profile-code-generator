@@ -86,6 +86,8 @@ public interface IQICoreLocation
 
    public ContactPointDt addTelecom();
 
+   public ContactPointDt getTelecomFirstRep();
+
    public List<IdentifierDt> getIdentifier();
 
    public IQICoreLocation setIdentifier(List<IdentifierDt> param);
@@ -93,6 +95,8 @@ public interface IQICoreLocation
    public IQICoreLocation addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public StringDt getDescriptionElement();
 

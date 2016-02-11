@@ -45,6 +45,8 @@ public interface IQICoreCommunicationRequest
 
    public CommunicationRequest.Payload addPayload();
 
+   public CommunicationRequest.Payload getPayloadFirstRep();
+
    public CodeableConceptDt getPriority();
 
    public IQICoreCommunicationRequest setPriority(CodeableConceptDt param);
@@ -86,6 +88,8 @@ public interface IQICoreCommunicationRequest
    public IQICoreCommunicationRequest addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public CodeableConceptDt getCategory();
 

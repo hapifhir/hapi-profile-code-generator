@@ -34,6 +34,8 @@ public interface IQICoreOrganization
 
    public AddressDt addAddress();
 
+   public AddressDt getAddressFirstRep();
+
    public StringDt getNameElement();
 
    public String getName();
@@ -49,6 +51,8 @@ public interface IQICoreOrganization
    public IQICoreOrganization addContact(Organization.Contact param);
 
    public Organization.Contact addContact();
+
+   public Organization.Contact getContactFirstRep();
 
    public BooleanDt getActiveElement();
 
@@ -70,6 +74,8 @@ public interface IQICoreOrganization
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public BoundCodeableConceptDt<OrganizationTypeEnum> getType();
 
    public IQICoreOrganization setType(
@@ -86,6 +92,8 @@ public interface IQICoreOrganization
    public IQICoreOrganization addTelecom(ContactPointDt param);
 
    public ContactPointDt addTelecom();
+
+   public ContactPointDt getTelecomFirstRep();
 
    public ContainedDt getContained();
 

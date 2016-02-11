@@ -99,6 +99,8 @@ public interface IMedicationAdministration
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public Encounter getEncounterResource();
 
    public IMedicationAdministration setEncounterResource(Encounter param);

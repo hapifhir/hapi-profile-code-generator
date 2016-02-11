@@ -46,6 +46,8 @@ public interface IEncounter
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public Encounter.Hospitalization getHospitalization();
 
    public IEncounter setHospitalization(Encounter.Hospitalization param);
@@ -62,6 +64,8 @@ public interface IEncounter
 
    public Encounter.StatusHistory addStatusHistory();
 
+   public Encounter.StatusHistory getStatusHistoryFirstRep();
+
    public List<Encounter.Participant> getParticipant();
 
    public IEncounter setParticipant(List<Encounter.Participant> param);
@@ -70,6 +74,8 @@ public interface IEncounter
 
    public Encounter.Participant addParticipant();
 
+   public Encounter.Participant getParticipantFirstRep();
+
    public List<Encounter.Location> getLocation();
 
    public IEncounter setLocation(List<Encounter.Location> param);
@@ -77,6 +83,8 @@ public interface IEncounter
    public IEncounter addLocation(Encounter.Location param);
 
    public Encounter.Location addLocation();
+
+   public Encounter.Location getLocationFirstRep();
 
    public Organization getServiceProviderResource();
 

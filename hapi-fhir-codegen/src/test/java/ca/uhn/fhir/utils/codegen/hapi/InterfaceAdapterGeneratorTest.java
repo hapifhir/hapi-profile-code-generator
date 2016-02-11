@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.Main;
@@ -47,7 +46,7 @@ public class InterfaceAdapterGeneratorTest {
 		manager.addProfileRepositoryLocation("/Users/cnanjo/repository/fhir/trunk/build/publish");
 		manager.initialize();
 		loader.setExtensionManager(manager);
-		CodeTemplateUtils utils = new CodeTemplateUtils();
+		MethodBodyGenerator utils = new MethodBodyGenerator();
 		utils.initialize();
 		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator("org.socraticgrid.fhir.generated", loader, utils);
 		generator.generateInterfaceAndAdapter("QICore-Patient");

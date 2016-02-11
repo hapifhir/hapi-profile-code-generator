@@ -69,6 +69,11 @@ public class AllergyIntoleranceAdapter implements IAllergyIntolerance
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public String getType()
    {
       return adaptedClass.getType();
@@ -128,6 +133,11 @@ public class AllergyIntoleranceAdapter implements IAllergyIntolerance
       ca.uhn.fhir.model.dstu2.resource.AllergyIntolerance.Reaction item = new ca.uhn.fhir.model.dstu2.resource.AllergyIntolerance.Reaction();
       adaptedClass.addReaction(item);
       return item;
+   }
+
+   public AllergyIntolerance.Reaction getReactionFirstRep()
+   {
+      return adaptedClass.getReactionFirstRep();
    }
 
    public String getCriticality()

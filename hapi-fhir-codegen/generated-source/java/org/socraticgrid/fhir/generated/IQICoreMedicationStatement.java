@@ -43,6 +43,8 @@ public interface IQICoreMedicationStatement
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public StringDt getNoteElement();
 
    public String getNote();
@@ -59,6 +61,8 @@ public interface IQICoreMedicationStatement
    public IQICoreMedicationStatement addDosage(MedicationStatement.Dosage param);
 
    public MedicationStatement.Dosage addDosage();
+
+   public MedicationStatement.Dosage getDosageFirstRep();
 
    public DateTimeDt getDateAssertedElement();
 

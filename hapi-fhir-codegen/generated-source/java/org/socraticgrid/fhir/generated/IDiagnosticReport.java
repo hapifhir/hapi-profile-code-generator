@@ -34,6 +34,8 @@ public interface IDiagnosticReport
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public InstantDt getIssuedElement();
 
    public Date getIssued();
@@ -54,6 +56,8 @@ public interface IDiagnosticReport
 
    public DiagnosticReport.Image addImage();
 
+   public DiagnosticReport.Image getImageFirstRep();
+
    public Encounter getEncounterResource();
 
    public IDiagnosticReport setEncounterResource(Encounter param);
@@ -65,6 +69,8 @@ public interface IDiagnosticReport
    public IDiagnosticReport addPresentedForm(AttachmentDt param);
 
    public AttachmentDt addPresentedForm();
+
+   public AttachmentDt getPresentedFormFirstRep();
 
    public CodeableConceptDt getCode();
 

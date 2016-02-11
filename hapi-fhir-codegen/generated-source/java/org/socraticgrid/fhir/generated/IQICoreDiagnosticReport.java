@@ -34,6 +34,8 @@ public interface IQICoreDiagnosticReport
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public InstantDt getIssuedElement();
 
    public Date getIssued();
@@ -59,6 +61,8 @@ public interface IQICoreDiagnosticReport
 
    public DiagnosticReport.Image addImage();
 
+   public DiagnosticReport.Image getImageFirstRep();
+
    public QICoreEncounterAdapter getEncounterResource();
 
    public IQICoreDiagnosticReport setEncounterResource(
@@ -71,6 +75,8 @@ public interface IQICoreDiagnosticReport
    public IQICoreDiagnosticReport addPresentedForm(AttachmentDt param);
 
    public AttachmentDt addPresentedForm();
+
+   public AttachmentDt getPresentedFormFirstRep();
 
    public CodeableConceptDt getCode();
 

@@ -65,6 +65,11 @@ public class OrganizationAdapter implements IOrganization
       return item;
    }
 
+   public Organization.Contact getContactFirstRep()
+   {
+      return adaptedClass.getContactFirstRep();
+   }
+
    public NarrativeDt getText()
    {
       return adaptedClass.getText();
@@ -98,6 +103,11 @@ public class OrganizationAdapter implements IOrganization
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public Organization getPartOfResource()
@@ -164,6 +174,11 @@ public class OrganizationAdapter implements IOrganization
       ca.uhn.fhir.model.dstu2.composite.ContactPointDt item = new ca.uhn.fhir.model.dstu2.composite.ContactPointDt();
       adaptedClass.addTelecom(item);
       return item;
+   }
+
+   public ContactPointDt getTelecomFirstRep()
+   {
+      return adaptedClass.getTelecomFirstRep();
    }
 
    public StringDt getNameElement()
@@ -244,6 +259,11 @@ public class OrganizationAdapter implements IOrganization
       ca.uhn.fhir.model.dstu2.composite.AddressDt item = new ca.uhn.fhir.model.dstu2.composite.AddressDt();
       adaptedClass.addAddress(item);
       return item;
+   }
+
+   public AddressDt getAddressFirstRep()
+   {
+      return adaptedClass.getAddressFirstRep();
    }
 
    public IdDt getId()

@@ -76,6 +76,11 @@ public class QICoreCommunicationAdapter implements IQICoreCommunication
       return item;
    }
 
+   public Communication.Payload getPayloadFirstRep()
+   {
+      return adaptedClass.getPayloadFirstRep();
+   }
+
    public DateTimeDt getSentElement()
    {
       return adaptedClass.getSentElement();
@@ -273,6 +278,11 @@ public class QICoreCommunicationAdapter implements IQICoreCommunication
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public DateTimeDt getReceivedElement()

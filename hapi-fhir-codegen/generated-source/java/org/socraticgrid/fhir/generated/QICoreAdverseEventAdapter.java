@@ -257,6 +257,11 @@ public class QICoreAdverseEventAdapter implements IQICoreAdverseEvent
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public List<PeriodDt> getPeriod() {
 		List<ExtensionDt> extensions = adaptedClass
 				.getUndeclaredExtensionsByUrl("http://hl7.org/fhir/StructureDefinition/qicore-adverseevent-period");

@@ -36,6 +36,8 @@ public interface IQICorePractitioner
 
    public Practitioner.PractitionerRole addPractitionerRole();
 
+   public Practitioner.PractitionerRole getPractitionerRoleFirstRep();
+
    public BooleanDt getActiveElement();
 
    public Boolean getActive();
@@ -52,6 +54,8 @@ public interface IQICorePractitioner
 
    public ContactPointDt addTelecom();
 
+   public ContactPointDt getTelecomFirstRep();
+
    public List<Practitioner.Qualification> getQualification();
 
    public IQICorePractitioner setQualification(
@@ -60,6 +64,8 @@ public interface IQICorePractitioner
    public IQICorePractitioner addQualification(Practitioner.Qualification param);
 
    public Practitioner.Qualification addQualification();
+
+   public Practitioner.Qualification getQualificationFirstRep();
 
    public HumanNameDt getName();
 
@@ -93,6 +99,8 @@ public interface IQICorePractitioner
 
    public AddressDt addAddress();
 
+   public AddressDt getAddressFirstRep();
+
    public IdDt getId();
 
    public IQICorePractitioner setId(IdDt param);
@@ -104,6 +112,8 @@ public interface IQICorePractitioner
    public IQICorePractitioner addPhoto(AttachmentDt param);
 
    public AttachmentDt addPhoto();
+
+   public AttachmentDt getPhotoFirstRep();
 
    public String getGender();
 
@@ -121,6 +131,8 @@ public interface IQICorePractitioner
    public IQICorePractitioner addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public ContainedDt getContained();
 

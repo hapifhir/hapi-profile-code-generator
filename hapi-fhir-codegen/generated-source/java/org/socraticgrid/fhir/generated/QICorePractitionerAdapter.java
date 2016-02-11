@@ -71,6 +71,11 @@ public class QICorePractitionerAdapter implements IQICorePractitioner
       return item;
    }
 
+   public Practitioner.PractitionerRole getPractitionerRoleFirstRep()
+   {
+      return adaptedClass.getPractitionerRoleFirstRep();
+   }
+
    public BooleanDt getActiveElement()
    {
       return adaptedClass.getActiveElement();
@@ -118,6 +123,11 @@ public class QICorePractitionerAdapter implements IQICorePractitioner
       return item;
    }
 
+   public ContactPointDt getTelecomFirstRep()
+   {
+      return adaptedClass.getTelecomFirstRep();
+   }
+
    public List<Practitioner.Qualification> getQualification()
    {
       return adaptedClass.getQualification();
@@ -141,6 +151,11 @@ public class QICorePractitionerAdapter implements IQICorePractitioner
       ca.uhn.fhir.model.dstu2.resource.Practitioner.Qualification item = new ca.uhn.fhir.model.dstu2.resource.Practitioner.Qualification();
       adaptedClass.addQualification(item);
       return item;
+   }
+
+   public Practitioner.Qualification getQualificationFirstRep()
+   {
+      return adaptedClass.getQualificationFirstRep();
    }
 
    public HumanNameDt getName()
@@ -253,6 +268,11 @@ public class QICorePractitionerAdapter implements IQICorePractitioner
       return item;
    }
 
+   public AddressDt getAddressFirstRep()
+   {
+      return adaptedClass.getAddressFirstRep();
+   }
+
    public IdDt getId()
    {
       return adaptedClass.getId();
@@ -286,6 +306,11 @@ public class QICorePractitionerAdapter implements IQICorePractitioner
       ca.uhn.fhir.model.dstu2.composite.AttachmentDt item = new ca.uhn.fhir.model.dstu2.composite.AttachmentDt();
       adaptedClass.addPhoto(item);
       return item;
+   }
+
+   public AttachmentDt getPhotoFirstRep()
+   {
+      return adaptedClass.getPhotoFirstRep();
    }
 
    public String getGender()
@@ -335,6 +360,11 @@ public class QICorePractitionerAdapter implements IQICorePractitioner
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public ContainedDt getContained()

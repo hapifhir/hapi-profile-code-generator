@@ -36,6 +36,8 @@ public interface IProcedureRequest
 
    public AnnotationDt addNotes();
 
+   public AnnotationDt getNotesFirstRep();
+
    public IdDt getId();
 
    public IProcedureRequest setId(IdDt param);
@@ -105,6 +107,8 @@ public interface IProcedureRequest
    public IProcedureRequest addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public BooleanDt getAsNeededBooleanElement();
 

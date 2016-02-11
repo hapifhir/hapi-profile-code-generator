@@ -38,6 +38,8 @@ public interface IQICoreCondition
 
    public Condition.Evidence addEvidence();
 
+   public Condition.Evidence getEvidenceFirstRep();
+
    public BoundCodeableConceptDt<ConditionCategoryCodesEnum> getCategory();
 
    public IQICoreCondition setCategory(
@@ -118,6 +120,8 @@ public interface IQICoreCondition
    public IQICoreCondition addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public String getClinicalStatus();
 

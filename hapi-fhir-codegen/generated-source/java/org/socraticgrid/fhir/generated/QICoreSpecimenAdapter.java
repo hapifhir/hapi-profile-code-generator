@@ -76,6 +76,11 @@ public class QICoreSpecimenAdapter implements IQICoreSpecimen
       return item;
    }
 
+   public Specimen.Treatment getTreatmentFirstRep()
+   {
+      return adaptedClass.getTreatmentFirstRep();
+   }
+
    public CodeDt getLanguage()
    {
       return adaptedClass.getLanguage();
@@ -238,5 +243,10 @@ public class QICoreSpecimenAdapter implements IQICoreSpecimen
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 }

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
@@ -38,7 +38,7 @@ public class SimpleAttributeHandler extends BaseMethodGenerator {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(SimpleAttributeHandler.class);
 	
-	public SimpleAttributeHandler(FhirResourceManager manager, CodeTemplateUtils template, StructureDefinition profile, ElementDefinitionDt element) {
+	public SimpleAttributeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
 	}
 	
@@ -144,6 +144,7 @@ public class SimpleAttributeHandler extends BaseMethodGenerator {
 		accessors.add(constructSetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType(),  InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
 		accessors.add(constructAddMethod(getTopLevelCoreAttribute(), getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDefaultAddBody(getTopLevelCoreAttribute())));
 		accessors.add(constructAddMethodDelegated(getTopLevelCoreAttribute(), getFullyQualifiedType()).setBody(buildDelegatedAddBody(getTopLevelCoreAttribute(), getFullyQualifiedType())));
+		accessors.add(constructGetFirstRepMethodFromField(getTopLevelCoreAttribute(),getFullyQualifiedType()).setBody(buildGetFirstRepInvocation(getTopLevelCoreAttribute())));
 	}
 	
 	/**

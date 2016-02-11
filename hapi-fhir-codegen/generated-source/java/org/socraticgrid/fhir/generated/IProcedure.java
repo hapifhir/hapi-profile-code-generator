@@ -43,6 +43,8 @@ public interface IProcedure
 
    public Procedure.FocalDevice addFocalDevice();
 
+   public Procedure.FocalDevice getFocalDeviceFirstRep();
+
    public List<IdentifierDt> getIdentifier();
 
    public IProcedure setIdentifier(List<IdentifierDt> param);
@@ -50,6 +52,8 @@ public interface IProcedure
    public IProcedure addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public CodeableConceptDt getCategory();
 
@@ -75,6 +79,8 @@ public interface IProcedure
 
    public Procedure.Performer addPerformer();
 
+   public Procedure.Performer getPerformerFirstRep();
+
    public List<AnnotationDt> getNotes();
 
    public IProcedure setNotes(List<AnnotationDt> param);
@@ -82,6 +88,8 @@ public interface IProcedure
    public IProcedure addNotes(AnnotationDt param);
 
    public AnnotationDt addNotes();
+
+   public AnnotationDt getNotesFirstRep();
 
    public NarrativeDt getText();
 

@@ -1,4 +1,4 @@
-package ca.uhn.fhir.utils.codegen;
+package ca.uhn.fhir.utils.common.st;
 
 import static org.junit.Assert.fail;
 

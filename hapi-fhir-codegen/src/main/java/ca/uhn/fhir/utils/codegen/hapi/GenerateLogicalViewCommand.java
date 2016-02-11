@@ -13,7 +13,6 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedAttributeHandler;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedBackboneElementHandler;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedStructureAttributeHandler;
@@ -40,7 +39,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	
 	private MethodHandlerResolver resolver;
 	private FhirResourceManager fhirResourceManager;
-	private CodeTemplateUtils templateUtils;
+	private MethodBodyGenerator templateUtils;
 	private Map<String, ClassModel> itemClassMap;
 	private StructureDefinition profile;
 	private String generatedCodePackage;
@@ -53,7 +52,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	
 	public GenerateLogicalViewCommand(StructureDefinition profile,
 							FhirResourceManager fhirResourceManager,
-							CodeTemplateUtils templateUtils,
+							MethodBodyGenerator templateUtils,
 							MethodHandlerResolver resolver, 
 							String generatedCodePackage) {
 		this();

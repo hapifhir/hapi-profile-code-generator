@@ -69,6 +69,11 @@ public class DiagnosticReportAdapter implements IDiagnosticReport
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public InstantDt getIssuedElement()
    {
       return adaptedClass.getIssuedElement();
@@ -127,6 +132,11 @@ public class DiagnosticReportAdapter implements IDiagnosticReport
       return item;
    }
 
+   public DiagnosticReport.Image getImageFirstRep()
+   {
+      return adaptedClass.getImageFirstRep();
+   }
+
    public Encounter getEncounterResource()
    {
       if (adaptedClass.getEncounter().getResource() instanceof ca.uhn.fhir.model.dstu2.resource.Encounter)
@@ -168,6 +178,11 @@ public class DiagnosticReportAdapter implements IDiagnosticReport
       ca.uhn.fhir.model.dstu2.composite.AttachmentDt item = new ca.uhn.fhir.model.dstu2.composite.AttachmentDt();
       adaptedClass.addPresentedForm(item);
       return item;
+   }
+
+   public AttachmentDt getPresentedFormFirstRep()
+   {
+      return adaptedClass.getPresentedFormFirstRep();
    }
 
    public CodeableConceptDt getCode()

@@ -35,6 +35,8 @@ public interface IQICoreDiagnosticOrder
 
    public DiagnosticOrder.Event addEvent();
 
+   public DiagnosticOrder.Event getEventFirstRep();
+
    public NarrativeDt getText();
 
    public IQICoreDiagnosticOrder setText(NarrativeDt param);
@@ -86,6 +88,8 @@ public interface IQICoreDiagnosticOrder
 
    public IdentifierDt addIdentifier();
 
+   public IdentifierDt getIdentifierFirstRep();
+
    public CodeableConceptDt getReasonRejected();
 
    public IQICoreDiagnosticOrder setReasonRejected(CodeableConceptDt param);
@@ -97,6 +101,8 @@ public interface IQICoreDiagnosticOrder
    public IQICoreDiagnosticOrder addNote(AnnotationDt param);
 
    public AnnotationDt addNote();
+
+   public AnnotationDt getNoteFirstRep();
 
    public IdDt getId();
 

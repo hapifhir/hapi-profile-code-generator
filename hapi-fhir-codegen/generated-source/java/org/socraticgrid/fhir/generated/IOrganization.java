@@ -30,6 +30,8 @@ public interface IOrganization
 
    public Organization.Contact addContact();
 
+   public Organization.Contact getContactFirstRep();
+
    public NarrativeDt getText();
 
    public IOrganization setText(NarrativeDt param);
@@ -41,6 +43,8 @@ public interface IOrganization
    public IOrganization addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 
    public Organization getPartOfResource();
 
@@ -62,6 +66,8 @@ public interface IOrganization
    public IOrganization addTelecom(ContactPointDt param);
 
    public ContactPointDt addTelecom();
+
+   public ContactPointDt getTelecomFirstRep();
 
    public StringDt getNameElement();
 
@@ -90,6 +96,8 @@ public interface IOrganization
    public IOrganization addAddress(AddressDt param);
 
    public AddressDt addAddress();
+
+   public AddressDt getAddressFirstRep();
 
    public IdDt getId();
 

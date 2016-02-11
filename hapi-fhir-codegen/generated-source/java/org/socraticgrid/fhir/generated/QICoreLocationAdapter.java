@@ -237,6 +237,11 @@ public class QICoreLocationAdapter implements IQICoreLocation
       return item;
    }
 
+   public ContactPointDt getTelecomFirstRep()
+   {
+      return adaptedClass.getTelecomFirstRep();
+   }
+
    public List<IdentifierDt> getIdentifier()
    {
       return adaptedClass.getIdentifier();
@@ -259,6 +264,11 @@ public class QICoreLocationAdapter implements IQICoreLocation
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 
    public StringDt getDescriptionElement()

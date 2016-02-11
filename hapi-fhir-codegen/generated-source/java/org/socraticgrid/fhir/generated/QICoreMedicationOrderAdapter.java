@@ -427,6 +427,11 @@ public class QICoreMedicationOrderAdapter implements IQICoreMedicationOrder
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public CodeableConceptDt getReasonEnded()
    {
       return adaptedClass.getReasonEnded();

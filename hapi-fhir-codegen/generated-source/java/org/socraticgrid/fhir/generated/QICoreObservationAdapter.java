@@ -75,6 +75,11 @@ public class QICoreObservationAdapter implements IQICoreObservation
       return item;
    }
 
+   public Observation.Related getRelatedFirstRep()
+   {
+      return adaptedClass.getRelatedFirstRep();
+   }
+
    public List<Observation.Component> getComponent()
    {
       return adaptedClass.getComponent();
@@ -97,6 +102,11 @@ public class QICoreObservationAdapter implements IQICoreObservation
       ca.uhn.fhir.model.dstu2.resource.Observation.Component item = new ca.uhn.fhir.model.dstu2.resource.Observation.Component();
       adaptedClass.addComponent(item);
       return item;
+   }
+
+   public Observation.Component getComponentFirstRep()
+   {
+      return adaptedClass.getComponentFirstRep();
    }
 
    public NarrativeDt getText()
@@ -134,6 +144,11 @@ public class QICoreObservationAdapter implements IQICoreObservation
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public List<Observation.ReferenceRange> getReferenceRange()
    {
       return adaptedClass.getReferenceRange();
@@ -157,6 +172,11 @@ public class QICoreObservationAdapter implements IQICoreObservation
       ca.uhn.fhir.model.dstu2.resource.Observation.ReferenceRange item = new ca.uhn.fhir.model.dstu2.resource.Observation.ReferenceRange();
       adaptedClass.addReferenceRange(item);
       return item;
+   }
+
+   public Observation.ReferenceRange getReferenceRangeFirstRep()
+   {
+      return adaptedClass.getReferenceRangeFirstRep();
    }
 
    public CodeableConceptDt getCode()

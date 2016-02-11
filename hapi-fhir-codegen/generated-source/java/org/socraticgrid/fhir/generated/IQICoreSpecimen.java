@@ -34,6 +34,8 @@ public interface IQICoreSpecimen
 
    public Specimen.Treatment addTreatment();
 
+   public Specimen.Treatment getTreatmentFirstRep();
+
    public CodeDt getLanguage();
 
    public IQICoreSpecimen setLanguage(CodeDt param);
@@ -89,4 +91,6 @@ public interface IQICoreSpecimen
    public IQICoreSpecimen addIdentifier(IdentifierDt param);
 
    public IdentifierDt addIdentifier();
+
+   public IdentifierDt getIdentifierFirstRep();
 }

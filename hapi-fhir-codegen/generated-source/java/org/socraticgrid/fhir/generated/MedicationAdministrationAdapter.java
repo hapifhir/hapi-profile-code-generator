@@ -295,6 +295,11 @@ public class MedicationAdministrationAdapter implements IMedicationAdministratio
       return item;
    }
 
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
+   }
+
    public Encounter getEncounterResource()
    {
       if (adaptedClass.getEncounter().getResource() instanceof ca.uhn.fhir.model.dstu2.resource.Encounter)

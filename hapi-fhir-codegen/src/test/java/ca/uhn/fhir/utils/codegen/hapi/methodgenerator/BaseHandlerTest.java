@@ -7,24 +7,24 @@ import org.junit.Test;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.utils.codegen.CodeTemplateUtils;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 
 public class BaseHandlerTest {
 	
-	private CodeTemplateUtils template;
+	private MethodBodyGenerator template;
 	private FhirResourceManager fhirResourceManager;
 	
 	public BaseHandlerTest() {
-		template = new CodeTemplateUtils().initialize();
+		template = new MethodBodyGenerator().initialize();
 		fhirResourceManager = new FhirResourceManager();
 	}
 	
-	public CodeTemplateUtils getTemplate() {
+	public MethodBodyGenerator getTemplate() {
 		return template;
 	}
 
-	public void setTemplate(CodeTemplateUtils template) {
+	public void setTemplate(MethodBodyGenerator template) {
 		this.template = template;
 	}
 	

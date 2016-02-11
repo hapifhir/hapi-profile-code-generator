@@ -75,6 +75,11 @@ public class SpecimenAdapter implements ISpecimen
       return item;
    }
 
+   public Specimen.Treatment getTreatmentFirstRep()
+   {
+      return adaptedClass.getTreatmentFirstRep();
+   }
+
    public CodeDt getLanguage()
    {
       return adaptedClass.getLanguage();
@@ -119,6 +124,11 @@ public class SpecimenAdapter implements ISpecimen
       ca.uhn.fhir.model.dstu2.resource.Specimen.Container item = new ca.uhn.fhir.model.dstu2.resource.Specimen.Container();
       adaptedClass.addContainer(item);
       return item;
+   }
+
+   public Specimen.Container getContainerFirstRep()
+   {
+      return adaptedClass.getContainerFirstRep();
    }
 
    public IdentifierDt getAccessionIdentifier()
@@ -235,5 +245,10 @@ public class SpecimenAdapter implements ISpecimen
       ca.uhn.fhir.model.dstu2.composite.IdentifierDt item = new ca.uhn.fhir.model.dstu2.composite.IdentifierDt();
       adaptedClass.addIdentifier(item);
       return item;
+   }
+
+   public IdentifierDt getIdentifierFirstRep()
+   {
+      return adaptedClass.getIdentifierFirstRep();
    }
 }

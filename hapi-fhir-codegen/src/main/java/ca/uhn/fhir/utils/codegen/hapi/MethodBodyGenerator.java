@@ -1,4 +1,4 @@
-package ca.uhn.fhir.utils.codegen;
+package ca.uhn.fhir.utils.codegen.hapi;
 
 import java.io.File;
 
@@ -9,6 +9,8 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupDir;
 
+import ca.uhn.fhir.utils.common.st.TemplateUtils;
+
 /**
  * Code generation framework using StringTemplate in conjunction
  * with the Roaster library.
@@ -16,47 +18,15 @@ import org.stringtemplate.v4.STGroupDir;
  * @author Claude Nanjo
  *
  */
-public class CodeTemplateUtils {
+public class MethodBodyGenerator extends TemplateUtils {
 	
-	public static final Logger LOGGER = LoggerFactory.getLogger(CodeTemplateUtils.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(MethodBodyGenerator.class);
 	
-	private String templatePath = "src/main/resources/templates";
-	private STGroup groupMain;
-
-	public CodeTemplateUtils() {}
+	public MethodBodyGenerator() {}
 	
-	/**
-	 * Method initializes the template utility by loading
-	 * the templates into memory.
-	 * 
-	 */
-	public CodeTemplateUtils initialize() {
-		try {
-			File rootMain = new File(templatePath);
-			groupMain = new STGroupDir(rootMain.getCanonicalPath());
-			return this;
-		} catch(Exception e) {
-			LOGGER.error("Error initializing StringTemplate. Validate template path: " + templatePath, e);
-			throw new RuntimeException("Error initializing StringTemplate. Validate template path: " + templatePath, e);
-		}
-	}
-	
-	/**
-	 * Returns path to templates.
-	 * 
-	 * @return
-	 */
-	public String getTemplatePath() {
-		return templatePath;
-	}
-	
-	/**
-	 * Sets path to directory containing the templates
-	 * 
-	 * @param templatePath
-	 */
-	public void setTemplatePath(String templatePath) {
-		this.templatePath = templatePath;
+	public MethodBodyGenerator initialize() {
+		super.initialize();
+		return this;
 	}
 	
 	/**
@@ -68,7 +38,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getMultivaluedPrimitiveBody(String propertyName, String canonicalPath) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("multivaluedPrimitiveMethodBody");
+		ST st = getGroupMain().getInstanceOf("multivaluedPrimitiveMethodBody");
 		st.add("propertyName", propertyName);
 		st.add("canonicalClassPath", canonicalPath);
 		return st.render();
@@ -83,7 +53,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getMultivaluedBody(String propertyName, String canonicalPath) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("multivaluedMethodBody");
+		ST st = getGroupMain().getInstanceOf("multivaluedMethodBody");
 		st.add("propertyName", propertyName);
 		st.add("canonicalClassPath", canonicalPath);
 		return st.render();
@@ -98,7 +68,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getReferenceGetterBody(String propertyName, String canonicalPath) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("referenceGetterBody");
+		ST st = getGroupMain().getInstanceOf("referenceGetterBody");
 		st.add("propertyName", propertyName);
 		st.add("canonicalClassPath", canonicalPath);
 		return st.render();
@@ -113,7 +83,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getProfiledReferenceGetterBody(String propertyName, String adapterClassPath, String canonicalPath) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("profiledReferenceGetterBody");
+		ST st = getGroupMain().getInstanceOf("profiledReferenceGetterBody");
 		st.add("propertyName", propertyName);
 		st.add("adapterClassPath", adapterClassPath);
 		st.add("canonicalClassPath", canonicalPath);
@@ -129,7 +99,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getAddToListMethodBody(String className, String propertyName) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("addToListMethodBody");
+		ST st = getGroupMain().getInstanceOf("addToListMethodBody");
 		st.add("fieldName", className);
 		st.add("propertyName", propertyName);
 		return st.render();
@@ -144,7 +114,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getAddToListMethodDelegatedBody(String className, String propertyName, String propertyType) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("addToListMethodDelegatedBody");
+		ST st = getGroupMain().getInstanceOf("addToListMethodDelegatedBody");
 		st.add("fieldName", className);
 		st.add("propertyName", propertyName);
 		st.add("propertyType", propertyType);
@@ -159,7 +129,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getAdapterSetMethodDelegationBody(String propertyName) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("setMethodInvocation");
+		ST st = getGroupMain().getInstanceOf("setMethodInvocation");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		st.add("param", "param");
@@ -172,9 +142,23 @@ public class CodeTemplateUtils {
 	 * @param propertyName - The name of the property
 	 * @return
 	 */
+	public String getFirstRepInvocationBody(String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("getFirstRepInvocation");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+	
+	/**
+	 * Method delegating to the adapter's class setter.
+	 * 
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
 	public String getSetMethodDelegationBody(String propertyName, String param) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("setMethodInvocation");
+		ST st = getGroupMain().getInstanceOf("setMethodInvocation");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		st.add("param", param);
@@ -188,7 +172,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getUserDefinedExtensionTypeGetterBody(String type, String fieldUri) {
-		ST st = groupMain.getInstanceOf("userDefinedExtensionTypeGetterBody");
+		ST st = getGroupMain().getInstanceOf("userDefinedExtensionTypeGetterBody");
 		st.add("type", type);
 		st.add("fieldUri", fieldUri);
 		return st.render();
@@ -201,7 +185,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getUserDefinedExtensionTypeSetterBody(String type) {
-		ST st = groupMain.getInstanceOf("userDefinedExtensionTypeSetterBody");
+		ST st = getGroupMain().getInstanceOf("userDefinedExtensionTypeSetterBody");
 		st.add("type", type);
 		return st.render();
 	}
@@ -214,7 +198,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getAdapterGetMethodDelegationBody(String propertyName) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("getMethodInvocation");
+		ST st = getGroupMain().getInstanceOf("getMethodInvocation");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		return st.render();
@@ -222,7 +206,7 @@ public class CodeTemplateUtils {
 	
 	public String getAdapterGetMethodDelegationWithCastBody(String propertyName, String castTo) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("getAndCastToExtendedType");
+		ST st = getGroupMain().getInstanceOf("getAndCastToExtendedType");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		st.add("castTo", castTo);
@@ -231,7 +215,7 @@ public class CodeTemplateUtils {
 	
 	public String getAdapterGetListMethodDelegationWithCastToListBody(String propertyName, String castTo) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("getListAndCastToExtendedTypeList");
+		ST st = getGroupMain().getInstanceOf("getListAndCastToExtendedTypeList");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		st.add("castTo", castTo);
@@ -240,7 +224,7 @@ public class CodeTemplateUtils {
 	
 	public String getAdapterSetListMethodDelegationWithCastToListBody(String propertyName, String castTo) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("setListAndCastToExtendedTypeList");
+		ST st = getGroupMain().getInstanceOf("setListAndCastToExtendedTypeList");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		st.add("castTo", castTo);
@@ -255,7 +239,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getReferenceSetterBody(String propertyName) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("referenceSetterBody");
+		ST st = getGroupMain().getInstanceOf("referenceSetterBody");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		return st.render();
@@ -269,7 +253,7 @@ public class CodeTemplateUtils {
 	 */
 	public String getProfiledReferenceSetterBody(String propertyName) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = groupMain.getInstanceOf("profiledReferenceSetterBody");
+		ST st = getGroupMain().getInstanceOf("profiledReferenceSetterBody");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		return st.render();
@@ -285,7 +269,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getCodesAsStringListBody(String className, String parameterName) {
-		ST st = groupMain.getInstanceOf("getCodesAsStringListBody");
+		ST st = getGroupMain().getInstanceOf("getCodesAsStringListBody");
 		st.add("className", className);
 		st.add("parameterName", parameterName);
 		return st.render();
@@ -297,7 +281,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getAdaptBundle() {
-		ST st = groupMain.getInstanceOf("adaptBundle");
+		ST st = getGroupMain().getInstanceOf("adaptBundle");
 		return st.render();
 	}
 	
@@ -306,7 +290,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getAdaptResource() {
-		ST st = groupMain.getInstanceOf("adaptResource");
+		ST st = getGroupMain().getInstanceOf("adaptResource");
 		return st.render();
 	}
 	
@@ -319,7 +303,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getExtensionListGetterBody(String type, String uri) {
-		ST st = groupMain.getInstanceOf("extensionListGetterBody");
+		ST st = getGroupMain().getInstanceOf("extensionListGetterBody");
 		st.add("type", type);
 		st.add("uri", uri);
 		return st.render();
@@ -334,7 +318,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getExtensionListSetterBody(String type, String uri) {
-		ST st = groupMain.getInstanceOf("extensionListSetterBody");
+		ST st = getGroupMain().getInstanceOf("extensionListSetterBody");
 		st.add("type", type);
 		st.add("uri", uri);
 		return st.render();
@@ -349,7 +333,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getExtensionSetterBody(String rootClassName, String uri) {
-		ST st = groupMain.getInstanceOf("extensionSetterBody");
+		ST st = getGroupMain().getInstanceOf("extensionSetterBody");
 		st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		return st.render();
@@ -368,7 +352,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getExtensionGetterBody(String rootClassName, String type, String uri, String fieldName) {
-		ST st = groupMain.getInstanceOf("extensionGetterBody");
+		ST st = getGroupMain().getInstanceOf("extensionGetterBody");
 		st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		st.add("type", type);
@@ -390,7 +374,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getExtensionGetterBodyPrimitive(String type, String uri, String fieldName) {
-		ST st = groupMain.getInstanceOf("extensionGetterBodyPrimitive");
+		ST st = getGroupMain().getInstanceOf("extensionGetterBodyPrimitive");
 		st.add("uri", uri);
 		st.add("type", type);
 		st.add("fieldName", fieldName);
@@ -406,7 +390,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getExtensionSetterBodyPrimitive(String type, String uri) {
-		ST st = groupMain.getInstanceOf("extensionSetterBodyPrimitive");
+		ST st = getGroupMain().getInstanceOf("extensionSetterBodyPrimitive");
 		st.add("uri", uri);
 		st.add("type", type);
 		return st.render();
@@ -420,7 +404,7 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 //	public String getSimpleGetter(String fieldName) {
-//		ST st = groupMain.getInstanceOf("simpleGetter");
+//		ST st = getGroupMain().getInstanceOf("simpleGetter");
 //		st.add("fieldName", fieldName);
 //		return st.render();
 //	}
@@ -434,44 +418,44 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 //	public String getSimpleSetter(String fieldName, String param) {
-//		ST st = groupMain.getInstanceOf("simpleSetter");
+//		ST st = getGroupMain().getInstanceOf("simpleSetter");
 //		st.add("fieldName", fieldName);
 //		st.add("param", param);
 //		return st.render();
 //	}
 	
 	public String getSerializeExtensionType() {
-		ST st = groupMain.getInstanceOf("serializeExtensionType");
+		ST st = getGroupMain().getInstanceOf("serializeExtensionType");
 		return st.render();
 	}
 	
 	public String getCodeEnumAsStringSetterBody(String fieldName, String bindingName) {
-		ST st = groupMain.getInstanceOf("codeEnumAsStringSetterBody");
+		ST st = getGroupMain().getInstanceOf("codeEnumAsStringSetterBody");
 		st.add("fieldName", fieldName);
 		st.add("bindingName", bindingName);
 		return st.render();
 	}
 	
 	public String getExtendedTypeGetterBody(String returnType, String fieldUri) {
-		ST st = groupMain.getInstanceOf("extendedTypeGetterBody");
+		ST st = getGroupMain().getInstanceOf("extendedTypeGetterBody");
 		st.add("type", returnType);
 		st.add("fieldUri", fieldUri);
 		return st.render();
 	}
 	
 	public String getExtendedTypeSetterBody(String fieldUri) {
-		ST st = groupMain.getInstanceOf("extendedTypeSetterBody");
+		ST st = getGroupMain().getInstanceOf("extendedTypeSetterBody");
 		st.add("fieldUri", fieldUri);
 		return st.render();
 	}
 	
 	public String getBindExtensionToParent() {
-		ST st = groupMain.getInstanceOf("bindExtensionToParent");
+		ST st = getGroupMain().getInstanceOf("bindExtensionToParent");
 		return st.render();
 	}
 	
 	public String getExtendedStructureListGetterBody(String callee, String type, String uri) {
-		ST st = groupMain.getInstanceOf("extendedStructureListGetterBody");
+		ST st = getGroupMain().getInstanceOf("extendedStructureListGetterBody");
 		st.add("callee", callee);
 		st.add("type", type);
 		st.add("uri", uri);
@@ -479,7 +463,7 @@ public class CodeTemplateUtils {
 	}
 	
 	public String getExtendedStructureListSetterBody(String callee, String uri) {
-		ST st = groupMain.getInstanceOf("extendedStructureListSetterBody");
+		ST st = getGroupMain().getInstanceOf("extendedStructureListSetterBody");
 		st.add("callee", callee);
 		st.add("uri", uri);
 		return st.render();
@@ -487,13 +471,13 @@ public class CodeTemplateUtils {
 	
 
 	public String getUnsupportedGetter() {
-		ST st = groupMain.getInstanceOf("unsupportedGetter");
+		ST st = getGroupMain().getInstanceOf("unsupportedGetter");
 		return st.render();
 	}
 	
 
 	public String getUnsupportedSetter() {
-		ST st = groupMain.getInstanceOf("unsupportedSetter");
+		ST st = getGroupMain().getInstanceOf("unsupportedSetter");
 		return st.render();
 	}
 	
@@ -511,14 +495,14 @@ public class CodeTemplateUtils {
 	 * @return
 	 */
 	public String getInitializeVariableStatement(String fieldName, String fieldType) {
-		ST st = groupMain.getInstanceOf("initializeVariable");
+		ST st = getGroupMain().getInstanceOf("initializeVariable");
 		st.add("fieldName", fieldName);
 		st.add("fieldType", fieldType);
 		return st.render();
 	}
 	
 	public String getAssignVariableStatement(String fieldName, String argName) {
-		ST st = groupMain.getInstanceOf("assignVariable");
+		ST st = getGroupMain().getInstanceOf("assignVariable");
 		st.add("fieldName", fieldName);
 		st.add("argName", argName);
 		return st.render();
