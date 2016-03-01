@@ -1,5 +1,12 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.FieldSource;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
@@ -8,11 +15,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
-import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.Main;
 import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
 import ca.uhn.fhir.utils.fhir.FhirExtensionManager;
 
@@ -34,7 +36,12 @@ public class InterfaceAdapterGeneratorTest {
 	@Test
 	public void testGenerateInterface() {
 		try {//TODO Fix hard coded path
+			FileUtils.deleteDirectory(new File("generated-source/java/org/socraticgrid/fhir/generated/"));
 			Main.generateCode(ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan.xml"), false);
+			File genDir = new File("generated-source/java/org/socraticgrid/fhir/generated/");
+			assertTrue(genDir.exists());
+			assertTrue(genDir.isDirectory());
+			assertEquals(111, genDir.listFiles().length);
 		} catch(Exception e) {
 			e.printStackTrace();
 			fail();

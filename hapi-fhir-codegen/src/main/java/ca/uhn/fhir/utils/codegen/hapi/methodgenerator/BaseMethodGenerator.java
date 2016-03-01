@@ -354,7 +354,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 		boolean ignoreField = false;
 		if(topLevelCoreAttribute == null) {
 			if(!FhirResourceManager.isFhirExtension(element)) {
-				ignoreField = true;
+				//ignoreField = true;
 				LOGGER.debug("Top level attribute is null for " + element.getPath() + ". It is probably a FHIR structure.");
 			} else {
 				ignoreField = false;
