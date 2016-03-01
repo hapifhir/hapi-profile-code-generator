@@ -91,7 +91,7 @@ public class FhirResourceManager {
 	}
 	
 	public boolean generatedTypeExists(String generatedType) {
-		return generatedType.contains(generatedType);
+		return this.generatedType.contains(generatedType);
 	}
 
 	/**

@@ -23,6 +23,7 @@ import ca.uhn.fhir.utils.common.graph.Node;
 import ca.uhn.fhir.utils.common.metamodel.ClassField;
 import ca.uhn.fhir.utils.common.metamodel.ClassModel;
 import ca.uhn.fhir.utils.common.metamodel.Method;
+import ca.uhn.fhir.utils.common.metamodel.ModifierEnum;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.ProfileWalker;
 
@@ -166,7 +167,9 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	public void handleInnerNonRootExtensionNode(Node<ElementDefinitionDt> node) {
 		buildExtendedParentClass(node);
 		ElementDefinitionDt clone = FhirResourceManager.shallowCloneElement(node.getPayload());
-		clone.addType().setCode(generatedCodePackage + "." + CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName());
+		String generatedType = generatedCodePackage + "." + CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName();
+		fhirResourceManager.addGeneratedType(generatedType);
+		clone.addType().setCode(generatedType);
 		List<Method> methods = handleUserDefinedExtensionType(clone, false);
 		ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 		rootClass.getMethods().addAll(methods);
@@ -208,28 +211,55 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			} else { //Leaf extension on a type or backbone element
 				//List<Method> extensionMethods = handleStructureDefinitionElement(node.getPayload(), true);
 				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-				if(parentClass.getSupertypes() == null || parentClass.getSupertypes().size() == 0) {
-					parentClass.addImport("java.util.List"); 
-					String supertype = fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
-					if(supertype.equals("BackboneElement")) {
-						String code = node.getParent().getParent().getName() + "." + node.getParent().getName();
-						Type type = new Type();
-						type.setCode(code);
-						supertype = fhirResourceManager.getFullyQualifiedJavaType(type);
-						System.out.println("Supertype: " + supertype);
-					}
-					parentClass.addImport("ca.uhn.fhir.model.dstu2.resource.*");//Why not just import 'supertype'?
-					parentClass.addSupertype(supertype);
-				}
+//				if(parentClass.getSupertypes() == null || parentClass.getSupertypes().size() == 0) {
+//					parentClass.addImport("java.util.List"); 
+//					String supertype = fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
+//					if(supertype.equals("BackboneElement")) {
+//						String code = node.getParent().getParent().getName() + "." + node.getParent().getName();
+//						Type type = new Type();
+//						type.setCode(code);
+//						supertype = fhirResourceManager.getFullyQualifiedJavaType(type);
+//						System.out.println("Supertype: " + supertype);
+//					}
+//					parentClass.addImport("ca.uhn.fhir.model.dstu2.resource.*");//Why not just import 'supertype'?
+//					parentClass.addSupertype(supertype);
+//				}
+				
+				
 				ExtendedAttributeHandler handler = new ExtendedAttributeHandler(fhirResourceManager, templateUtils, profile, node.getPayload());
 				handler.initialize();
 				handler.setGeneratedCodePackage(generatedCodePackage);
-				handler.setAddExtensionsToThis(true);
+				handler.setAddExtensionsToThis(false);
 				handler.setExtendedStructure(true);
 				handler.setExtendedTypeName(parentClass.getName());
 				parentClass.getMethods().addAll(handler.buildCorrespondingMethods());
 			}
 		}
+	}
+
+	private void initializeAdaptedModel(Node<ElementDefinitionDt> node, ClassModel model) {
+		String tentativeType = null;
+		String nodeType = node.getPayload().getTypeFirstRep().getCode();
+		if(nodeType.equals("BackboneElement")) {
+			String code = node.getParent().getName() + "." + node.getName();
+			Type type = new Type();
+			type.setCode(code);
+			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(type);
+			System.out.println("Supertype: " + tentativeType);
+		} else if(nodeType.equals("DomainResource")) {
+			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(node.getName(), null);
+		} else {
+			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(node.getPayload().getTypeFirstRep());
+			if(tentativeType.contains("BaseResource")) {
+				System.out.println("STOP HERE");
+			}
+		}
+		InterfaceAdapterGenerator.addAdapteeField(model, tentativeType);
+		InterfaceAdapterGenerator.generateConstructors(templateUtils, model.getName(), tentativeType, model.getMethods());
+		InterfaceAdapterGenerator.generateAdapteeGetter(model.getMethods(), tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+		InterfaceAdapterGenerator.generateAdapteeSetter(model.getMethods(), tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+		model.addImport("java.util.List"); 
+		model.addImport("ca.uhn.fhir.model.dstu2.resource.*");//Why not just import 'supertype'?
 	}
 	
 	/**
@@ -386,10 +416,10 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		bindMethod.setBody(templateUtils.getBindExtensionToParent());
 		bindMethod.setReturnType("ca.uhn.fhir.model.api.ExtensionDt");
 		classModel.addMethod(bindMethod);
-		Method constructor = new Method();
-		constructor.setBody("this.rootObjectExtension = new ExtensionDt(false, uri);");
-		constructor.isConstructor(true);
-		classModel.addMethod(constructor);
+//		Method constructor = new Method();
+//		constructor.setBody("this.rootObjectExtension = new ExtensionDt(false, uri);");
+//		constructor.isConstructor(true);
+//		classModel.addMethod(constructor);
 	}
 	
 	/**
@@ -405,6 +435,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		if(model == null) {
 			model = new ClassModel(CodeGenerationUtils.makeIdentifierJavaSafe(className));
 			model.setNamespace(generatedCodePackage);
+			initializeAdaptedModel(node, model);
 			itemClassMap.put(node.getPathFromRoot(), model);
 		}
 		return model;

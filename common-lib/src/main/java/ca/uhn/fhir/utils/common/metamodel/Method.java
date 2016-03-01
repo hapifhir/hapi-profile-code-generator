@@ -183,10 +183,15 @@ public class Method {
 	public static void addGetterSetterFieldToClass(ClassModel classModel, String attributeName, String attributeType) {
 		Method getter = constructSimpleGetterMethod(attributeName, attributeType);
 		Method setter = constructSimpleSetterMethod(attributeName, attributeType);
-		ClassField field = new ClassField(StringUtils.uncapitalize(attributeName), attributeType);
-		field.addModifier(ModifierEnum.PRIVATE);
-		classModel.addField(field);
+//		ClassField field = new ClassField(StringUtils.uncapitalize(attributeName), attributeType);
+//		field.addModifier(ModifierEnum.PRIVATE);
+//		classModel.addField(field);
 		classModel.addMethod(getter);
 		classModel.addMethod(setter);
+		List<ModifierEnum> modifiers = new ArrayList<ModifierEnum>();
+		modifiers.add(ModifierEnum.PRIVATE);
+		ClassField field = new ClassField(StringUtils.uncapitalize(attributeName), attributeType , modifiers, "new ExtensionDt(false, uri);");//TODO Move to constructor body
+		classModel.addField(field);
+		
 	}
 }

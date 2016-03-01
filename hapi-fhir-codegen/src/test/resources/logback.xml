@@ -11,7 +11,7 @@
   <logger name="org.socraticgrid.cqf" level="DEBUG"/>
   <logger name="ca.uhn.fhir" level="OFF"/>
 
-  <root level="ERROR">
+  <root level="DEBUG">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

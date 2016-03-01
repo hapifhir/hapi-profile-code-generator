@@ -21,6 +21,7 @@ import ca.uhn.fhir.utils.common.metamodel.ClassModel;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.common.metamodel.MethodParameter;
 import ca.uhn.fhir.utils.common.metamodel.ModifierEnum;
+import ca.uhn.fhir.utils.common.st.TemplateUtils;
 import ca.uhn.fhir.utils.fhir.ProfileWalker;
 
 /**
@@ -189,21 +190,26 @@ public class InterfaceAdapterGenerator {
 			ClassModel rootModel = command.getClassMap().get(profileWalker.getRoot().getPathFromRoot());
 			String resourceName = getUnderlyingFhirCoreResourceName(profile);
 			buildAdapter(rootModel, resourceName, generatedPackage + "." + generateInterfaceName(javaSafeProfileName));
-			generateConstructors(generateAdapterName(javaSafeProfileName), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName(), rootModel.getMethods() );
-			generateAdapteeGetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+//			generateConstructors(generateAdapterName(javaSafeProfileName), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName(), rootModel.getMethods() );//Move to GenerateLogicalModelCommand.initializeAdaptedModel()
+//			generateAdapteeGetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+//			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			for(ClassModel model : command.getClassMap().values()) {
 				//fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
-				if(model != rootModel && model.getMethods().size() > 0) {
-//					if(model.getName().equalsIgnoreCase("Address")) {
-//						System.out.println("STOP HERE");
-//					}
-//					String typeName = fhirResourceManager.getFullyQualifiedJavaType(model.getName(), null);
-//					addAdapteeField(model, typeName);
-//					generateAdapteeGetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
-//					generateAdapteeSetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
-					String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
-					CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
+				if(model != rootModel && model.getMethods().size() > 4) {//getAdaptee, setAdaptee, no-arg constructor, adaptee constructor
+					try {
+						if(model.getName().equalsIgnoreCase("Address")) {
+							System.out.println("STOP HERE");
+						}
+//						String typeName = fhirResourceManager.getFullyQualifiedJavaType(model.getName(), null);
+//						addAdapteeField(model, typeName);
+//						generateAdapteeGetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+//						generateAdapteeSetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+						String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
+						CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
+					}catch(Exception e) {
+						e.printStackTrace();
+						LOGGER.error("Error processing " + model.getName(), e);
+					}
 				}
 			}
 //			String generatedProfileInterface = cleanUpWorkaroundInterface(interfaceAdapterPair.getResourceInterface(), true);
@@ -399,10 +405,10 @@ public class InterfaceAdapterGenerator {
 	public void buildAdapter(ClassModel classModel, String resourceName, String interfaceName) {
 		classModel.addInterface(interfaceName);
 		String type = fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName();
-		addAdapteeField(classModel, type);
+		//addAdapteeField(classModel, type);
 	}
 
-	private void addAdapteeField(ClassModel classModel, String type) {
+	public static void addAdapteeField(ClassModel classModel, String type) {
 		ClassField field = new ClassField("adaptedClass");
 		field.setType(type);//fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName());
 		field.addModifier(ModifierEnum.PRIVATE);
@@ -434,16 +440,16 @@ public class InterfaceAdapterGenerator {
 	 * @param adapterType
 	 * @param accessors
 	 */
-	protected void generateConstructors(String constructorName, String adapterType, List<Method> accessors) {
+	public static void generateConstructors(MethodBodyGenerator bodyGenerator, String constructorName, String adapterType, List<Method> accessors) {
 		Method noArgConstructor = new Method();
 		noArgConstructor.isConstructor(true);
-		noArgConstructor.setBody(this.templateUtils.getInitializeVariableStatement(ADAPTER_FIELD_NAME, adapterType));
+		noArgConstructor.setBody(bodyGenerator.getInitializeVariableStatement(ADAPTER_FIELD_NAME, adapterType));
 		accessors.add(0, noArgConstructor);
 		
 		Method singleArgConstructor = new Method();
 		singleArgConstructor.addParameter("adaptee", adapterType);
 		singleArgConstructor.isConstructor(true);
-		singleArgConstructor.setBody(this.templateUtils.getAssignVariableStatement(ADAPTER_FIELD_NAME, "adaptee"));
+		singleArgConstructor.setBody(bodyGenerator.getAssignVariableStatement(ADAPTER_FIELD_NAME, "adaptee"));
 		accessors.add(1, singleArgConstructor);
 	}
 	
@@ -453,12 +459,16 @@ public class InterfaceAdapterGenerator {
 	 * @param accessors
 	 * @param resourcePath
 	 */
-	protected void generateAdapteeGetter(List<Method> accessors, String resourcePath) {
+	protected static void generateAdapteeGetter(List<Method> accessors, String resourcePath) {
 		Method method = new Method();
 		method.setName("getAdaptee");
 		method.setReturnType(resourcePath);
 		method.setBody("return adaptedClass;");
-		accessors.add(2, method);
+		if(accessors.size() > 2) {
+			accessors.add(2, method);
+		} else {
+			accessors.add(method);
+		}
 	}
 	
 	/**
@@ -467,14 +477,18 @@ public class InterfaceAdapterGenerator {
 	 * @param accessors
 	 * @param resourcePath
 	 */
-	protected void generateAdapteeSetter(List<Method> accessors, String resourcePath) {
+	protected static void generateAdapteeSetter(List<Method> accessors, String resourcePath) {
 		Method method = new Method();
 		method.setName("setAdaptee");
 		List<MethodParameter> params = new ArrayList<MethodParameter>();
 		params.add(new MethodParameter("param", resourcePath));
 		method.setParameters(params);
 		method.setBody("this.adaptedClass = param;");
-		accessors.add(3, method);
+		if(accessors.size() > 3) {
+			accessors.add(3, method);
+		} else {
+			accessors.add(method);
+		}
 	}
 	
 	/**

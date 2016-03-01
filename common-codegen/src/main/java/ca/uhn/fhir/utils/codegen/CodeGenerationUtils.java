@@ -239,11 +239,18 @@ public class CodeGenerationUtils {
 				} catch (Exception e) {
 					LOGGER.error("Error adding method parameter " + argument.getName() + " on method "
 							+ methodDefinition.getName() + " to class " + classModel.getName(), e);
+					throw new RuntimeException("Error adding method parameter " + argument.getName() + " with type on method " + argument.getValue()
+					+ methodDefinition.getName() + " to class " + classModel.getName(), e);
 				}
 			}
 		}
 		for (String importString : classModel.getImports()) {
-			javaClass.addImport(importString);
+			try {
+				javaClass.addImport(importString);
+			} catch(Exception e) {
+				LOGGER.error("Error importing " + importString, e);
+				throw new RuntimeException("Error importing " + importString, e);
+			}
 		}
 		return javaClass;
 	}
