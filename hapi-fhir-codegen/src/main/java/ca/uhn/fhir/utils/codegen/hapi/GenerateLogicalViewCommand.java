@@ -67,15 +67,16 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	public void execute(Node<ElementDefinitionDt> node) {
 		boolean found = false;
 		if(node.getPayload() != null) {
-			found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("status"));
+			found = node.getPayload().getName() != null && (node.getPayload().getName().contains("infuseOver"));
 		}
-		if(found && profile.getName().equals("Immunization")) {
+		if(found) {// && profile.getName().equals("Immunization")) {
 			LOGGER.debug("Found!");
 		}
 		try {
 			handleNode(node);
 		} catch(Exception e) {
 			LOGGER.error("Error processing node: " + node.getPathFromRoot() + ". Skipping element " + node.getPayload().getPath(), e);
+			e.printStackTrace();
 		}
 	}
 	
@@ -247,7 +248,15 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 				ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 				rootClass.getMethods().addAll(methods);
 			} else { //a leaf on a type or backbone element
-				//Nothing needs to be done unless extension is used
+//				System.out.println("NON EXTENSION LEAF NODE: " + node.getParent().getName() + "." + node);
+//				if(node.getParent().getName().equals("Address")) {
+//					System.out.println("Stop here");
+//				}
+//				//Nothing needs to be done unless extension is used
+//				UriDt profile = node.getPayload().getTypeFirstRep().getProfileFirstRep();
+//				List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false);
+//				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+//				parentClass.getMethods().addAll(methods);
 			}
 		}
 	}

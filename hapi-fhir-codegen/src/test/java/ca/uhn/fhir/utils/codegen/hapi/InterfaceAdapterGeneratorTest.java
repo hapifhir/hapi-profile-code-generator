@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.Main;
@@ -35,6 +37,7 @@ public class InterfaceAdapterGeneratorTest {
 			Main.generateCode(ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan.xml"), false);
 		} catch(Exception e) {
 			e.printStackTrace();
+			fail();
 		}
 	}
 	

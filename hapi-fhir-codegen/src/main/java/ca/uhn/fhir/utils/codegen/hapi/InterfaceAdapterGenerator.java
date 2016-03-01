@@ -56,7 +56,7 @@ public class InterfaceAdapterGenerator {
 	
 	//public static final String profilePrefix = "http://hl7.org/fhir/StructureDefinition/";
 	public static final Logger LOGGER = LoggerFactory.getLogger(InterfaceAdapterGenerator.class);
-	public static final String DEFAULT_DESTINATION_DIRECTORY = "generated-source/java/";
+	public static final String DEFAULT_DESTINATION_DIRECTORY = "generated-source/java";
 	public static final String ADAPTER_FIELD_NAME = "adaptedClass";
 	
 	private String generatedPackage;
@@ -193,7 +193,15 @@ public class InterfaceAdapterGenerator {
 			generateAdapteeGetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			for(ClassModel model : command.getClassMap().values()) {
+				//fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
 				if(model != rootModel && model.getMethods().size() > 0) {
+//					if(model.getName().equalsIgnoreCase("Address")) {
+//						System.out.println("STOP HERE");
+//					}
+//					String typeName = fhirResourceManager.getFullyQualifiedJavaType(model.getName(), null);
+//					addAdapteeField(model, typeName);
+//					generateAdapteeGetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+//					generateAdapteeSetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
 					String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
 					CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
 				}
@@ -390,12 +398,17 @@ public class InterfaceAdapterGenerator {
 	
 	public void buildAdapter(ClassModel classModel, String resourceName, String interfaceName) {
 		classModel.addInterface(interfaceName);
+		String type = fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName();
+		addAdapteeField(classModel, type);
+	}
+
+	private void addAdapteeField(ClassModel classModel, String type) {
 		ClassField field = new ClassField("adaptedClass");
-		field.setType(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName());
+		field.setType(type);//fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName());
 		field.addModifier(ModifierEnum.PRIVATE);
 		//field.setInitializer("new " + fhirResourceManager.getResourceNameToClassMap().get(resourceName).getSimpleName() + "()");
 		classModel.addField(field);
-		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
+		classModel.addImport(type);//fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
 	}
 	

@@ -21,6 +21,7 @@ import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.composite.HumanNameDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.primitive.BooleanDt;
 import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
@@ -72,6 +73,11 @@ public class QICorePatientAdapterTest {
 		} catch(Exception e) {
 			fail(); //Operations should not fail. If so, it is an error.
 		}
+	}
+	
+	@Test
+	public void testCodeableConceptsAndEnums() {
+		patient.setGender(AdministrativeGenderEnum.MALE);
 	}
 	
 	/**

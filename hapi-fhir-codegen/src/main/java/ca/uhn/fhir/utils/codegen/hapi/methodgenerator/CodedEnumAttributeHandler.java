@@ -136,10 +136,15 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 		}
 		Method getMethod = constructGetMethodFromField(getTopLevelCoreAttribute() + "Element", getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute() + "Element"));
 		Method setMethod = constructSetMethod(getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));
+		if(bindingName != null) {//There is in fact an enumeration defined in HAPI
+			Method setMethodEnum = constructSetMethod(bindingName, InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));//HAPI Supports passing the enum directly to the setter.
+			accessors.add(setMethodEnum);
+		}
 		getMethod.getImports().addAll(imports);
 		setMethod.getImports().addAll(imports);
 		accessors.add(getMethod);
 		accessors.add(setMethod);
+		
 		
 		
 		
@@ -193,6 +198,7 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 				setFullyQualifiedType(override);
 			} else {
 				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + override + ">");
+				bindingName = override;
 			}
 			imports.add(override);
 		} else if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
@@ -204,9 +210,9 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 				identifyValidEnumerationType(bindingName);
 			}
 			bindingName = enumType;
-			if(enumType != null) {
-				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + enumType + ">");
-				imports.add(enumType);
+			if(bindingName != null) {
+				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + bindingName + ">");
+				imports.add(bindingName);
 			} else {
 				LOGGER.error("No bindings discovered for " + getElement().getPath());
 			}
