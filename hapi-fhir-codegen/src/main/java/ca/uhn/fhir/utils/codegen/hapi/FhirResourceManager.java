@@ -69,6 +69,10 @@ public class FhirResourceManager {
 		ctx = FhirContext.forDstu2();
 	}
 	
+	public FhirContext getFhirContext() {
+		return ctx;
+	}
+	
 	public StructureDefinition getProfileFromProfileUri(String uri) {
 		return profileUriToProfileMap.get(uri);
 	}
@@ -426,6 +430,10 @@ public class FhirResourceManager {
 		primitiveMap.put("Patient.Animal", ca.uhn.fhir.model.dstu2.resource.Patient.Animal.class.getName());
 		primitiveMap.put("Patient.Communication", ca.uhn.fhir.model.dstu2.resource.Patient.Communication.class.getName());
 		primitiveMap.put("Patient.Link", ca.uhn.fhir.model.dstu2.resource.Patient.Link.class.getName());
+		primitiveMap.put("Patient.Address", ca.uhn.fhir.model.dstu2.composite.AddressDt.class.getName());
+		primitiveMap.put("Patient.Telecom", ca.uhn.fhir.model.dstu2.composite.ContactPointDt.class.getName());
+		primitiveMap.put("Organization.Address", ca.uhn.fhir.model.dstu2.composite.AddressDt.class.getName());
+		primitiveMap.put("Location.Address", ca.uhn.fhir.model.dstu2.composite.AddressDt.class.getName());
 		primitiveMap.put("Observation.Component", ca.uhn.fhir.model.dstu2.resource.Observation.Component.class.getName());
 		primitiveMap.put("DiagnosticOrder.Item", ca.uhn.fhir.model.dstu2.resource.DiagnosticOrder.Item.class.getName());
 		primitiveMap.put("AllergyIntolerance.Reaction", ca.uhn.fhir.model.dstu2.resource.AllergyIntolerance.Reaction.class.getName());
@@ -440,12 +448,18 @@ public class FhirResourceManager {
 		primitiveMap.put("MedicationDispense.DosageInstruction", ca.uhn.fhir.model.dstu2.resource.MedicationDispense.DosageInstruction.class.getName());
 		primitiveMap.put("MedicationOrder.DosageInstruction", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DosageInstruction.class.getName());
 		primitiveMap.put("MedicationOrder.DispenseRequest", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DispenseRequest.class.getName());
+		primitiveMap.put("Medication.Ingredient", ca.uhn.fhir.model.dstu2.resource.Medication.ProductIngredient.class.getName());
+		primitiveMap.put("Medication.Batch", ca.uhn.fhir.model.dstu2.resource.Medication.ProductBatch.class.getName());
+		primitiveMap.put("Product.Batch", ca.uhn.fhir.model.dstu2.resource.Medication.ProductBatch.class.getName());
+		primitiveMap.put("Package.Content", ca.uhn.fhir.model.dstu2.resource.Medication.PackageContent.class.getName());
+		primitiveMap.put("Medication.Content", ca.uhn.fhir.model.dstu2.resource.Medication.PackageContent.class.getName());
 		primitiveMap.put("MedicationOrder.Substitution", ca.uhn.fhir.model.dstu2.resource.MedicationOrder.Substitution.class.getName());
 		primitiveMap.put("MedicationStatement.Dosage", ca.uhn.fhir.model.dstu2.resource.MedicationStatement.Dosage.class.getName());
 		primitiveMap.put("Immunization.Explanation", ca.uhn.fhir.model.dstu2.resource.Immunization.Explanation.class.getName());
 		primitiveMap.put("Immunization.VaccinationProtocol", ca.uhn.fhir.model.dstu2.resource.Immunization.VaccinationProtocol.class.getName());
 		primitiveMap.put("Immunization.Reaction", ca.uhn.fhir.model.dstu2.resource.Immunization.Reaction.class.getName());
 		primitiveMap.put("Practitioner.Qualification", ca.uhn.fhir.model.dstu2.resource.Practitioner.Qualification.class.getName());
+		primitiveMap.put("Practitioner.Specialty", ca.uhn.fhir.model.dstu2.resource.Practitioner.Qualification.class.getName());
 		primitiveMap.put("Procedure.FocalDevice", ca.uhn.fhir.model.dstu2.resource.Procedure.FocalDevice.class.getName());
 		primitiveMap.put("Substance.Ingredient", ca.uhn.fhir.model.dstu2.resource.Substance.Ingredient.class.getName());
 		primitiveMap.put("Specimen.Treatment", ca.uhn.fhir.model.dstu2.resource.Specimen.Treatment.class.getName());
@@ -503,6 +517,8 @@ public class FhirResourceManager {
 			return java.lang.String.class.getName();
 		} else if(type.equals("ca.uhn.fhir.model.primitive.InstantDt")) {
 			return java.util.Date.class.getName();
+		} else if(type.equals("ca.uhn.fhir.model.primitive.PositiveIntDt")) {
+			return java.lang.Integer.class.getName();
 		} else {
 			return null;
 		}
@@ -689,7 +705,7 @@ public class FhirResourceManager {
 					lastClass = method.getReturnType();
 					methodType = method.getReturnType().getName();
 					if(lastClass.getName().equals("java.util.List")) {
-						methodType  = ((ParameterizedType)method.getGenericReturnType()).getActualTypeArguments()[0].getTypeName();
+						methodType  = "";//((ParameterizedType)method.getGenericReturnType()).getActualTypeArguments()[0].getTypeName();//TODO Fix this
 						lastClass = Class.forName(methodType);
 					}
 				} catch(Exception e) {

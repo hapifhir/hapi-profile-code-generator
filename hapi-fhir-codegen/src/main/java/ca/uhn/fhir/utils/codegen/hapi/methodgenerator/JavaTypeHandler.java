@@ -140,10 +140,11 @@ public class JavaTypeHandler extends BaseMethodGenerator {
 	 * @param accessors
 	 */
 	protected void handleSingleCardinalityJavaType(List<Method> accessors) {
+		String fluentReturnType = getFluentReturnType();
 		accessors.add(constructGetMethodFromField(getTopLevelCoreAttribute() + "Element",getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute() + "Element")));
 		accessors.add(constructGetMethod(javaType).setBody(buildJavaTypeGetterBody(getTopLevelCoreAttribute())));
-		accessors.add(constructSetMethod(javaType, InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildJavaTypeSetterBody(getTopLevelCoreAttribute())));
-		accessors.add(constructSetMethod(getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
+		accessors.add(constructSetMethod(javaType, fluentReturnType).setBody(buildJavaTypeSetterBody(getTopLevelCoreAttribute())));
+		accessors.add(constructSetMethod(getFullyQualifiedType(), fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
 	}
 	
 	/**
@@ -168,8 +169,9 @@ public class JavaTypeHandler extends BaseMethodGenerator {
 	 */
 	protected void handleMultipleCardinalityJavaType(List<Method> accessors) {
 		accessors.add(constructGetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute())));
-		accessors.add(constructSetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType(),  InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
-		accessors.add(constructAddMethod(getTopLevelCoreAttribute(), getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDefaultAddBody(getTopLevelCoreAttribute())));
+		accessors.add(constructSetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType(),  getFluentReturnType()).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
+		accessors.add(constructAddMethod(getTopLevelCoreAttribute(), getFullyQualifiedType(), getFluentReturnType()).setBody(buildDefaultAddBody(getTopLevelCoreAttribute())));
+		accessors.add(constructAddMethod(getTopLevelCoreAttribute(), javaType, getFluentReturnType()).setBody(buildDefaultAddBody(getTopLevelCoreAttribute())));
 		accessors.add(constructAddMethodDelegated(getTopLevelCoreAttribute(), getFullyQualifiedType()).setBody(buildDelegatedAddBody(getTopLevelCoreAttribute(), getFullyQualifiedType())));
 	}
 	

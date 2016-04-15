@@ -120,15 +120,16 @@ public class MultiTypeAttributeHandler extends BaseMethodGenerator {
 		String typeString = element.getTypeFirstRep().getCode();
 		String qualifiedAttribute = getTopLevelCoreAttribute() + StringUtils.capitalize(typeString);
 		String fullyQualifiedType = getFullyQualifiedType(element.getTypeFirstRep());
+		String fluentReturnType = getFluentReturnType();
 		String javaType = FhirResourceManager.getPrimitiveEquivalent(fullyQualifiedType);
 		if(javaType == null) {
 			accessors.add(constructGetMethodFromField(qualifiedAttribute, fullyQualifiedType).setBody(buildMultivaluedGetterBody(fullyQualifiedType)));
-			accessors.add(constructSetMethodFromField(qualifiedAttribute, fullyQualifiedType, InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
+			accessors.add(constructSetMethodFromField(qualifiedAttribute, fullyQualifiedType, fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
 		} else {
 			accessors.add(constructGetMethodFromField(qualifiedAttribute + "Element", fullyQualifiedType).setBody(buildMultivaluedGetterBody(fullyQualifiedType)));
 			accessors.add(constructGetMethodFromField(qualifiedAttribute, javaType).setBody(buildMultivaluedPrimitiveGetterBody(fullyQualifiedType)));
-			accessors.add(constructSetMethodFromField(qualifiedAttribute, fullyQualifiedType, InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
-			accessors.add(constructSetMethodFromField(qualifiedAttribute, javaType, InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildJavaTypeSetterBody(getTopLevelCoreAttribute(), fullyQualifiedType)));
+			accessors.add(constructSetMethodFromField(qualifiedAttribute, fullyQualifiedType, fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
+			accessors.add(constructSetMethodFromField(qualifiedAttribute, javaType, fluentReturnType).setBody(buildJavaTypeSetterBody(getTopLevelCoreAttribute(), fullyQualifiedType)));
 		}
 	}
 	

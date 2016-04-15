@@ -204,6 +204,10 @@ public class InterfaceAdapterGenerator {
 //						addAdapteeField(model, typeName);
 //						generateAdapteeGetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
 //						generateAdapteeSetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+						List<Method> methods = command.getMethodsForClass(model.getName());
+						if(methods != null) {
+							model.addMethods(methods);
+						}
 						String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
 						CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
 					}catch(Exception e) {

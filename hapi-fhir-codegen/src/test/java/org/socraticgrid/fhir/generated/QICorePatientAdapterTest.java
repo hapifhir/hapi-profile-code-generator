@@ -21,10 +21,12 @@ import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.composite.HumanNameDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
+import ca.uhn.fhir.model.dstu2.valueset.AddressTypeEnum;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.primitive.BooleanDt;
 import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 
 public class QICorePatientAdapterTest {
 	
@@ -109,6 +111,7 @@ public class QICorePatientAdapterTest {
 			//We add the nationalities to the underlying Patient resource and test that all is properly persisted
 			nationalities.add(nationality);
 			patient.setNationality(nationalities);
+			patient.getNationality().get(0).setCode(russianNationality);
 			assertNotNull(patient.getNationality());
 			assertEquals(1, patient.getNationality().size());
 			assertEquals("http://national.code.systems", patient.getNationality().get(0).getCode().getCodingFirstRep().getSystem());
@@ -171,11 +174,26 @@ public class QICorePatientAdapterTest {
 	}
 	
 	@Test
-	public void testExtendedBackboneElementAddressPreferred() {
-		QICorePatientAddress address = new QICorePatientAddress();
+	public void testExtendedBackboneElementsAndType() {
+		QICorePatientAddress address = buildAddressInstance();
+		List<QICorePatientAddress> addresses = new ArrayList<QICorePatientAddress>();
+		addresses.add(address);
 		address.setPreferred(new BooleanDt(true));
-		patient.addAddress(address);
-		assertEquals(new BooleanDt(true), patient.getAddress().get(0).getPreferred());
+		patient.addWrappedAddress(address);
+		assertEquals(new BooleanDt(true), patient.getWrappedAddress().get(0).getPreferred());
+		assertEquals(address.getAdaptee(), patient.getAddressFirstRep());
+		patient.setWrappedAddress(addresses);
+		assertEquals(patient.getWrappedAddressFirstRep().getAdaptee(), patient.getAddressFirstRep());
+		assertEquals(patient.getWrappedAddress().get(0).getAdaptee(), addresses.get(0).getAdaptee());
+		assertEquals(1, patient.getWrappedAddress().size());
+		
+		assertTrue(patient.addAddress() instanceof AddressDt);
+		assertNotNull(patient.addAddress());
+		patient.addAddress(address.getAdaptee());
+		assertEquals(patient.getAddressFirstRep(), address.getAdaptee());
+		assertEquals(4, patient.getAddress().size());
+		patient.setAddress(patient.getAddress());
+		assertEquals(4, patient.getAddress().size());
 	}
 	
 	@Test
@@ -217,12 +235,12 @@ public class QICorePatientAdapterTest {
 	public void testFluentSetters() {
 		try {
 			assertEquals(patient, patient.setActive(true));
-			assertEquals(patient, patient.setAddress(new ArrayList<QICorePatientAddress>()));
+			assertEquals(patient, patient.setWrappedAddress(new ArrayList<QICorePatientAddress>()));
 			assertEquals(patient, patient.setCadavericDonor(new BooleanDt(true)));
 			assertEquals(patient, patient.setClinicalTrial(new ArrayList<QICorePatientClinicalTrial>()));
 			assertEquals(patient, patient.setContact(new ArrayList<Patient.Contact>()));
 			assertEquals(patient, patient.setRace(new CodeableConceptDt()));
-			assertEquals(patient, patient.setTelecom(new ArrayList<QICorePatientTelecom>()));
+			assertEquals(patient, patient.setWrappedTelecom(new ArrayList<QICorePatientTelecom>()));
 		} catch(Exception e) {
 			fail();
 		}
@@ -231,13 +249,37 @@ public class QICorePatientAdapterTest {
 	@Test
 	public void testFluentAddMethod() {
 		//Test no-arg add method. Note that direct delegation to HAPI FHIR cannot occur because the returned object reference must support an extended type.
-		patient.addAddress().setPreferred(new BooleanDt(true));
-		assertTrue(patient.getAddress().get(0).getPreferred().getValue());//TODO Add FirstRep convenience methods and support primitives for extension methods
+		patient.addWrappedAddress().setPreferred(new BooleanDt(true));
+		assertTrue(patient.getWrappedAddress().get(0).getPreferred().getValue());//TODO Add FirstRep convenience methods and support primitives for extension methods
 		
 		//Test single arg add method.
 		QICorePatientAddress address = new QICorePatientAddress();
 		address.setPreferred(new BooleanDt(true));
-		patient.addAddress(address);
-		assertTrue(patient.getAddress().get(0).getPreferred().getValue());
+		patient.addWrappedAddress(address);
+		assertTrue(patient.getWrappedAddress().get(0).getPreferred().getValue());
+	}
+	
+	/***********************************************************
+	 * 	Helper Methods for Test
+	 * *********************************************************/
+	
+	public QICorePatientAddress buildAddressInstance() {
+		QICorePatientAddress address = new QICorePatientAddress();
+		address.addLine().setValue("123 Main Street");
+		address.addLine("Apartment 123");
+		StringDt line = new StringDt("Second Floor");
+		address.addLine(line);
+		address.setCity("Los Angeles");
+		address.setState("California");
+		address.setPostalCode("90049");
+		address.setType(AddressTypeEnum.POSTAL);
+		return address;
+	}
+	
+	public CodeableConceptDt createCodeableConcept(String codeSystem, String code) {
+		CodeableConceptDt codeableConcept = new CodeableConceptDt();
+		CodingDt codeDt = new CodingDt(codeSystem, code);
+		codeableConcept.getCoding().add(codeDt);
+		return codeableConcept;
 	}
 }

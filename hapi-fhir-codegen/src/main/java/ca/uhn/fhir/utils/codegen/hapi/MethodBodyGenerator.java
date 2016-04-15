@@ -231,6 +231,49 @@ public class MethodBodyGenerator extends TemplateUtils {
 		return st.render();
 	}
 	
+	public String getWrappedTypeListBody(String adapterType, String adaptedType, String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("getWrappedTypeList");
+		st.add("adapterType", adapterType);
+		st.add("adaptedType", adaptedType);
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+	
+	public String setWrappedTypeListBody(String adapterType, String adaptedType, String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("setWrappedTypeList");
+		st.add("adapterType", adapterType);
+		st.add("adaptedType", adaptedType);
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+	
+	public String addWrappedTypeToListMethodDelegatedBody(String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("addWrappedTypeToListMethodDelegatedBody");
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+	
+	public String addWrappedTypeToListMethodBody(String adapterType, String adaptedType, String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("addWrappedTypeToListMethodBody");
+		st.add("adapterType", adapterType);
+		st.add("adaptedType", adaptedType);
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+	
+	public String getWrappedTypeFirstRepMethodBody(String adapterType, String adaptedType, String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("getWrappedTypeFirstRep");
+		st.add("adapterType", adapterType);
+		st.add("adaptedType", adaptedType);
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+	
 	/**
 	 * Sets a reference type in HAPI FHIR.
 	 * 

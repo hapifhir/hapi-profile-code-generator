@@ -14,7 +14,9 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
+import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
@@ -123,7 +125,7 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	 */
 	protected void handleSingleCardinality(List<Method> accessors) {
 		Method getMethod = constructGetMethod(getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute()));
-		Method setMethod = constructSetMethod(getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildCodeableConceptSetterBody(getTopLevelCoreAttribute()));
+		Method setMethod = constructSetMethod(getFullyQualifiedType(), getFluentReturnType()).setBody(buildCodeableConceptSetterBody(getTopLevelCoreAttribute()));
 		getMethod.getImports().addAll(imports);
 		setMethod.getImports().addAll(imports);
 		accessors.add(getMethod);
@@ -168,42 +170,52 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	}
 	
 	public void handleCodeableConcept() {
+		String attributePath = getElement().getPath();
 		String override = getFhirResourceManager().getCodeableConceptOverride(getElement().getPath());
-		if(override != null) { //Enumerated type does not follow convention in naming
-			if(override.equals("ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt")) {
-				setFullyQualifiedType(override);
-			} else {
-				setFullyQualifiedType("ca.uhn.fhir.model.dstu2.composite.BoundCodeableConceptDt<" + override + ">");
-			}
-			imports.add(override);
-		} else if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt.class.getName()) 
-				&& getElement().getBinding() != null 
-				&& !isMultipleCardinality()) {
-			Binding binding = getElement().getBinding();
-			String bindingName = null;
-			if(binding != null && binding.getValueSet() != null) {
-				IDatatype vs = binding.getValueSet();
-				if(vs instanceof ResourceReferenceDt) {
-					String valueSetUri = ((ResourceReferenceDt) vs).getReference().getValueAsString();
-					bindingName = PathUtils.getEnumNameFromValueSetBindingUri(valueSetUri);
-				}
-			}
-			if(bindingName == null) {
-				bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());
-			}
-			//bindingName = getParentClass() + getElement().getName();//TODO may be Condition[c]ategoryCodesEnum - check case
-			String enumClassName1 = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "Enum";
-			String enumClassName2 = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "CodesEnum";
-			if(classExists(enumClassName1)) {
-				enumType = enumClassName1;
-			} else if(classExists(enumClassName2)) {
-				enumType = enumClassName2;
-			}
-			if(enumType != null) {
-				setFullyQualifiedType("ca.uhn.fhir.model.dstu2.composite.BoundCodeableConceptDt<" + enumType  + ">");
-				imports.add(enumType);
-			}
+		String fieldName = CodeGenerationUtils.getSuffix(getResourceName(), attributePath);
+		HapiFhirUtils.TypeDefinition boundType = HapiFhirUtils.getBoundCodeableConcept(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
+		if(boundType.isEnumerationType()) {
+			enumType = boundType.getEnumerationType();
+			imports.add(boundType.getEnumerationType());
+			setFullyQualifiedType(boundType.getCodedTypeAsString());
+		} else {
+			setFullyQualifiedType(boundType.getDatatype());
 		}
+//		if(override != null) { //Enumerated type does not follow convention in naming
+//			if(override.equals("ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt")) {
+//				setFullyQualifiedType(override);
+//			} else {
+//				setFullyQualifiedType("ca.uhn.fhir.model.dstu2.composite.BoundCodeableConceptDt<" + override + ">");
+//			}
+//			imports.add(override);
+//		} else if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt.class.getName()) 
+//				&& getElement().getBinding() != null 
+//				&& !isMultipleCardinality()) {
+//			Binding binding = getElement().getBinding();
+//			String bindingName = null;
+//			if(binding != null && binding.getValueSet() != null) {
+//				IDatatype vs = binding.getValueSet();
+//				if(vs instanceof ResourceReferenceDt) {
+//					String valueSetUri = ((ResourceReferenceDt) vs).getReference().getValueAsString();
+//					bindingName = PathUtils.getEnumNameFromValueSetBindingUri(valueSetUri);
+//				}
+//			}
+//			if(bindingName == null) {
+//				bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());
+//			}
+//			//bindingName = getParentClass() + getElement().getName();//TODO may be Condition[c]ategoryCodesEnum - check case
+//			String enumClassName1 = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "Enum";
+//			String enumClassName2 = "ca.uhn.fhir.model.dstu2.valueset." + bindingName + "CodesEnum";
+//			if(classExists(enumClassName1)) {
+//				enumType = enumClassName1;
+//			} else if(classExists(enumClassName2)) {
+//				enumType = enumClassName2;
+//			}
+//			if(enumType != null) {
+//				setFullyQualifiedType("ca.uhn.fhir.model.dstu2.composite.BoundCodeableConceptDt<" + enumType  + ">");
+//				imports.add(enumType);
+//			}
+//		}
 	}
 	
 	/**

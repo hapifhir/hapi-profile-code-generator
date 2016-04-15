@@ -13,6 +13,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
 import ca.uhn.fhir.utils.common.metamodel.Cardinality;
 import ca.uhn.fhir.utils.common.metamodel.Method;
@@ -33,6 +34,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	private String fullyQualifiedType;
 	private MethodBodyGenerator template;
 	private String generatedCodePackage;
+	private String fluentReturnTypeOverride;
 
 	/**
 	 * Constructor setting an element and its parent profile
@@ -267,6 +269,31 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 		this.generatedCodePackage = generatedCodePackage;
 	}
 	
+	/**
+	 * Will use this type for all setters in fluent code generation
+	 * @return
+	 */
+	public String getFluentReturnTypeOverride() {
+		return fluentReturnTypeOverride;
+	}
+	
+	/**
+	 * Will use this type for all setters in fluent code generation
+	 * @return
+	 */
+	public void setFluentReturnTypeOverride(String fluentReturnTypeOverride) {
+		this.fluentReturnTypeOverride = fluentReturnTypeOverride;
+	}
+	
+	public String getFluentReturnType() {
+		if(fluentReturnTypeOverride != null) {
+			return CodeGenerationUtils.makeIdentifierJavaSafe(getProfile().getName()) + this.fluentReturnTypeOverride;
+		} else {
+			return InterfaceAdapterGenerator.generateInterfaceName(getProfile());
+		}
+	}
+
+	
 	/*
 	 * Configuration and helper method section starts here
 	 */
@@ -288,6 +315,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 		assignCardinality();
 		if(parentClass == null) {
 			assignParentClass();
+			resourceName = CodeGenerationUtils.getLastPathComponent(parentClass);
 		}
 	}
 	
@@ -302,12 +330,19 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * @return
 	 */
 	public void parseTopLevelCoreAttribute() {
-		resourceName = CodeGenerationUtils.getLastPathComponent(parentClass);
 		String attributePath = element.getPath();
 		String suffix = CodeGenerationUtils.getSuffix(resourceName, attributePath);
-		if(suffix != null && suffix.indexOf('.') >= 0) {
+		if(suffix != null && suffix.indexOf('.') >= 0) {//If you are here, you are probably an attribute on a 'backbone' element or a type.
 			LOGGER.info(element.getPath() + " is not of the form Resource.attribute.");
-			suffix = null;
+			//TODO Review this algorithm with James or scrap altogether based on HAPI
+			if(attributePath.equalsIgnoreCase("Practitioner.practitionerRole.specialty.primaryInd")) {
+				LOGGER.error(attributePath + " is to be handled later");
+			} else {
+				String[] pathComponents = attributePath.split("\\.");
+				String parentClassName = StringUtils.capitalize(pathComponents[0]) + "." + StringUtils.capitalize(pathComponents[pathComponents.length - 2]);
+				parentClass = fhirResourceManager.getFullyQualifiedJavaType(parentClassName, null);
+				suffix = pathComponents[pathComponents.length-1];
+			}
 		}
 		if(suffix != null && suffix.indexOf('.') < 0) {
 			if(FhirResourceManager.isMultivaluedAttribute(suffix)) {
@@ -605,6 +640,33 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 */
 	public String buildDelegatedGetterWithCastToExtendedTypeListBody(String propertyName, String castTo) {
 		return template.getAdapterGetListMethodDelegationWithCastToListBody(propertyName, castTo);
+	}
+	
+	/**
+	 * 
+	 * @param adapterType
+	 * @param adaptedType
+	 * @param propertyName
+	 * @return
+	 */
+	public String getWrappedTypeListBody(String adapterType, String adaptedType, String propertyName) {
+		return template.getWrappedTypeListBody(adapterType, adaptedType, propertyName);
+	}
+	
+	public String setWrappedTypeListBody(String adapterType, String adaptedType, String propertyName) {
+		return template.setWrappedTypeListBody(adapterType, adaptedType, propertyName);
+	}
+	
+	public String addWrappedTypeToListMethodDelegatedBody(String propertyName) {
+		return template.addWrappedTypeToListMethodDelegatedBody(propertyName);
+	}
+	
+	public String addWrappedTypeToListMethodBody(String adapterType, String adaptedType, String propertyName) {
+		return template.addWrappedTypeToListMethodBody(adapterType, adaptedType, propertyName);
+	}
+	
+	public String getWrappedTypeFirstRepMethodBody(String adapterType, String adaptedType, String propertyName) {
+		return template.getWrappedTypeFirstRepMethodBody(adapterType, adaptedType, propertyName);
 	}
 	
 	/**

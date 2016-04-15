@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.primitive.CodeDt;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
+import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.BaseMethodGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedAttributeHandler;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedBackboneElementHandler;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedStructureAttributeHandler;
@@ -23,7 +25,6 @@ import ca.uhn.fhir.utils.common.graph.Node;
 import ca.uhn.fhir.utils.common.metamodel.ClassField;
 import ca.uhn.fhir.utils.common.metamodel.ClassModel;
 import ca.uhn.fhir.utils.common.metamodel.Method;
-import ca.uhn.fhir.utils.common.metamodel.ModifierEnum;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.ProfileWalker;
 
@@ -38,10 +39,13 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(FhirResourceManager.class);
 	
+	public static final String EXTENDED_TYPE = "extended_type";
+	
 	private MethodHandlerResolver resolver;
 	private FhirResourceManager fhirResourceManager;
 	private MethodBodyGenerator templateUtils;
 	private Map<String, ClassModel> itemClassMap;
+	private Map<String, List<Method>> classToMethodStore;
 	private StructureDefinition profile;
 	private String generatedCodePackage;
 	private Node<ElementDefinitionDt> rootNode;
@@ -49,6 +53,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	
 	public GenerateLogicalViewCommand() {
 		itemClassMap = new HashMap<>();
+		classToMethodStore = new HashMap<>();
 	}
 	
 	public GenerateLogicalViewCommand(StructureDefinition profile,
@@ -64,11 +69,35 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		this.generatedCodePackage = generatedCodePackage;
 	}
 	
+	public void addMethodToStore(String modelName, Method method) {
+		List<Method> cache = classToMethodStore.get(modelName);
+		if(cache == null) {
+			cache = new ArrayList<Method>();
+			classToMethodStore.put(modelName, cache);
+		}
+		if(!cache.contains(method)) {
+			cache.add(method);
+		} else {
+			LOGGER.info("Method already exist - skipping" + method);
+			System.out.println("Method already exist - skipping" + method);
+		}
+	}
+	
+	public void addMethodsToStore(String modelName, List<Method> methods) {
+		for(Method method : methods) {
+			addMethodToStore(modelName, method);
+		}
+	}
+	
+	public List<Method> getMethodsForClass(String modelName) {
+		return classToMethodStore.get(modelName);
+	}
+	
 	@Override
 	public void execute(Node<ElementDefinitionDt> node) {
 		boolean found = false;
 		if(node.getPayload() != null) {
-			found = node.getPayload().getName() != null && (node.getPayload().getName().contains("infuseOver"));
+			found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("batch"));
 		}
 		if(found) {// && profile.getName().equals("Immunization")) {
 			LOGGER.debug("Found!");
@@ -211,6 +240,9 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			} else { //Leaf extension on a type or backbone element
 				//List<Method> extensionMethods = handleStructureDefinitionElement(node.getPayload(), true);
 				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+				if(!parentClass.hasTaggedValue(EXTENDED_TYPE)) {
+					parentClass.addTaggedValue(EXTENDED_TYPE, EXTENDED_TYPE);
+				}
 //				if(parentClass.getSupertypes() == null || parentClass.getSupertypes().size() == 0) {
 //					parentClass.addImport("java.util.List"); 
 //					String supertype = fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
@@ -284,12 +316,15 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 //				}
 //				//Nothing needs to be done unless extension is used
 //				UriDt profile = node.getPayload().getTypeFirstRep().getProfileFirstRep();
-//				List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false);
-//				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+				List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false, node.getParent().getName());
+				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+				addMethodsToStore(parentClass.getName(), methods);
 //				parentClass.getMethods().addAll(methods);
 			}
 		}
 	}
+	
+	
 	
 	/**
 	 * Handles non-leaf nodes that are the direct children of the root node.
@@ -298,8 +333,8 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 */
 	public void handleInnerL1Node(Node<ElementDefinitionDt> node) {
 		ClassModel currentClass = retrieveClassModel(node, node.getName());
-		if(currentClass != null && currentClass.getSupertypes() != null && currentClass.getSupertypes().size() > 0) {
-			//Clone the payload
+		if(currentClass.hasTaggedValue(EXTENDED_TYPE)) {
+			//Clone the payload so as not to change the original
 			ElementDefinitionDt clone = FhirResourceManager.shallowCloneElement(node.getPayload());
 			//Set new type
 			clone.getType().clear();
@@ -318,6 +353,9 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			}
 			List<Method> methods = handler.buildCorrespondingMethods();
 			ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+			rootClass.getMethods().addAll(methods);
+			//Add the original set from HAPI FHIR as well
+			methods = handleStructureDefinitionElement(node.getPayload(), false);
 			rootClass.getMethods().addAll(methods);
 		} else {
 			List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false);
@@ -386,11 +424,12 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		return handler.buildCorrespondingMethods();
 	}
 	
-	public List<Method> handleStructureDefinitionElement(ElementDefinitionDt element, boolean addExtensionsToThis) {
+	public List<Method> handleStructureDefinitionElement(ElementDefinitionDt element, boolean addExtensionsToThis, String fluentReturnOverride) {
 		List<Method> methodDefinitions = new ArrayList<>();
 		IMethodHandler handler = resolver.identifyHandler(profile, element, generatedCodePackage);
 		if(handler != null) {
 			handler.setGeneratedCodePackage(generatedCodePackage);
+			((BaseMethodGenerator)handler).setFluentReturnTypeOverride(fluentReturnOverride);
 			if(handler instanceof ExtendedAttributeHandler) {//TODO Fix this ugliness
 				((ExtendedAttributeHandler)handler).setAddExtensionsToThis(addExtensionsToThis);
 				if(addExtensionsToThis) {
@@ -400,6 +439,10 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			methodDefinitions.addAll(handler.buildCorrespondingMethods());
 		}
 		return methodDefinitions;
+	}
+	
+	public List<Method> handleStructureDefinitionElement(ElementDefinitionDt element, boolean addExtensionsToThis) {
+		return handleStructureDefinitionElement(element, addExtensionsToThis, null);
 	}
 	
 	public void buildExtendedParentClass(Node<ElementDefinitionDt> node) {
@@ -444,4 +487,5 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	private ClassField buildUriField(String name, String extensionDefUri) {
 		return ClassField.buildStaticConstant(name, java.lang.String.class.getCanonicalName(), "\"" + extensionDefUri + "\"");
 	}
+	
 }

@@ -1,7 +1,9 @@
 package ca.uhn.fhir.utils.common.metamodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ClassModel {
 	
@@ -13,6 +15,7 @@ public class ClassModel {
 	private List<String> interfaces;
 	private List<String> supertypes;
 	private List<String> imports;
+	private Map<String, Object> taggedValues;
 	
 	public ClassModel() {
 		fields = new ArrayList<ClassField>();
@@ -20,6 +23,7 @@ public class ClassModel {
 		supertypes = new ArrayList<String>();
 		methods = new ArrayList<Method>();
 		imports = new ArrayList<String>();
+		taggedValues = new HashMap<>();
 	}
 
 	public ClassModel(String name) {
@@ -52,6 +56,12 @@ public class ClassModel {
 	
 	public void addMethod(Method method) {
 		this.methods.add(method);
+	}
+	
+	public void addMethods(List<Method> methods) {
+		if(methods != null) {
+			this.methods.addAll(methods);
+		}
 	}
 
 	public List<ClassField> getFields() {
@@ -120,5 +130,21 @@ public class ClassModel {
 	
 	public void addImport(String anImport) {
 		this.imports.add(anImport);
+	}
+	
+	public void addTaggedValue(String key, Object value) {
+		taggedValues.put(key, value);
+	}
+	
+	public Object getTaggedValue(String key) {
+		return taggedValues.get(key);
+	}
+	
+	public boolean hasTaggedValue(String key) {
+		return taggedValues.get(key) != null;
+	}
+	
+	public String toString() {
+		return name;
 	}
 }

@@ -116,7 +116,7 @@ public class SimpleAttributeHandler extends BaseMethodGenerator {
 	 */
 	protected void handleSingleCardinality(List<Method> accessors) {
 		accessors.add(constructGetMethod(getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute())));
-		accessors.add(constructSetMethod(getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
+		accessors.add(constructSetMethod(getFullyQualifiedType(), getFluentReturnType()).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
 	}
 	
 	/**
@@ -140,9 +140,10 @@ public class SimpleAttributeHandler extends BaseMethodGenerator {
 	 * @param accessors
 	 */
 	protected void handleMultipleCardinality(List<Method> accessors) {
+		String fluentReturnType = getFluentReturnType();
 		accessors.add(constructGetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute())));
-		accessors.add(constructSetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType(),  InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
-		accessors.add(constructAddMethod(getTopLevelCoreAttribute(), getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDefaultAddBody(getTopLevelCoreAttribute())));
+		accessors.add(constructSetMethodForMultiCardinalityField(getTopLevelCoreAttribute(),getFullyQualifiedType(),  fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
+		accessors.add(constructAddMethod(getTopLevelCoreAttribute(), getFullyQualifiedType(), fluentReturnType).setBody(buildDefaultAddBody(getTopLevelCoreAttribute())));
 		accessors.add(constructAddMethodDelegated(getTopLevelCoreAttribute(), getFullyQualifiedType()).setBody(buildDelegatedAddBody(getTopLevelCoreAttribute(), getFullyQualifiedType())));
 		accessors.add(constructGetFirstRepMethodFromField(getTopLevelCoreAttribute(),getFullyQualifiedType()).setBody(buildGetFirstRepInvocation(getTopLevelCoreAttribute())));
 	}

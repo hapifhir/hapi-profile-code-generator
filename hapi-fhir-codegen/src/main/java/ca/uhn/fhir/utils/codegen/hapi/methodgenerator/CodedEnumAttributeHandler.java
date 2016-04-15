@@ -124,20 +124,21 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	 * @param accessors
 	 */
 	protected void handleSingleCardinality(List<Method> accessors) {
+		String fluentReturnType = getFluentReturnType();
 		accessors.add(constructGetMethod(java.lang.String.class.getCanonicalName()).setBody(buildJavaTypeGetterBody(getTopLevelCoreAttribute())));
 		if(bindingName != null) {
-			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), bindingName)));
+			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), bindingName)));
 		} else if(bindingName == null && getFullyQualifiedType().equals("ca.uhn.fhir.model.primitive.CodeDt")){
 			//Handle Immunization.getStatus() oddity
-			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
+			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
 		} else {
 			//Handle ReferralRequest.status
-			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), override)));
+			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), override)));
 		}
 		Method getMethod = constructGetMethodFromField(getTopLevelCoreAttribute() + "Element", getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute() + "Element"));
-		Method setMethod = constructSetMethod(getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));
+		Method setMethod = constructSetMethod(getFullyQualifiedType(), fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));
 		if(bindingName != null) {//There is in fact an enumeration defined in HAPI
-			Method setMethodEnum = constructSetMethod(bindingName, InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));//HAPI Supports passing the enum directly to the setter.
+			Method setMethodEnum = constructSetMethod(bindingName, fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));//HAPI Supports passing the enum directly to the setter.
 			accessors.add(setMethodEnum);
 		}
 		getMethod.getImports().addAll(imports);

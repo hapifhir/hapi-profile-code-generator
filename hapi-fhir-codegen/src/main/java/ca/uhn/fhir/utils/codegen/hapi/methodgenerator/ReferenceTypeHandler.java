@@ -136,13 +136,14 @@ public class ReferenceTypeHandler extends BaseMethodGenerator {
 			adapterClass = getGeneratedCodePackage() + "." + profileName + "Adapter";
 		}
 		if(resourceClass != null) {
+			String fluentReturnType = getFluentReturnType();
 			setFullyQualifiedType(getFhirResourceManager().addResourceToIndex(resourceName).getCanonicalName());
 			if(!isProfiledResource) {
 				accessors.add(constructGetMethodFromField(getTopLevelCoreAttribute() + descriminator + "Resource", getFullyQualifiedType()).setBody(buildReferenceGetterBody()));
-				accessors.add(constructSetMethodFromField(getTopLevelCoreAttribute() + "Resource", getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildReferenceSetterBody()));
+				accessors.add(constructSetMethodFromField(getTopLevelCoreAttribute() + "Resource", getFullyQualifiedType(), fluentReturnType).setBody(buildReferenceSetterBody()));
 			} else {
 				accessors.add(constructGetMethodFromField(getTopLevelCoreAttribute() + descriminator + "Resource", adapterClass).setBody(buildProfiledReferenceGetterBody(adapterClass)));
-				accessors.add(constructSetMethodFromField(getTopLevelCoreAttribute() + "Resource", adapterClass, InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildProfiledReferenceSetterBody()));
+				accessors.add(constructSetMethodFromField(getTopLevelCoreAttribute() + "Resource", adapterClass, fluentReturnType).setBody(buildProfiledReferenceSetterBody()));
 			}
 		} else {
 			LOGGER.error("No class found for the following type: " + resourceName + ". Skipping code generation for " + getTopLevelCoreAttribute());

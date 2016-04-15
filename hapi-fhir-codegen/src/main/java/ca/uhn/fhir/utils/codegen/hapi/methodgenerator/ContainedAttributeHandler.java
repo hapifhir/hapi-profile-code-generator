@@ -52,7 +52,7 @@ public class ContainedAttributeHandler extends BaseMethodGenerator {
 	public List<Method> buildCorrespondingMethods() {
 		List<Method> methods = new ArrayList<Method>();
 		methods.add(constructGetMethod(getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute())));
-		methods.add(constructSetMethod(getFullyQualifiedType(), InterfaceAdapterGenerator.generateInterfaceName(getProfile())).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
+		methods.add(constructSetMethod(getFullyQualifiedType(), getFluentReturnType()).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
 		return methods;
 	}
 	
