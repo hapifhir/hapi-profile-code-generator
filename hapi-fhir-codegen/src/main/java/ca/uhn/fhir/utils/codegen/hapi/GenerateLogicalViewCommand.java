@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.primitive.CodeDt;
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.BaseMethodGenerator;
@@ -97,7 +96,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	public void execute(Node<ElementDefinitionDt> node) {
 		boolean found = false;
 		if(node.getPayload() != null) {
-			found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("batch"));
+			found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("criticality"));
 		}
 		if(found) {// && profile.getName().equals("Immunization")) {
 			LOGGER.debug("Found!");

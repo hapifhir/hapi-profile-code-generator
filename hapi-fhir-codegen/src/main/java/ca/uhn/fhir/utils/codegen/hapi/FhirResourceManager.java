@@ -1,12 +1,7 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.File;
 import java.io.Reader;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -333,7 +328,10 @@ public class FhirResourceManager {
 //				typeClass = getHapiTypeForFhirType(profile, typeCode);
 //			}
 //		}
-String typeClass = primitiveMap.get(typeCode);
+		String typeClass = primitiveMap.get(typeCode);
+		if(typeClass != null) {
+			//throw new RuntimeException("Check what is happening here");
+		}
 		if(typeClass != null) {
 			typeClass = handlePrimitiveSpecializations(typeClass, typeProfile);
 		}

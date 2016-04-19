@@ -47,6 +47,34 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 		imports = new ArrayList<String>();
 	}
 	
+	/**
+	 * Method assesses whether the handler can process the ElementDefinitionDt argument.
+	 * If the method can process the argument, it returns true. Otherwise, it returns false.
+	 * This method will return true only if:
+	 * <ul>
+	 * <li>The element has a single type of CodeableConcept</li>
+	 * </ul>
+	 * Note: Multi-type elements containing codeable concepts will require processing in order
+	 * to have a single type.
+	 * <p>
+	 * @param profile
+	 * @param element
+	 * @return
+	 */
+	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
+		if(FhirResourceManager.elementHasNoType(element) || FhirResourceManager.isMultiTypeAttribute(element)) {
+			return false;
+		} else {
+			if(element.getTypeFirstRep().getCode() == null || FhirResourceManager.isFhirExtension(element)) {
+				return false;
+			} else if(element.getTypeFirstRep().getCode().equals("CodeableConcept")) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	
 	public boolean isEnumeration() {
 		return enumType != null;
 	}
@@ -165,13 +193,12 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		//setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
 		handleCodeableConcept();
 	}
 	
 	public void handleCodeableConcept() {
 		String attributePath = getElement().getPath();
-		String override = getFhirResourceManager().getCodeableConceptOverride(getElement().getPath());
 		String fieldName = CodeGenerationUtils.getSuffix(getResourceName(), attributePath);
 		HapiFhirUtils.TypeDefinition boundType = HapiFhirUtils.getBoundCodeableConcept(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
 		if(boundType.isEnumerationType()) {
@@ -216,34 +243,6 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 //				imports.add(enumType);
 //			}
 //		}
-	}
-	
-	/**
-	 * Method assesses whether the handler can process the ElementDefinitionDt argument.
-	 * If the method can process the argument, it returns true. Otherwise, it returns false.
-	 * This method will return true only if:
-	 * <ul>
-	 * <li>The element has a single type of CodeableConcept</li>
-	 * </ul>
-	 * Note: Multi-type elements containing codeable concepts will require processing in order
-	 * to have a single type.
-	 * <p>
-	 * @param profile
-	 * @param element
-	 * @return
-	 */
-	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		if(FhirResourceManager.elementHasNoType(element) || FhirResourceManager.isMultiTypeAttribute(element)) {
-			return false;
-		} else {
-			if(element.getTypeFirstRep().getCode() == null || FhirResourceManager.isFhirExtension(element)) {
-				return false;
-			} else if(element.getTypeFirstRep().getCode().equals("CodeableConcept")) {
-				return true;
-			} else {
-				return false;
-			}
-		}
 	}
 
 }

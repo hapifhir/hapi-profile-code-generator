@@ -14,7 +14,9 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
+import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
@@ -126,19 +128,22 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	protected void handleSingleCardinality(List<Method> accessors) {
 		String fluentReturnType = getFluentReturnType();
 		accessors.add(constructGetMethod(java.lang.String.class.getCanonicalName()).setBody(buildJavaTypeGetterBody(getTopLevelCoreAttribute())));
-		if(bindingName != null) {
-			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), bindingName)));
-		} else if(bindingName == null && getFullyQualifiedType().equals("ca.uhn.fhir.model.primitive.CodeDt")){
+		if(enumType != null) {
+			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), enumType)));
+		} else if(enumType == null && getFullyQualifiedType().equals("ca.uhn.fhir.model.primitive.CodeDt")){
 			//Handle Immunization.getStatus() oddity
 			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
 		} else {
-			//Handle ReferralRequest.status
-			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), override)));
+			throw new RuntimeException("Binding name is null");
 		}
+//		else {
+//			//Handle ReferralRequest.status
+//			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), override)));
+//		}
 		Method getMethod = constructGetMethodFromField(getTopLevelCoreAttribute() + "Element", getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute() + "Element"));
 		Method setMethod = constructSetMethod(getFullyQualifiedType(), fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));
-		if(bindingName != null) {//There is in fact an enumeration defined in HAPI
-			Method setMethodEnum = constructSetMethod(bindingName, fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));//HAPI Supports passing the enum directly to the setter.
+		if(enumType != null) {//There is in fact an enumeration defined in HAPI
+			Method setMethodEnum = constructSetMethod(enumType, fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));//HAPI Supports passing the enum directly to the setter.
 			accessors.add(setMethodEnum);
 		}
 		getMethod.getImports().addAll(imports);
@@ -188,36 +193,47 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		//setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
 		handleCode();
 	}
 	
 	public void handleCode() {
-		override = getFhirResourceManager().getCodeOverride(getElement().getPath());
-		if(override != null) { //Enumerated type does not follow convention in naming
-			if(override.equals("ca.uhn.fhir.model.dstu2.composite.CodeDt")) {
-				setFullyQualifiedType(override);
-			} else {
-				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + override + ">");
-				bindingName = override;
-			}
-			imports.add(override);
-		} else if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
-				&& getElement().getBinding() != null) {
-			bindingName = getBindingNameFromValueSetReference();
-			identifyValidEnumerationType(bindingName);
-			if(enumType == null) {
-				bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());
-				identifyValidEnumerationType(bindingName);
-			}
-			bindingName = enumType;
-			if(bindingName != null) {
-				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + bindingName + ">");
-				imports.add(bindingName);
-			} else {
-				LOGGER.error("No bindings discovered for " + getElement().getPath());
-			}
+		String attributePath = getElement().getPath();
+		String fieldName = CodeGenerationUtils.getSuffix(getResourceName(), attributePath);
+		HapiFhirUtils.TypeDefinition boundType = HapiFhirUtils.getBoundCodeableConcept(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
+		if(boundType.isEnumerationType()) {
+			enumType = boundType.getEnumerationType();
+			imports.add(boundType.getEnumerationType());
+			setFullyQualifiedType(boundType.getCodedTypeAsString());
+			//bindingName = enumType;//See if necessary
+		} else {
+			setFullyQualifiedType(boundType.getDatatype());
 		}
+//		override = getFhirResourceManager().getCodeOverride(getElement().getPath());
+//		if(override != null) { //Enumerated type does not follow convention in naming
+//			if(override.equals("ca.uhn.fhir.model.dstu2.composite.CodeDt")) {
+//				setFullyQualifiedType(override);
+//			} else {
+//				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + override + ">");
+//				bindingName = override;
+//			}
+//			imports.add(override);
+//		} else if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
+//				&& getElement().getBinding() != null) {
+//			bindingName = getBindingNameFromValueSetReference();
+//			identifyValidEnumerationType(bindingName);
+//			if(enumType == null) {
+//				bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());
+//				identifyValidEnumerationType(bindingName);
+//			}
+//			bindingName = enumType;
+//			if(bindingName != null) {
+//				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + bindingName + ">");
+//				imports.add(bindingName);
+//			} else {
+//				LOGGER.error("No bindings discovered for " + getElement().getPath());
+//			}
+//		}
 	}
 	
 	public String getBindingNameFromValueSetReference() {

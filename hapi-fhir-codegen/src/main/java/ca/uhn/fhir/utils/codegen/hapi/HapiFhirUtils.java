@@ -163,7 +163,12 @@ public class HapiFhirUtils {
 					datatype = ((BaseRuntimeChildDatatypeDefinition)child).getDatatype();
 				} else if(child instanceof ca.uhn.fhir.context.RuntimeChildResourceBlockDefinition) {
 					//Do nothing here
-				} else {
+				} else if(child instanceof ca.uhn.fhir.context.RuntimeChildPrimitiveBoundCodeDatatypeDefinition) {
+					enumerationType = ((BaseRuntimeChildDatatypeDefinition)child).getBoundEnumType();
+					datatype = ((BaseRuntimeChildDatatypeDefinition)child).getDatatype();
+				} else if(child instanceof ca.uhn.fhir.context.RuntimeChildPrimitiveDatatypeDefinition) {
+					datatype = ((BaseRuntimeChildDatatypeDefinition)child).getDatatype();
+				}else {
 					throw new RuntimeException("Unknown type " + child.getClass().getName());
 				}
 				childType = new HapiFhirUtils.TypeDefinition(datatype, enumerationType);

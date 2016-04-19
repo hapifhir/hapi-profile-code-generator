@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.model.primitive.BooleanDt;
-import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
-import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 
 /**
@@ -65,6 +64,35 @@ public class JavaTypeHandler extends BaseMethodGenerator {
 	 */
 	public void setJavaType(String javaType) {
 		this.javaType = javaType;
+	}
+	
+	/**
+	 * Method assesses whether the handler can process the ElementDefinitionDt argument.
+	 * If the method can process the argument, it returns true. Otherwise, it returns false.
+	 * This method will return true only if:
+	 * <ul>
+	 * <li>The element has a single type</li>
+	 * <li>The element has a HAPI FHIR type that has a corresponding java type (e.g., BooleanDt corresponds to java.lang.Boolean.</li>
+	 * </ul>
+	 * 
+	 * @param profile
+	 * @param element
+	 * @return
+	 */
+	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
+		if(FhirResourceManager.elementHasNoType(element) || FhirResourceManager.isMultiTypeAttribute(element)) {
+			return false;
+		} else {
+			if(element.getTypeFirstRep().getCode() == null || FhirResourceManager.isFhirExtension(element)) {
+				return false;
+			} else if(!FhirResourceManager.hasEquivalentJavaType(element.getTypeFirstRep())) {
+				return false;
+			} else if(element.getTypeFirstRep().getCode().equals("code")) {//Make exception for Code Enums
+				return false;
+			} else {
+				return true;
+			}
+		}
 	}
 	
 	/**
@@ -181,37 +209,14 @@ public class JavaTypeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
-		javaType = getFhirResourceManager().getPrimitiveEquivalent(getFullyQualifiedType());
-	}
-	
-	/**
-	 * Method assesses whether the handler can process the ElementDefinitionDt argument.
-	 * If the method can process the argument, it returns true. Otherwise, it returns false.
-	 * This method will return true only if:
-	 * <ul>
-	 * <li>The element has a single type</li>
-	 * <li>The element has a HAPI FHIR type that has a corresponding java type (e.g., BooleanDt corresponds to java.lang.Boolean.</li>
-	 * </ul>
-	 * 
-	 * @param profile
-	 * @param element
-	 * @return
-	 */
-	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		if(FhirResourceManager.elementHasNoType(element) || FhirResourceManager.isMultiTypeAttribute(element)) {
-			return false;
-		} else {
-			if(element.getTypeFirstRep().getCode() == null || FhirResourceManager.isFhirExtension(element)) {
-				return false;
-			} else if(!FhirResourceManager.hasEquivalentJavaType(element.getTypeFirstRep())) {
-				return false;
-			} else if(element.getTypeFirstRep().getCode().equals("code")) {//Make exception for Code Enums
-				return false;
-			} else {
-				return true;
-			}
-		}
+		String code = type.getCode();
+		Class<?> primitiveClass = HapiFhirUtils.getPrimitiveTypeClass(getFhirResourceManager().getFhirContext(), code);
+//		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+//		if(!getFullyQualifiedType().equals(primitiveClass.getName())) {
+//			throw new RuntimeException("Types are mismatched");
+//		}
+		setFullyQualifiedType(primitiveClass.getName());
+		javaType = FhirResourceManager.getPrimitiveEquivalent(getFullyQualifiedType());
 	}
 
 }
