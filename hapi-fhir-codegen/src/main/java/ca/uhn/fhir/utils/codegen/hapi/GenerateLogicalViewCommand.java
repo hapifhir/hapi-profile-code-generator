@@ -226,7 +226,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			}
 			ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 			//String parentClassName = StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getParent().getName()));
-			String type = fhirResourceManager.getFullyQualifiedJavaType(node.getPayload().getTypeFirstRep());
+			String type = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
 			ExtendedStructureAttributeHandler handler = new ExtendedStructureAttributeHandler(fhirResourceManager, templateUtils, profile, node.getPayload());
 			handler.initialize();
 			handler.setExtendedStructureName(parentClass.getName());
@@ -274,14 +274,18 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		String nodeType = node.getPayload().getTypeFirstRep().getCode();
 		if(nodeType.equals("BackboneElement")) {
 			String code = node.getParent().getName() + "." + node.getName();
+			//String code = node.getPayload().getPath();
+			//code = PathUtils.getPathMinusRootComponent(code);
+//			String code = node.getName();
+//			code = Character.toLowerCase(code.charAt(0)) + code.substring(1);
 			Type type = new Type();
 			type.setCode(code);
-			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(type);
+			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, type);
 			System.out.println("Supertype: " + tentativeType);
 		} else if(nodeType.equals("DomainResource")) {
-			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(node.getName(), null);
+			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getName(), null);
 		} else {
-			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(node.getPayload().getTypeFirstRep());
+			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
 			if(tentativeType.contains("BaseResource")) {
 				System.out.println("STOP HERE");
 			}

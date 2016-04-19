@@ -36,8 +36,8 @@ public class CodeGeneratorConfiguratorTest {
 
 	@Test
 	public void testGetProfileFilePaths() {
-		assertEquals(3, configurator.getProfileFilePaths().size());
-		assertEquals("/root/profile/source/path1", configurator.getProfileFilePaths().get(0));
+		assertEquals(1, configurator.getProfileFilePaths().size());
+		assertEquals("/Users/cnanjo/repository/fhir/trunk/build/publish/profiles-resources.xml", configurator.getProfileFilePaths().get(0));
 	}
 
 	@Test
@@ -51,8 +51,8 @@ public class CodeGeneratorConfiguratorTest {
 
 	@Test
 	public void testGetProfileDirectoryPaths() {
-		assertEquals(4, configurator.getProfileDirectoryPaths().size());
-		assertEquals("/root/profile/dir/dir4", configurator.getProfileDirectoryPaths().get(3));
+		assertEquals(1, configurator.getProfileDirectoryPaths().size());
+		assertEquals("/Users/cnanjo/work/qicore/profiles", configurator.getProfileDirectoryPaths().get(0));
 	}
 
 	@Test
@@ -77,7 +77,7 @@ public class CodeGeneratorConfiguratorTest {
 	
 	@Test
 	public void testGetTargetCodeDirectory() {
-		assertEquals("/root/dir/target", configurator.getTargetCodeGenerationDirectory());
+		assertEquals("generated-source/java/", configurator.getTargetCodeGenerationDirectory());
 	}
 
 	@Test
@@ -99,8 +99,8 @@ public class CodeGeneratorConfiguratorTest {
 
 	@Test
 	public void testGetProfileNameList() {
-		assertEquals(11, configurator.getProfileNameList().size());
-		assertEquals("DeviceUseStatement", configurator.getProfileNameList().get(10));
+		assertEquals(48, configurator.getProfileNameList().size());
+		assertEquals("Goal", configurator.getProfileNameList().get(10));
 	}
 
 	@Test
@@ -115,8 +115,8 @@ public class CodeGeneratorConfiguratorTest {
 
 	@Test
 	public void testGetExtensionRepositories() {
-		assertEquals(5, configurator.getExtensionRepositories().size());
-		assertEquals("/root/extension/dir/path3", configurator.getExtensionRepositories().get(2));
+		assertEquals(2, configurator.getExtensionRepositories().size());
+		assertEquals("/Users/cnanjo/repository/fhir/trunk/build/publish/qicore", configurator.getExtensionRepositories().get(1));
 	}
 
 	@Test

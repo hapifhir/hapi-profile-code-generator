@@ -6,17 +6,17 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stringtemplate.v4.ST;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
-import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
 import ca.uhn.fhir.utils.common.metamodel.Cardinality;
 import ca.uhn.fhir.utils.common.metamodel.Method;
+import ca.uhn.fhir.utils.fhir.PathUtils;
 
 
 public abstract class BaseMethodGenerator implements IMethodHandler {
@@ -340,7 +340,11 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 			} else {
 				String[] pathComponents = attributePath.split("\\.");
 				String parentClassName = StringUtils.capitalize(pathComponents[0]) + "." + StringUtils.capitalize(pathComponents[pathComponents.length - 2]);
-				parentClass = fhirResourceManager.getFullyQualifiedJavaType(parentClassName, null);
+				parentClass = fhirResourceManager.getFullyQualifiedJavaType(profile, parentClassName, null);
+				//String parentClassName = pathComponents[pathComponents.length - 2];
+				//String parentClassName = PathUtils.getPathMinusRootComponent(attributePath);
+				//parentClassName = PathUtils.getPathPrefix(parentClassName);
+				//parentClass = fhirResourceManager.getFullyQualifiedJavaType(getProfile(), parentClassName /*parentClassName*/, null);
 				suffix = pathComponents[pathComponents.length-1];
 			}
 		}

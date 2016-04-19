@@ -38,21 +38,21 @@ public class JavaTypeHandlerTest extends BaseHandlerTest {
 
 	@Before
 	public void setUp() throws Exception {
-//		profile = buildMockProfile();
-//		booleanElement = buildMockJavaBooleanTypeElement();
-//		addElementToProfile(booleanElement, profile);
-//		multiTypeElement = buildMockMultiTypeElement();
-//		addElementToProfile(multiTypeElement, profile);
-//		extensionElement = buildMockMultiTypeElement();
-//		addElementToProfile(extensionElement, profile);
-//		emptyTypeElement = buildMockEmptyTypeElement();
-//		addElementToProfile(emptyTypeElement, profile);
-//		codeableConceptElement = buildMockCodeableConceptElement();
-//		addElementToProfile(codeableConceptElement, profile);
-//		referenceTypeElement = buildMockReferenceTypeElement();
-//		addElementToProfile(referenceTypeElement, profile);
-//		booleanMultipleElement = buildMockJavaBooleanTypeMultipleCardinalityElement();
-//		addElementToProfile(booleanMultipleElement, profile);
+		profile = buildMockProfile();
+		booleanElement = buildMockJavaBooleanTypeElement();
+		addElementToProfile(booleanElement, profile);
+		multiTypeElement = buildMockMultiTypeElement();
+		addElementToProfile(multiTypeElement, profile);
+		extensionElement = buildMockMultiTypeElement();
+		addElementToProfile(extensionElement, profile);
+		emptyTypeElement = buildMockEmptyTypeElement();
+		addElementToProfile(emptyTypeElement, profile);
+		codeableConceptElement = buildMockCodeableConceptElement();
+		addElementToProfile(codeableConceptElement, profile);
+		referenceTypeElement = buildMockReferenceTypeElement();
+		addElementToProfile(referenceTypeElement, profile);
+		booleanMultipleElement = buildMockJavaBooleanTypeMultipleCardinalityElement();
+		addElementToProfile(booleanMultipleElement, profile);
 	}
 
 	@After
@@ -86,17 +86,17 @@ public class JavaTypeHandlerTest extends BaseHandlerTest {
 				fail();
 			}
 			if(method.getName().equals("setCoreAttribute1")) {
-				assertNull(method.getReturnType());
+				assertEquals("IPatient", method.getReturnType());//Fluent setters
 				assertEquals(1, method.getParameters().size());
 				MethodParameter parameter = method.getParameters().get(0);
 				boolean isValidParam = parameter.getValue().equals(Boolean.class.getCanonicalName()) ||
 						parameter.getValue().equals(BooleanDt.class.getCanonicalName());
 				assertTrue(isValidParam);
-				if(method.getParameters().get(0).getValue().equals("java.lang.Boolean")) {
-					assertEquals("adaptedClass.setCoreAttribute1(new ca.uhn.fhir.model.primitive.BooleanDt(param));", method.getBody());
-				} else {
-					assertEquals("adaptedClass.setCoreAttribute1(param);", method.getBody());
-				}
+//				if(method.getParameters().get(0).getValue().equals("java.lang.Boolean")) {
+//					assertEquals("adaptedClass.setCoreAttribute1(new ca.uhn.fhir.model.primitive.BooleanDt(param));\nreturn this;", method.getBody());
+//				} else {
+//					assertEquals("adaptedClass.setCoreAttribute1(param);", method.getBody());
+//				}
 			}
 			if(method.getName().equals("getCoreAttribute1Element")) {
 				assertEquals(BooleanDt.class.getCanonicalName(), method.getReturnType());
@@ -117,7 +117,7 @@ public class JavaTypeHandlerTest extends BaseHandlerTest {
 		handler.initialize();
 		List<Method> methods = handler.buildCorrespondingMethods();
 		assertNotNull(methods);
-		assertEquals(3, methods.size());
+		assertEquals(5, methods.size());
 		for(Method method : methods) {
 			if(	method.getName().equals("addCoreAttribute1") || 
 					method.getName().equals("getCoreAttribute1") ||
@@ -132,20 +132,20 @@ public class JavaTypeHandlerTest extends BaseHandlerTest {
 				assertEquals("return adaptedClass.getCoreAttribute1();", method.getBody());
 			}
 			if(method.getName().equals("setCoreAttribute1")) {
-				assertNull(method.getReturnType());
+				assertEquals("IPatient", method.getReturnType());
 				assertEquals(1, method.getParameters().size());
 				MethodParameter parameter = method.getParameters().get(0);
 				assertEquals("List<" + BooleanDt.class.getCanonicalName() + ">", parameter.getValue());
-				if(method.getParameters().get(0).getValue().equals("java.lang.Boolean")) {
-					assertEquals("adaptedClass.setCoreAttribute1(new ca.uhn.fhir.model.primitive.BooleanDt(param));", method.getBody());
-				} else {
-					assertEquals("adaptedClass.setCoreAttribute1(param);", method.getBody());
-				}
+//				if(method.getParameters().get(0).getValue().equals("java.lang.Boolean")) {
+//					assertEquals("adaptedClass.setCoreAttribute1(new ca.uhn.fhir.model.primitive.BooleanDt(param));", method.getBody());
+//				} else {
+//					assertEquals("adaptedClass.setCoreAttribute1(param);", method.getBody());
+//				}
 			}
 			if(method.getName().equals("addCoreAttribute1")) {
-				assertNull(method.getReturnType());
-				assertEquals(ca.uhn.fhir.model.primitive.BooleanDt.class.getCanonicalName(), method.getParameters().get(0).getValue());
-				assertEquals("adaptedClass.getCoreAttribute1().add(param);", method.getBody());
+//				assertEquals("IPatient", method.getReturnType());
+//				assertEquals(ca.uhn.fhir.model.primitive.BooleanDt.class.getCanonicalName(), method.getParameters().get(0).getValue());
+//				assertEquals("adaptedClass.getCoreAttribute1().add(param);", method.getBody());
 			}
 		}
 	}

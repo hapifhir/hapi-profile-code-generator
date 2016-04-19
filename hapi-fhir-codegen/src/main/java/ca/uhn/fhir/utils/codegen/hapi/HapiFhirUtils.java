@@ -56,23 +56,41 @@ public class HapiFhirUtils {
 		}
 	}
 	
+	/**
+	 * Method returns the HAPI FHIR type for this fhir primitive or null
+	 * if no such mapping exists.
+	 * 
+	 * @param ctx
+	 * @param fhirPrimitiveType The FHIR primitive type whose HAPI type we are looking for
+	 * @return
+	 */
 	public static Class<?> getPrimitiveTypeClass(FhirContext ctx, String fhirPrimitiveType) {
-		Class<?> primitiveClassName = ctx.getElementDefinition(fhirPrimitiveType).getImplementingClass();
-		if(primitiveClassName != null) {
+		BaseRuntimeElementDefinition<?> elementDefinition = ctx.getElementDefinition(fhirPrimitiveType);
+		if(elementDefinition != null) {
+			Class<?> primitiveClassName = elementDefinition.getImplementingClass();
 			LOGGER.trace(primitiveClassName.getName());
+			return primitiveClassName;
 		} else {
 			LOGGER.trace("No primitive class found for " + fhirPrimitiveType);
+			return null;
 		}
-		return primitiveClassName;
 	}
 	
+	/**
+	 * Method returns the resource class if it exists or null if no such resource can 
+	 * be found.
+	 * 
+	 * @param ctx
+	 * @param resourceName The name of the resource whose class we wish to find
+	 * @return
+	 */
 	public static Class<? extends IBaseResource> getResourceClass(FhirContext ctx, String resourceName) {
-		Class clazz = null;
-		RuntimeResourceDefinition def = ctx.getResourceDefinition(resourceName);
-		if(def == null) {
-			throw new RuntimeException("Unknown type " + resourceName);
-		} else {
+		Class<? extends IBaseResource> clazz = null;
+		try {
+			RuntimeResourceDefinition def = ctx.getResourceDefinition(resourceName);
 			clazz = def.getImplementingClass();
+		} catch(Exception e) {
+			LOGGER.trace(resourceName + " is not a valid resource");
 		}
 		return clazz;
 	}
@@ -92,6 +110,12 @@ public class HapiFhirUtils {
 			
 			String nextPart = iter.next();
 			BaseRuntimeChildDefinition child = parentDef.getChildByName(nextPart);
+			if(child == null) {
+				if(nextPart.equals("org")) {
+					System.out.println("Stop here");
+				}
+				throw new RuntimeException("No type found for " + resourceName + "." + nextPart);
+			}
 			BaseRuntimeElementDefinition<?> childDef = child.getChildByName(nextPart);
 			
 			if (iter.hasNext()) {

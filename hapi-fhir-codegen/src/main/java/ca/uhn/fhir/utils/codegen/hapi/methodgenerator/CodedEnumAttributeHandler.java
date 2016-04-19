@@ -188,7 +188,7 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
 		handleCode();
 	}
 	

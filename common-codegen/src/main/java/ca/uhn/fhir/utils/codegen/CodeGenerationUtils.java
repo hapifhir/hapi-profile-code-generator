@@ -125,7 +125,7 @@ public class CodeGenerationUtils {
 	 */
 	public static void addFieldToJavaClass(JavaClassSource classSource, ClassField field) {
 		FieldSource<?> fieldSource = classSource.addField().setName(field.getName()).setType(field.getType())
-				.setLiteralInitializer(field.getInitializer());
+					.setLiteralInitializer(field.getInitializer());
 		for (ModifierEnum modifier : field.getModifiers()) {
 			setFieldSourceModifier(fieldSource, modifier);
 		}

@@ -31,7 +31,7 @@ public class ExtendedBackboneElementHandler extends BaseMethodGenerator {
 	 * @param supertype
 	 */
 	public void setExtendedSupertype(Type supertype) {
-		this.extendedSupertype = getFhirResourceManager().getFullyQualifiedJavaType(supertype);
+		this.extendedSupertype = getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), supertype);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class ExtendedBackboneElementHandler extends BaseMethodGenerator {
 	}
 	
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
 	}
 	
 	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {

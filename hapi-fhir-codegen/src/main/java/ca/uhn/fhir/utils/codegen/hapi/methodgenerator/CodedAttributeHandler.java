@@ -165,7 +165,7 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(type));
+		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
 		handleCodeableConcept();
 	}
 	

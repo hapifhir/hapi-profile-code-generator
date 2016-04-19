@@ -114,6 +114,32 @@ public class PathUtils {
 	}
 	
 	/**
+	 * Returns the path minus the first component of the path.
+	 * 
+	 * If path is
+	 * <p>
+	 * <code>
+	 * Condition.evidence.details
+	 * </code>
+	 * <p>
+	 * Method will return
+	 * <p>
+	 * <code>
+	 * evidence.details
+	 * </code>
+	 * <p>
+	 * @param path
+	 * @return
+	 */
+	public static String getPathMinusRootComponent(String path) {
+		if(path != null && path.indexOf('.') >= 0) {
+			return path.substring(path.indexOf('.') + 1);
+		} else {
+			return null;
+		}
+	}
+	
+	/**
 	 * Returns value set name from URI using the following convention:
 	 * <p>
 	 * <ul>

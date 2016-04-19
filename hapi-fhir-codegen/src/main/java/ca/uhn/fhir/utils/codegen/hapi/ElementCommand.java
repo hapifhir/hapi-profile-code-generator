@@ -95,7 +95,7 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 			node.getPayload().setPath(node.getParent().getName() + "." + node.getName());
 			String parentClassName = StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getParent().getName()));
 			ClassModel parentClass = classModels.get(parentClassName);
-			String type = fhirResourceManager.getFullyQualifiedJavaType(node.getPayload().getTypeFirstRep());
+			String type = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
 //			ClassField field = new ClassField(StringUtils.uncapitalize(node.getOriginalName()), type);
 //			field.addModifier(ModifierEnum.PRIVATE);
 //			ClassField fieldUri = buildUriField(node.getOriginalName() + "Uri", extensionDefUri);

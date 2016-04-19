@@ -1,5 +1,8 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.io.Reader;
 import java.lang.reflect.Method;
@@ -22,8 +25,10 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
+import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
 import ca.uhn.fhir.utils.fhir.FhirExtensionManager;
+import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
 
 /**
@@ -64,7 +69,7 @@ public class FhirResourceManager {
 		generatedType = new ArrayList<String>();
 		loadProfileUriToResourceMap();
 		populatePrimitiveMap();
-		populateCodeableConceptEnumTypeOverrides();
+		//populateCodeableConceptEnumTypeOverrides();
 		populateCodeEnumTypeOverrides();
 		ctx = FhirContext.forDstu2();
 	}
@@ -291,12 +296,12 @@ public class FhirResourceManager {
 	 * @param type
 	 * @return
 	 */
-	public String getFullyQualifiedJavaType(Type type) {
-		String profile = null;
+	public String getFullyQualifiedJavaType(StructureDefinition profile, Type type) {
+		String typeProfile = null;
 		if(type.getProfileFirstRep() != null) {
-			profile = type.getProfileFirstRep().getValueAsString();
+			typeProfile = type.getProfileFirstRep().getValueAsString();
 		}
-		return getFullyQualifiedJavaType(type.getCode(), profile); //TODO Handle multi-profiles later
+		return getFullyQualifiedJavaType(profile, type.getCode(), typeProfile); //TODO Handle multi-profiles later
 	}
 
 	/**
@@ -307,8 +312,28 @@ public class FhirResourceManager {
 	 * @param type
 	 * @return
 	 */
-	public String getFullyQualifiedJavaType(String typeCode, String typeProfile) {
-		String typeClass = primitiveMap.get(typeCode);
+	public String getFullyQualifiedJavaType(StructureDefinition profile, String typeCode, String typeProfile) {
+//		String typeClass = null;
+//		if(generatedTypeExists(typeCode)) {
+//			typeClass = typeCode;
+//		} else if(typeCode != null && typeCode.equals("Resource")) {//TODO This needs to be handled in ContainedResource Handler
+//			typeClass = ca.uhn.fhir.model.dstu2.composite.ContainedDt.class.getName();
+//		} else if(typeCode.equals("Reference")) {
+//			typeClass = ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt.class.getName();
+//		} else if(typeCode.equals("Extension")) {
+//			typeClass = ca.uhn.fhir.model.api.ExtensionDt.class.getName();
+//		} else {
+//			typeCode = updateIfReferenceType(typeCode, typeProfile);//If it is a reference, set the type of what is being referenced - only first profile considered for now
+//			if(typeCode.equals("Resource")) {
+//				typeClass = "ca.uhn.fhir.model.api.IResource";//Handles the case for references to 'any'
+//			} else {
+//				if(typeCode.equals("Extension")) {
+//					System.out.println("Stop here");
+//				}
+//				typeClass = getHapiTypeForFhirType(profile, typeCode);
+//			}
+//		}
+String typeClass = primitiveMap.get(typeCode);
 		if(typeClass != null) {
 			typeClass = handlePrimitiveSpecializations(typeClass, typeProfile);
 		}
@@ -334,6 +359,33 @@ public class FhirResourceManager {
 		return typeClass;
 	}
 	
+	/**
+	 * For attributes that are references to other resources, method returns the type of the reference.
+	 * If the type is not a resource reference, the original typeCode is returned.
+	 * 
+	 * @param typeCode
+	 * @param typeProfile
+	 * @return
+	 */
+	public String updateIfReferenceType(String typeCode, String typeProfile) {
+		String referenceType = typeCode;
+		if(typeCode != null && typeCode.equals("Reference")) {
+			StructureDefinition profile = getProfileFromProfileUri(typeProfile);//We first get the profile associated with the type
+			String profileUri = profile.getBase();
+			if(profileUri == null) {
+				profileUri = typeProfile;
+			}
+			if(typeProfile.indexOf("qicore") >= 0) {
+				System.out.println("Stop here");
+			}
+			referenceType = CodeGenerationUtils.getLastPathComponent(profileUri, '/');
+			if(referenceType.equals("DomainResource")) {
+				referenceType = CodeGenerationUtils.getLastPathComponent(typeProfile, '/');
+			}
+		}
+		return referenceType;
+	}
+	
 	//TODO Handle more elegantly during refactoring
 	public String handlePrimitiveSpecializations(String primitiveType, String primitiveProfile) {
 		String type = primitiveType;
@@ -354,6 +406,47 @@ public class FhirResourceManager {
 	
 	public String getCodeOverride(String path) {
 		return codeEnumTypeOverride.get(path);
+	}
+	
+	/**
+	 * Method returns the equivalent HAPI Type for a given FHIR type. It checks
+	 * for primitive types, resources, and structure types.
+	 * 
+	 * @param profile The relevant FHIR profile for the resource of interest
+	 * @param fhirType The FHIR attribute type to translate
+	 * @return The equivalent HAPI type
+	 */
+	public String getHapiTypeForFhirType(StructureDefinition profile, String fhirType) {
+		String hapiTypeName = HapiFhirUtils.getPrimitiveTypeClassName(getFhirContext(), fhirType);
+		if(hapiTypeName != null) {
+			return hapiTypeName;
+		} else {
+			Class<?> hapiTypeClass = HapiFhirUtils.getResourceClass(getFhirContext(), fhirType);
+			if(hapiTypeClass != null) {
+				hapiTypeName = hapiTypeClass.getName();
+			} else {
+				String baseResourcePath = profile.getBase();
+				String baseResourceName = PathUtils.getLastResourcePathComponent(baseResourcePath);
+				if(baseResourceName.equals("DomainResource")) {
+					baseResourceName = profile.getName();
+				}
+				try {
+					if(fhirType.equals("Extension")) {
+						System.out.println("Stop here");
+					}
+					Class<?> typeClass = HapiFhirUtils.getStructureTypeClass(getFhirContext(), baseResourceName, fhirType);
+				if(typeClass == null) {
+					throw new RuntimeException("Unknown type " + fhirType + " for base resource " + baseResourcePath);
+				} else {
+					return typeClass.getName();
+				}
+				} catch(Exception e) {
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		}
+		return hapiTypeName;
 	}
 	
 	/**
@@ -469,19 +562,20 @@ public class FhirResourceManager {
 		primitiveMap.put("Practitioner.PractitionerRole", ca.uhn.fhir.model.dstu2.resource.Practitioner.PractitionerRole.class.getName());
 		primitiveMap.put("Location.Position", ca.uhn.fhir.model.dstu2.resource.Location.Position.class.getName());
 		primitiveMap.put("Product.Ingredient", ca.uhn.fhir.model.dstu2.resource.Medication.ProductIngredient.class.getName());
+		primitiveMap.put("Patient.Communication", ca.uhn.fhir.model.dstu2.resource.Patient.Communication.class.getName());
 	}
 	
 	/**
 	 * TODO Discuss with James Agnew
 	 */
-	public void populateCodeableConceptEnumTypeOverrides() {
-		codeableConceptEnumTypeOverride.put("CommunicationRequest.priority", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
-		codeableConceptEnumTypeOverride.put("Encounter.priority", "ca.uhn.fhir.model.dstu2.valueset.PriorityCodesEnum");
-		codeableConceptEnumTypeOverride.put("Location.type", "ca.uhn.fhir.model.dstu2.valueset.LocationTypeEnum");
-		codeableConceptEnumTypeOverride.put("ReferralRequest.status", "ca.uhn.fhir.model.dstu2.valueset.ReferralStatusEnum");
-		codeableConceptEnumTypeOverride.put("ReferralRequest.specialty", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
-		codeableConceptEnumTypeOverride.put("ReferralRequest.priority", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
-	}
+//	public void populateCodeableConceptEnumTypeOverrides() {
+//		codeableConceptEnumTypeOverride.put("CommunicationRequest.priority", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
+//		codeableConceptEnumTypeOverride.put("Encounter.priority", "ca.uhn.fhir.model.dstu2.valueset.PriorityCodesEnum");
+//		codeableConceptEnumTypeOverride.put("Location.type", "ca.uhn.fhir.model.dstu2.valueset.LocationTypeEnum");
+//		codeableConceptEnumTypeOverride.put("ReferralRequest.status", "ca.uhn.fhir.model.dstu2.valueset.ReferralStatusEnum");
+//		codeableConceptEnumTypeOverride.put("ReferralRequest.specialty", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
+//		codeableConceptEnumTypeOverride.put("ReferralRequest.priority", "ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt");
+//	}
 	
 	/**
 	 * TODO Discuss with James Agnew
@@ -691,31 +785,31 @@ public class FhirResourceManager {
 	 * @return
 	 */
 	
-	public String getLeafLevelItemType(List<String> canonicalPath) {
-		String resourceName = canonicalPath.get(0);
-		Class<?> lastClass = ctx.getResourceDefinition(resourceName).getImplementingClass();
-		String methodType = null;
-		for(int index = 1; index < canonicalPath.size(); index++) {
-			if(canonicalPath.get(index).equals("extension")) {
-				break;
-			} else {
-				try {
-					String methodName = "get" + StringUtils.capitalize(canonicalPath.get(index));
-					Method method = lastClass.getDeclaredMethod(methodName);
-					lastClass = method.getReturnType();
-					methodType = method.getReturnType().getName();
-					if(lastClass.getName().equals("java.util.List")) {
-						methodType  = "";//((ParameterizedType)method.getGenericReturnType()).getActualTypeArguments()[0].getTypeName();//TODO Fix this
-						lastClass = Class.forName(methodType);
-					}
-				} catch(Exception e) {
-					e.printStackTrace();
-					throw new RuntimeException("Invalid path: " + canonicalPath);
-				}
-			}
-		}
-		return methodType;
-	}
+//	public String getLeafLevelItemType(List<String> canonicalPath) {
+//		String resourceName = canonicalPath.get(0);
+//		Class<?> lastClass = ctx.getResourceDefinition(resourceName).getImplementingClass();
+//		String methodType = null;
+//		for(int index = 1; index < canonicalPath.size(); index++) {
+//			if(canonicalPath.get(index).equals("extension")) {
+//				break;
+//			} else {
+//				try {
+//					String methodName = "get" + StringUtils.capitalize(canonicalPath.get(index));
+//					Method method = lastClass.getDeclaredMethod(methodName);
+//					lastClass = method.getReturnType();
+//					methodType = method.getReturnType().getName();
+//					if(lastClass.getName().equals("java.util.List")) {
+//						methodType  = "";//((ParameterizedType)method.getGenericReturnType()).getActualTypeArguments()[0].getTypeName();//TODO Fix this
+//						lastClass = Class.forName(methodType);
+//					}
+//				} catch(Exception e) {
+//					e.printStackTrace();
+//					throw new RuntimeException("Invalid path: " + canonicalPath);
+//				}
+//			}
+//		}
+//		return methodType;
+//	}
 	
 	/**
 	 * Method performs a shallow clone of the element and, when multi-type,
