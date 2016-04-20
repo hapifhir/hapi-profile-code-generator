@@ -89,7 +89,7 @@ public class PathUtils {
 	}
 	
 	/**
-	 * Returns the last component of a delimited path.
+	 * Returns the last component of a '.' delimited path.
 	 * If path is
 	 * <p>
 	 * <code>
@@ -106,8 +106,29 @@ public class PathUtils {
 	 * @return
 	 */
 	public static String getLastPathComponent(String path) {
-		if(path != null && path.indexOf('.') >= 0) {
-			return path.substring(path.lastIndexOf('.') + 1);
+		return getLastPathComponent(path, '.');
+	}
+	
+	/**
+	 * Returns the last component of a delimited path.
+	 * If path is
+	 * <p>
+	 * <code>
+	 * birthDate.verification
+	 * </code>
+	 * <p>
+	 * Method will return
+	 * <p>
+	 * <code>
+	 * verification
+	 * </code>
+	 * <p>
+	 * @param path
+	 * @return
+	 */
+	public static String getLastPathComponent(String path, char delimiter) {
+		if(path != null && path.indexOf(delimiter) >= 0) {
+			return path.substring(path.lastIndexOf(delimiter) + 1);
 		} else {
 			return path;
 		}

@@ -244,6 +244,16 @@ public class FhirResourceManager {
 		return clazz;
 	}
 	
+	/**
+	 * Method interrogates HAPI library for class associated with the given resource
+	 * name. If a class is not found for the given resource name, the base resource 
+	 * is considered.
+	 * 
+	 * TODO Method should take profile and call the HapiFhirUtils
+	 * 
+	 * @param resourceName
+	 * @return
+	 */
 	public Class<?> addResourceToIndex(String resourceName) {
 		Class<?> clazz = null;
 		try {

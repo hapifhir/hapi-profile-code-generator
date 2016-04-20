@@ -1,13 +1,16 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Before;
 import org.junit.Test;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 
 public class HapiFhirUtilsTest {
@@ -59,6 +62,24 @@ public class HapiFhirUtilsTest {
 		Class<?> patientAddress = HapiFhirUtils.getStructureTypeClass(ctx, "Patient", "address");
 		assertNotNull(patientAddress);
 		assertEquals("ca.uhn.fhir.model.dstu2.composite.AddressDt", patientAddress.getName());
+	}
+	
+	@Test 
+	public void testGetDatatypeClass() {
+		Type type = new Type();
+		type.setCode("Quantity");
+		type.addProfile("http://hl7.org/fhir/StructureDefinition/SimpleQuantity");
+		assertEquals(ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt.class, HapiFhirUtils.getDataTypeClass(ctx, type));
+		assertNotEquals(ca.uhn.fhir.model.dstu2.composite.QuantityDt.class, HapiFhirUtils.getDataTypeClass(ctx, type));
+		
+		type = new Type();
+		type.setCode("Quantity");
+		type.addProfile("http://hl7.org/fhir/StructureDefinition/SomeUserProfileOnQuantity");
+		assertNull(HapiFhirUtils.getDataTypeClass(ctx, type));
+		
+		type = new Type();
+		type.setCode("Quantity");
+		assertEquals(ca.uhn.fhir.model.dstu2.composite.QuantityDt.class, HapiFhirUtils.getDataTypeClass(ctx, type));
 	}
 
 }

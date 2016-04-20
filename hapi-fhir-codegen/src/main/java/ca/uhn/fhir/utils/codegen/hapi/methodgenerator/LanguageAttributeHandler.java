@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Cardinality;
 import ca.uhn.fhir.utils.common.metamodel.Method;
@@ -30,6 +31,7 @@ import ca.uhn.fhir.utils.common.metamodel.Method;
  * handler.initialize();
  * </code>
  * </pre>
+ * TODO Consider removing this altogether
  * 
  * @author Claude Nanjo
  *
@@ -68,7 +70,9 @@ public class LanguageAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		Class<?> clazz = HapiFhirUtils.getStructureTypeClass(getFhirResourceManager().getFhirContext(), getResourceName(), "language");
+		setFullyQualifiedType(clazz.getName());
+		//setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
 	}
 	
 	/**

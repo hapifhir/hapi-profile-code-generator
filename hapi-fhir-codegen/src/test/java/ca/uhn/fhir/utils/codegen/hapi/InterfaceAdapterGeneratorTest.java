@@ -52,8 +52,10 @@ public class InterfaceAdapterGeneratorTest {
 	public void testQiCoreProfile() {
 		loader = new FhirResourceManager();
 		loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("qicore-patient.profile.xml"));
+		loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("qicore-organization.profile.xml"));
 		FhirExtensionManager manager = new FhirExtensionManager();
 		manager.addProfileRepositoryLocation("/Users/cnanjo/repository/fhir/trunk/build/publish");
+		manager.addProfileRepositoryLocation("/Users/cnanjo/repository/fhir/trunk/build/publish/qicore");
 		manager.initialize();
 		loader.setExtensionManager(manager);
 		MethodBodyGenerator utils = new MethodBodyGenerator();

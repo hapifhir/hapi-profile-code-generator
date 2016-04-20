@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
@@ -336,15 +337,11 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 			LOGGER.info(element.getPath() + " is not of the form Resource.attribute.");
 			//TODO Review this algorithm with James or scrap altogether based on HAPI
 			if(attributePath.equalsIgnoreCase("Practitioner.practitionerRole.specialty.primaryInd")) {
-				LOGGER.error(attributePath + " is to be handled later");
+				LOGGER.error(attributePath + " is to be handled later");//TODO Revisit this
 			} else {
 				String[] pathComponents = attributePath.split("\\.");
-				String parentClassName = StringUtils.capitalize(pathComponents[0]) + "." + StringUtils.capitalize(pathComponents[pathComponents.length - 2]);
-				parentClass = fhirResourceManager.getFullyQualifiedJavaType(profile, parentClassName, null);
-				//String parentClassName = pathComponents[pathComponents.length - 2];
-				//String parentClassName = PathUtils.getPathMinusRootComponent(attributePath);
-				//parentClassName = PathUtils.getPathPrefix(parentClassName);
-				//parentClass = fhirResourceManager.getFullyQualifiedJavaType(getProfile(), parentClassName /*parentClassName*/, null);
+				parentClass = HapiFhirUtils.getStructureTypeClass(getFhirResourceManager().getFhirContext(), pathComponents[0], suffix.substring(0, suffix.lastIndexOf('.'))).getName();
+				//parentClass = fhirResourceManager.getFullyQualifiedJavaType(profile, parentClassName, null);
 				suffix = pathComponents[pathComponents.length-1];
 			}
 		}
