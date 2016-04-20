@@ -40,8 +40,6 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(CodedEnumAttributeHandler.class);
 	private String enumType;
-	private String bindingName;
-	private String override;
 	private List<String> imports;
 	
 	public CodedEnumAttributeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
@@ -136,10 +134,6 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 		} else {
 			throw new RuntimeException("Binding name is null");
 		}
-//		else {
-//			//Handle ReferralRequest.status
-//			accessors.add(constructSetMethod(java.lang.String.class.getCanonicalName(), fluentReturnType).setBody(buildCodeEnumAsStringSetterBody(getTopLevelCoreAttribute(), override)));
-//		}
 		Method getMethod = constructGetMethodFromField(getTopLevelCoreAttribute() + "Element", getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute() + "Element"));
 		Method setMethod = constructSetMethod(getFullyQualifiedType(), fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute()));
 		if(enumType != null) {//There is in fact an enumeration defined in HAPI
@@ -150,14 +144,6 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 		setMethod.getImports().addAll(imports);
 		accessors.add(getMethod);
 		accessors.add(setMethod);
-		
-		
-		
-		
-//		accessors.add(constructGetMethodFromField(getTopLevelCoreAttribute() + "Element",getFullyQualifiedType()).setBody(buildDelegatedGetterBody(getTopLevelCoreAttribute() + "Element")));
-//		accessors.add(constructGetMethod(javaType).setBody(buildJavaTypeGetterBody(getTopLevelCoreAttribute())));
-//		accessors.add(constructSetMethod(javaType).setBody(buildJavaTypeSetterBody(getTopLevelCoreAttribute())));
-//		accessors.add(constructSetMethod(getFullyQualifiedType()).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
 	}
 	
 	/**
@@ -205,35 +191,9 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 			enumType = boundType.getEnumerationType();
 			imports.add(boundType.getEnumerationType());
 			setFullyQualifiedType(boundType.getCodedTypeAsString());
-			//bindingName = enumType;//See if necessary
 		} else {
 			setFullyQualifiedType(boundType.getDatatype());
 		}
-//		override = getFhirResourceManager().getCodeOverride(getElement().getPath());
-//		if(override != null) { //Enumerated type does not follow convention in naming
-//			if(override.equals("ca.uhn.fhir.model.dstu2.composite.CodeDt")) {
-//				setFullyQualifiedType(override);
-//			} else {
-//				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + override + ">");
-//				bindingName = override;
-//			}
-//			imports.add(override);
-//		} else if(getFullyQualifiedType().equalsIgnoreCase(ca.uhn.fhir.model.primitive.CodeDt.class.getName()) 
-//				&& getElement().getBinding() != null) {
-//			bindingName = getBindingNameFromValueSetReference();
-//			identifyValidEnumerationType(bindingName);
-//			if(enumType == null) {
-//				bindingName = getResourceName() + StringUtils.capitalize(getTopLevelCoreAttribute());
-//				identifyValidEnumerationType(bindingName);
-//			}
-//			bindingName = enumType;
-//			if(bindingName != null) {
-//				setFullyQualifiedType("ca.uhn.fhir.model.primitive.BoundCodeDt<" + bindingName + ">");
-//				imports.add(bindingName);
-//			} else {
-//				LOGGER.error("No bindings discovered for " + getElement().getPath());
-//			}
-//		}
 	}
 	
 	public String getBindingNameFromValueSetReference() {
