@@ -13,6 +13,7 @@ import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 
@@ -175,12 +176,12 @@ public class ReferenceTypeHandler extends BaseMethodGenerator {
 	}
 	
 	/**
-	 * Method that identifies the HAPI FHIR type
+	 * Method to get the HAPI FHIR type associated with the FHIR type: 'Reference'
 	 * 
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		setFullyQualifiedType(HapiFhirUtils.getPrimitiveTypeClassName(getFhirResourceManager().getFhirContext(), type.getCode()));
 	}
 	
 	/**

@@ -330,7 +330,7 @@ public class FhirResourceManager {
 //		}
 		String typeClass = primitiveMap.get(typeCode);
 		if(typeClass != null) {
-			//throw new RuntimeException("Check what is happening here");
+			//throw new RuntimeException("Check what is happening here " + typeClass);
 		}
 		if(typeClass != null) {
 			typeClass = handlePrimitiveSpecializations(typeClass, typeProfile);
