@@ -45,6 +45,25 @@ public class LanguageAttributeHandler extends BaseMethodGenerator {
 	}
 	
 	/**
+	 * Method assesses whether the handler can process the ElementDefinitionDt argument.
+	 * If the method can process the argument, it returns true. Otherwise, it returns false.
+	 * Method returns true only for the 'Resource.language' resource attribute.
+	 * 
+	 * @param profile
+	 * @param element
+	 * @return
+	 */
+	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
+		boolean appliesTo = false;
+		if(element == null || element.getPath() == null) {
+			return appliesTo;
+		} else if(element.getPath().endsWith(".language") && FhirResourceManager.isRootLevelAttribute(element.getPath())) {
+			appliesTo = true;
+		}
+		return appliesTo;
+	}
+	
+	/**
 	 * Workhorse method of MethodHandler. Generates methods corresponding
 	 * to the metadata specified by the FHIR profile element.
 	 * <p>
@@ -73,25 +92,6 @@ public class LanguageAttributeHandler extends BaseMethodGenerator {
 		Class<?> clazz = HapiFhirUtils.getStructureTypeClass(getFhirResourceManager().getFhirContext(), getResourceName(), "language");
 		setFullyQualifiedType(clazz.getName());
 		//setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
-	}
-	
-	/**
-	 * Method assesses whether the handler can process the ElementDefinitionDt argument.
-	 * If the method can process the argument, it returns true. Otherwise, it returns false.
-	 * Method returns true only for the 'Resource.language' resource attribute.
-	 * 
-	 * @param profile
-	 * @param element
-	 * @return
-	 */
-	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		boolean appliesTo = false;
-		if(element == null || element.getPath() == null) {
-			return appliesTo;
-		} else if(element.getPath().endsWith(".language") && FhirResourceManager.isRootLevelAttribute(element.getPath())) {
-			appliesTo = true;
-		}
-		return appliesTo;
 	}
 
 }

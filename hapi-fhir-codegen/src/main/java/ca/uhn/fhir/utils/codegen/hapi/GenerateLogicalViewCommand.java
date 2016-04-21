@@ -78,7 +78,6 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			cache.add(method);
 		} else {
 			LOGGER.info("Method already exist - skipping" + method);
-			System.out.println("Method already exist - skipping" + method);
 		}
 	}
 	
@@ -271,23 +270,29 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	private void initializeAdaptedModel(Node<ElementDefinitionDt> node, ClassModel model) {
 		String tentativeType = null;
 		String nodeType = node.getPayload().getTypeFirstRep().getCode();
-		if(nodeType.equals("BackboneElement")) {
-			String code = node.getParent().getName() + "." + node.getName();
-			//String code = node.getPayload().getPath();
-			//code = PathUtils.getPathMinusRootComponent(code);
-//			String code = node.getName();
-//			code = Character.toLowerCase(code.charAt(0)) + code.substring(1);
-			Type type = new Type();
-			type.setCode(code);
-			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, type);
-			System.out.println("Supertype: " + tentativeType);
-		} else if(nodeType.equals("DomainResource")) {
-			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getName(), null);
-		} else {
-			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
-			if(tentativeType.contains("BaseResource")) {
-				System.out.println("STOP HERE");
-			}
+		String path = node.getPayload().getPath();
+		String suffix =  PathUtils.getPathMinusRootComponent(path);
+		String root = PathUtils.getFirstPathComponent(path);
+		if(nodeType != null && nodeType.equals("Extension")) {//Extensions are handled differently
+			root = nodeType;
+			suffix = null;
+		}
+//		if(path.equals("Patient.clinicalTrial")) {
+//			System.out.println("STOP HERE");
+//		}
+//		if(nodeType.equals("BackboneElement")) {
+//			tentativeType = HapiFhirUtils.getStructureTypeClass(fhirResourceManager.getFhirContext(), root, suffix).getName();
+//		} else if(nodeType.equals("DomainResource")) {
+//			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getName(), null);
+//		} else {
+//			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
+//		}
+		if(root.equals("Extension")) {
+			tentativeType = ca.uhn.fhir.model.api.ExtensionDt.class.getName();//Not sure how else to get
+		} else if(nodeType.equals("DomainResource") || suffix == null) { //We are dealing with a resource
+			tentativeType = HapiFhirUtils.getResourceClass(fhirResourceManager.getFhirContext(), root).getName();
+		} else { //We are dealing with an attribute of a resource or a backbone element
+			tentativeType = HapiFhirUtils.getStructureTypeClass(fhirResourceManager.getFhirContext(), root, suffix).getName();
 		}
 		InterfaceAdapterGenerator.addAdapteeField(model, tentativeType);
 		InterfaceAdapterGenerator.generateConstructors(templateUtils, model.getName(), tentativeType, model.getMethods());

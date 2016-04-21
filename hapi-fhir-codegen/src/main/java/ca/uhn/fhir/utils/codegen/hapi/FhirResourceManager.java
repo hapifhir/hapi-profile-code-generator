@@ -383,9 +383,6 @@ public class FhirResourceManager {
 			if(profileUri == null) {
 				profileUri = typeProfile;
 			}
-			if(typeProfile.indexOf("qicore") >= 0) {
-				System.out.println("Stop here");
-			}
 			referenceType = CodeGenerationUtils.getLastPathComponent(profileUri, '/');
 			if(referenceType.equals("DomainResource")) {
 				referenceType = CodeGenerationUtils.getLastPathComponent(typeProfile, '/');
@@ -439,9 +436,6 @@ public class FhirResourceManager {
 					baseResourceName = profile.getName();
 				}
 				try {
-					if(fhirType.equals("Extension")) {
-						System.out.println("Stop here");
-					}
 					Class<?> typeClass = HapiFhirUtils.getStructureTypeClass(getFhirContext(), baseResourceName, fhirType);
 				if(typeClass == null) {
 					throw new RuntimeException("Unknown type " + fhirType + " for base resource " + baseResourcePath);

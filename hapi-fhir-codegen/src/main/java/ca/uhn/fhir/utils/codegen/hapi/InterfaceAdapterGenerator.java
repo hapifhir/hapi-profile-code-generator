@@ -197,9 +197,6 @@ public class InterfaceAdapterGenerator {
 				//fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
 				if(model != rootModel && model.getMethods().size() > 4) {//getAdaptee, setAdaptee, no-arg constructor, adaptee constructor
 					try {
-						if(model.getName().equalsIgnoreCase("Address")) {
-							System.out.println("STOP HERE");
-						}
 //						String typeName = fhirResourceManager.getFullyQualifiedJavaType(model.getName(), null);
 //						addAdapteeField(model, typeName);
 //						generateAdapteeGetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());

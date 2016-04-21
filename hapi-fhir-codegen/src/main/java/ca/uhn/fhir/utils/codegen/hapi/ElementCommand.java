@@ -68,7 +68,6 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 	public void execute(Node<ElementDefinitionDt> node) {
 		String extensionDefUri = node.getPayload().getTypeFirstRep().getProfileFirstRep().getValueAsString();
 		if(node.hasChildren()) {
-			System.out.println("Create a class for: " + node.getName());
 			String className = StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getName()));
 			if(classModels.get(className) != null) {
 				throw new RuntimeException("Error: a duplicate class was found.");
@@ -91,7 +90,6 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 			classModel.addMethod(constructor);
 		}
 		if(node.hasParent()) {
-			System.out.println("Simply build a method for " + node.getName());
 			node.getPayload().setPath(node.getParent().getName() + "." + node.getName());
 			String parentClassName = StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getParent().getName()));
 			ClassModel parentClass = classModels.get(parentClassName);

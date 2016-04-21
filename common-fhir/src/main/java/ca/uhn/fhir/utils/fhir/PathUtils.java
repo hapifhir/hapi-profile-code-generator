@@ -134,6 +134,18 @@ public class PathUtils {
 		}
 	}
 	
+	public static String getFirstPathComponent(String path) {
+		return getFirstPathComponent(path, '.');
+	}
+	
+	public static String getFirstPathComponent(String path, char delimiter) {
+		if(path != null && path.indexOf(delimiter) >= 0) {
+			return path.substring(0, path.indexOf(delimiter));
+		} else {
+			return path;
+		}
+	}
+	
 	/**
 	 * Returns the path minus the first component of the path.
 	 * 

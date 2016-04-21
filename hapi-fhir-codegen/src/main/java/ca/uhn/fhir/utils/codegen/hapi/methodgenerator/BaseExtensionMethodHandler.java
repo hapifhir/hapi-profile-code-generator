@@ -86,9 +86,6 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 			extendedElement.setName(extensionName);
 		}
 		extendedElement = FhirResourceManager.shallowCloneElement(extendedElement);
-		if(extendedElement.getName() != null && extendedElement.getName().equals("Goal.target")) {
-			//System.out.println("HERE");
-		}
 		if(extendedElement.getType().size() == 1) {
 			handleType(extendedElement.getTypeFirstRep());
 		} else if(extendedElement.getType().size() == 0){
