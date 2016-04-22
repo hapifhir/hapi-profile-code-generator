@@ -165,7 +165,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 * @param node
 	 */
 	public void handleInnerNonRootExtensionNode(Node<ElementDefinitionDt> node) {
-		buildExtendedParentClass(node);
+		//buildExtendedParentClass(node);
 		ElementDefinitionDt clone = FhirResourceManager.shallowCloneElement(node.getPayload());
 		String generatedType = generatedCodePackage + "." + CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName();
 		fhirResourceManager.addGeneratedType(generatedType);
@@ -252,12 +252,16 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		} else { //We are dealing with an attribute of a resource or a backbone element
 			tentativeType = HapiFhirUtils.getStructureTypeClass(fhirResourceManager.getFhirContext(), root, suffix).getName();
 		}
-		InterfaceAdapterGenerator.addAdapteeField(model, tentativeType);
-		InterfaceAdapterGenerator.generateConstructors(templateUtils, tentativeType, model);
-		InterfaceAdapterGenerator.generateAdapteeGetter(model, tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
-		InterfaceAdapterGenerator.generateAdapteeSetter(model, tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
-		model.addImport("java.util.List"); 
-		model.addImport("ca.uhn.fhir.model.dstu2.resource.*");//Why not just import 'supertype'?
+		if(!root.equals("Extension")) {
+			InterfaceAdapterGenerator.addAdapteeField(model, tentativeType);
+			InterfaceAdapterGenerator.generateConstructors(templateUtils, tentativeType, model);
+			InterfaceAdapterGenerator.generateAdapteeGetter(model, tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+			InterfaceAdapterGenerator.generateAdapteeSetter(model, tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+			model.addImport("java.util.List"); 
+			model.addImport("ca.uhn.fhir.model.dstu2.resource.*");//Why not just import 'supertype'?
+		} else {
+			buildExtendedParentClass(model, node);
+		}
 	}
 	
 	/**
@@ -424,20 +428,31 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		return handleStructureDefinitionElement(element, addExtensionsToThis, null);
 	}
 	
-	public void buildExtendedParentClass(Node<ElementDefinitionDt> node) {
+	/**
+	 * <p>Method builds the core structure of a user-defined extension that itself contains extensions.
+	 * An example may include an extension to a patient for nationality (Patient.extension) which itself
+	 *  contains a code and a validity period (both Patient.extension.extension.</p>
+	 * <p>Each such class thus contains a root extensions to represent the Patient.extension along with
+	 * the URI for this extension (e.g., 'http://hl7.org/fhir/StructureDefinition/patient-nationality')
+	 * and a method to bind the root extension to the parent resource's declared extension tree (e.g., Patient)</p>
+	 * <p>This class will then expose logical accessors for its own extensions and can be manipulated as
+	 * a first class object (e.g., Patient.getNationality().getCode(), rather than Patient.getExtension(...).getExtension...</p>
+	 * 
+	 * @param node
+	 */
+	public void buildExtendedParentClass(ClassModel classDefinition, Node<ElementDefinitionDt> node) {
 		LOGGER.info("Creating a new class for: " + node.getName());
 		String extensionDefUri = node.getPayload().getTypeFirstRep().getProfileFirstRep().getValueAsString();
-		ClassModel classModel = retrieveClassModel(node, node.getName());//StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getName())));
-		classModel.setNamespace(generatedCodePackage);
+		classDefinition.setNamespace(generatedCodePackage);
 		ClassField fieldUri = buildUriField("uri", extensionDefUri);
-		classModel.addField(fieldUri);
-		Method.addGetterSetterFieldToClass(classModel, "rootObjectExtension", "ca.uhn.fhir.model.api.ExtensionDt");
+		classDefinition.addField(fieldUri);
+		Method.addGetterSetterFieldToClass(classDefinition, "rootObjectExtension", "ca.uhn.fhir.model.api.ExtensionDt");
 		Method bindMethod = new Method();
 		bindMethod.setName("bindTemplateToParent");
 		bindMethod.addParameter("containingResource", "ca.uhn.fhir.model.dstu2.resource.BaseResource");
 		bindMethod.setBody(templateUtils.getBindExtensionToParent());
 		bindMethod.setReturnType("ca.uhn.fhir.model.api.ExtensionDt");
-		classModel.addMethod(bindMethod);
+		classDefinition.addMethod(bindMethod);
 	}
 	
 	/**
