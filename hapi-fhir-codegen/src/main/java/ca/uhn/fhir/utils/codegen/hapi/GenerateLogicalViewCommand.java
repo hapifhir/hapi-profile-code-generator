@@ -293,9 +293,9 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			tentativeType = HapiFhirUtils.getStructureTypeClass(fhirResourceManager.getFhirContext(), root, suffix).getName();
 		}
 		InterfaceAdapterGenerator.addAdapteeField(model, tentativeType);
-		InterfaceAdapterGenerator.generateConstructors(templateUtils, model.getName(), tentativeType, model.getMethods());
-		InterfaceAdapterGenerator.generateAdapteeGetter(model.getMethods(), tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
-		InterfaceAdapterGenerator.generateAdapteeSetter(model.getMethods(), tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+		InterfaceAdapterGenerator.generateConstructors(templateUtils, tentativeType, model);
+		InterfaceAdapterGenerator.generateAdapteeGetter(model, tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
+		InterfaceAdapterGenerator.generateAdapteeSetter(model, tentativeType);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
 		model.addImport("java.util.List"); 
 		model.addImport("ca.uhn.fhir.model.dstu2.resource.*");//Why not just import 'supertype'?
 	}
