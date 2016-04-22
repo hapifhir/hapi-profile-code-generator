@@ -225,6 +225,10 @@ public class ClassModel {
 		return taggedValues.get(key) != null;
 	}
 	
+	public void removeTaggedValue(String key) {
+		taggedValues.remove(key);
+	}
+	
 	public boolean containsMethod(Method method) {
 		return methods.contains(method);
 	}

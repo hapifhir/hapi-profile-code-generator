@@ -42,7 +42,6 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	private FhirResourceManager fhirResourceManager;
 	private MethodBodyGenerator templateUtils;
 	private Map<String, ClassModel> itemClassMap;
-	private Map<String, List<Method>> classToMethodStore;
 	private StructureDefinition profile;
 	private String generatedCodePackage;
 	private Node<ElementDefinitionDt> rootNode;
@@ -50,7 +49,6 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	
 	public GenerateLogicalViewCommand() {
 		itemClassMap = new HashMap<>();
-		classToMethodStore = new HashMap<>();
 	}
 	
 	public GenerateLogicalViewCommand(StructureDefinition profile,
@@ -66,34 +64,11 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		this.generatedCodePackage = generatedCodePackage;
 	}
 	
-	public void addMethodToStore(String modelName, Method method) {
-		List<Method> cache = classToMethodStore.get(modelName);
-		if(cache == null) {
-			cache = new ArrayList<Method>();
-			classToMethodStore.put(modelName, cache);
-		}
-		if(!cache.contains(method)) {
-			cache.add(method);
-		} else {
-			LOGGER.info("Method already exist - skipping" + method);
-		}
-	}
-	
-	public void addMethodsToStore(String modelName, List<Method> methods) {
-		for(Method method : methods) {
-			addMethodToStore(modelName, method);
-		}
-	}
-	
-	public List<Method> getMethodsForClass(String modelName) {
-		return classToMethodStore.get(modelName);
-	}
-	
 	@Override
 	public void execute(Node<ElementDefinitionDt> node) {
 		boolean found = false;
 		if(node.getPayload() != null) {
-			found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("criticality"));
+			found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("preferred"));
 		}
 		if(found) {// && profile.getName().equals("Immunization")) {
 			LOGGER.debug("Found!");
@@ -209,9 +184,18 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	}
 	
 	/**
-	 * Handles leaf nodes that are FHIR extensions. There are two kinds of
-	 * extension leaf nodes. Extensions on the root node or extensions on backbone
-	 * elements or data types.
+	 * <p>Handles leaf nodes that are FHIR extensions. There are two kinds of
+	 * extension leaf nodes:</p>
+	 * <ul>
+	 * 	<li>extensions on the root node</li>
+	 * 	<li>extensions on backbone elements or data types.</li>
+	 * </ul>
+	 * 
+	 * <p>When processing the latter, the creation of logical accessors for extended attributes
+	 * will need to be adjusted to return the extended type for getters and take the extended type
+	 * as an argument to setters. This method handles this by clearing the default DO_NOT_PROCESS 
+	 * PROCESSING_INSTRUCTION tagged value assigned to backbone elements. (For more information about
+	 * this process, please refer to method: handleNonExtensionLeafNode.)</p> 
 	 * 
 	 * @param node
 	 */
@@ -221,8 +205,6 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 				node.getPayload().getTypeFirstRep().getProfileFirstRep().setValue(node.getParent().getPayload().getTypeFirstRep().getProfileFirstRep().getValueAsString() + "#" + PathUtils.getLastPathComponent(node.getPayload().getName()));
 			}
 			ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-			//String parentClassName = StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getParent().getName()));
-			//String type = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
 			ExtendedStructureAttributeHandler handler = new ExtendedStructureAttributeHandler(fhirResourceManager, templateUtils, profile, node.getPayload());
 			handler.initialize();
 			handler.setExtendedStructureName(parentClass.getName());
@@ -234,25 +216,13 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 				ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 				rootClass.addMethods(extensionMethods);
 			} else { //Leaf extension on a type or backbone element
-				//List<Method> extensionMethods = handleStructureDefinitionElement(node.getPayload(), true);
 				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 				if(!parentClass.hasTaggedValue(EXTENDED_TYPE)) {
 					parentClass.addTaggedValue(EXTENDED_TYPE, EXTENDED_TYPE);
 				}
-//				if(parentClass.getSupertypes() == null || parentClass.getSupertypes().size() == 0) {
-//					parentClass.addImport("java.util.List"); 
-//					String supertype = fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
-//					if(supertype.equals("BackboneElement")) {
-//						String code = node.getParent().getParent().getName() + "." + node.getParent().getName();
-//						Type type = new Type();
-//						type.setCode(code);
-//						supertype = fhirResourceManager.getFullyQualifiedJavaType(type);
-//						System.out.println("Supertype: " + supertype);
-//					}
-//					parentClass.addImport("ca.uhn.fhir.model.dstu2.resource.*");//Why not just import 'supertype'?
-//					parentClass.addSupertype(supertype);
-//				}
-				
+				if(parentClass.hasTaggedValue(InterfaceAdapterGenerator.PROCESSING_INSTRUCTION)) {
+					parentClass.removeTaggedValue(InterfaceAdapterGenerator.PROCESSING_INSTRUCTION);
+				}
 				
 				ExtendedAttributeHandler handler = new ExtendedAttributeHandler(fhirResourceManager, templateUtils, profile, node.getPayload());
 				handler.initialize();
@@ -275,16 +245,6 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			root = nodeType;
 			suffix = null;
 		}
-//		if(path.equals("Patient.clinicalTrial")) {
-//			System.out.println("STOP HERE");
-//		}
-//		if(nodeType.equals("BackboneElement")) {
-//			tentativeType = HapiFhirUtils.getStructureTypeClass(fhirResourceManager.getFhirContext(), root, suffix).getName();
-//		} else if(nodeType.equals("DomainResource")) {
-//			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getName(), null);
-//		} else {
-//			tentativeType = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
-//		}
 		if(root.equals("Extension")) {
 			tentativeType = ca.uhn.fhir.model.api.ExtensionDt.class.getName();//Not sure how else to get
 		} else if(nodeType.equals("DomainResource") || suffix == null) { //We are dealing with a resource
@@ -301,31 +261,46 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	}
 	
 	/**
-	 * Handles leaf nodes that are NOT FHIR Extensions. There are two kinds of
-	 * non-extension leaf nodes. leaf nodes on the root node or leaf nodes on backbone
-	 * elements or data types. The latter requires no special handling as they
-	 * are already handled by HAPI FHIR.
+	 * <p>Handles leaf nodes that are NOT FHIR Extensions. There are two kinds of
+	 * non-extension leaf nodes:
+	 * <ul>
+	 *   <li>leaf nodes on the root node</li>
+	 *   <li>leaf nodes on a backbone structure or data type such as Address</li>
+	 * </ul>
+	 * 
+	 * <p>It is important to note that extended backbone types or datatypes become new logical types which must
+	 * be returned by getters and taken as arguments to setters instead of 
+	 * the original type.</p>
+	 * 
+	 * <p>For instance, if an address is extended with a preferred attribute, it becomes an 
+	 * 'ExtendedAddress' and getAddress() must now return
+	 * this new 'ExtendedAddress' in order to support the 'logical' chaining of methods such as
+	 * patient.getAddress().setPreferred(true) even for extended attributes. However, this is only the case IF THE
+	 * BACKBONE ELEMENT IS IN FACT EXTENDED. As extended types are wrapped and must delegate
+	 * all calls to the HAPI FHIR adaptee which they wrap, all non-extended attributes must be exposed by the adapter.
+	 * Thus, by default the backbone parent class is constructed as if it were to be wrapped but 
+	 * is tagged with a processing instruction of DO_NOT_PROCESS
+	 * upon creation. This processing instruction is cleared if any extension is added to
+	 * the type by the call handleExtensionLeafNode() to signal that the signature for the getter and setter 
+	 * for this extended backbone type will need to be adjusted and that the type must be wrapped. If
+	 * no extended attributes exist for the type, the temporary class is simply ignored at processing time
+	 * (so as not to wrap a type that has no extensions).
+	 * 
 	 * 
 	 * @param node
 	 */
 	public void handleNonExtensionLeafNode(Node<ElementDefinitionDt> node) {
 		if(node.isLeaf() && isNotExtensionNode(node)) {
-			if(node.parentIsRoot()) { // A leaf element on root
-//				UriDt profile = node.getPayload().getTypeFirstRep().getProfileFirstRep();
+			if(node.parentIsRoot()) { 
+				// A leaf element on root
 				List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false);
 				ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
 				rootClass.addMethods(methods);
-			} else { //a leaf on a type or backbone element
-//				System.out.println("NON EXTENSION LEAF NODE: " + node.getParent().getName() + "." + node);
-//				if(node.getParent().getName().equals("Address")) {
-//					System.out.println("Stop here");
-//				}
-//				//Nothing needs to be done unless extension is used
-//				UriDt profile = node.getPayload().getTypeFirstRep().getProfileFirstRep();
+			} else { 
+				//a leaf on a type or backbone element
 				List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false, node.getParent().getName());
-				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-				addMethodsToStore(parentClass.getName(), methods);
-//				parentClass.getMethods().addAll(methods);
+				ClassModel parentClass = retrieveDoNotProcessClassModel(node.getParent(), node.getParent().getName());
+				parentClass.addMethods(methods);
 			}
 		}
 	}
@@ -351,8 +326,6 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			handler.initialize();
 			String supertype = node.getPayload().getTypeFirstRep().getCode();
 			if(supertype != null && supertype.equals("BackboneElement")) {
-//				Type type = new Type();
-//				type.setCode(handler.getBackboneElementName());
 				handler.setExtendedSupertype(handler.getResourceName(), handler.getTopLevelCoreAttribute());
 			} else {
 				handler.setExtendedSupertype(null, node.getPayload().getTypeFirstRep().getCode());
@@ -465,10 +438,6 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		bindMethod.setBody(templateUtils.getBindExtensionToParent());
 		bindMethod.setReturnType("ca.uhn.fhir.model.api.ExtensionDt");
 		classModel.addMethod(bindMethod);
-//		Method constructor = new Method();
-//		constructor.setBody("this.rootObjectExtension = new ExtensionDt(false, uri);");
-//		constructor.isConstructor(true);
-//		classModel.addMethod(constructor);
 	}
 	
 	/**
@@ -480,10 +449,50 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 * @return
 	 */
 	public ClassModel retrieveClassModel(Node<ElementDefinitionDt> node, String className) {
+		return retrieveClassModel(node, className, null);
+	}
+		
+		
+	/**
+	 * Retrieves a class model for the element at that path location or creates a new
+	 * one if none exists and initializes with the taggedValues argument.
+	 * 
+	 * @param node
+	 * @param className
+	 * @param taggedValues
+	 * @return
+	 */
+	public ClassModel retrieveClassModel(Node<ElementDefinitionDt> node, String className, Map<String, Object> taggedValues) {
 		ClassModel model = itemClassMap.get(node.getPathFromRoot());
 		if(model == null) {
 			model = new ClassModel(CodeGenerationUtils.makeIdentifierJavaSafe(className));
 			model.setNamespace(generatedCodePackage);
+			if(taggedValues != null) {
+				for(String key: taggedValues.keySet()) {
+					model.addTaggedValue(key, taggedValues.get(key));
+				}
+			}
+			initializeAdaptedModel(node, model);
+			itemClassMap.put(node.getPathFromRoot(), model);
+		}
+		return model;
+	}
+	
+	/**
+	 * Method creates a new ClassModel with tagged value PROCESSING_INSTRUCTION = DO_NOT_PROCESS. The intent
+	 * is to create a class that by default should not be processed by code generating frameworks unless
+	 * the tag is cleared downstream.
+	 * 
+	 * @param node
+	 * @param className
+	 * @return
+	 */
+	public ClassModel retrieveDoNotProcessClassModel(Node<ElementDefinitionDt> node, String className) {
+		ClassModel model = itemClassMap.get(node.getPathFromRoot());
+		if(model == null) {
+			model = new ClassModel(CodeGenerationUtils.makeIdentifierJavaSafe(className));
+			model.setNamespace(generatedCodePackage);
+			model.addTaggedValue(InterfaceAdapterGenerator.PROCESSING_INSTRUCTION, InterfaceAdapterGenerator.DO_NOT_PROCESS);
 			initializeAdaptedModel(node, model);
 			itemClassMap.put(node.getPathFromRoot(), model);
 		}

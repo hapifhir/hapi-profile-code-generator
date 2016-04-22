@@ -54,10 +54,11 @@ import ca.uhn.fhir.utils.fhir.ProfileWalker;
  */
 public class InterfaceAdapterGenerator {
 	
-	//public static final String profilePrefix = "http://hl7.org/fhir/StructureDefinition/";
 	public static final Logger LOGGER = LoggerFactory.getLogger(InterfaceAdapterGenerator.class);
 	public static final String DEFAULT_DESTINATION_DIRECTORY = "generated-source/java";
 	public static final String ADAPTER_FIELD_NAME = "adaptedClass";
+	public static final String PROCESSING_INSTRUCTION = "processing_instruction";
+	public static final String DO_NOT_PROCESS = "do_not_process";
 	
 	private String generatedPackage;
 	private String destinationDirectory;
@@ -189,21 +190,10 @@ public class InterfaceAdapterGenerator {
 			ClassModel rootModel = command.getClassMap().get(profileWalker.getRoot().getPathFromRoot());
 			String resourceName = getUnderlyingFhirCoreResourceName(profile);
 			buildAdapter(rootModel, resourceName, generatedPackage + "." + generateInterfaceName(javaSafeProfileName));
-//			generateConstructors(generateAdapterName(javaSafeProfileName), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName(), rootModel.getMethods() );//Move to GenerateLogicalModelCommand.initializeAdaptedModel()
-//			generateAdapteeGetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-//			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			for(ClassModel model : command.getClassMap().values()) {
 				//fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
-				if(model != rootModel && model.getMethodCount() > 4) {//getAdaptee, setAdaptee, no-arg constructor, adaptee constructor
+				if(model != rootModel && canProcess(model)) {//getAdaptee, setAdaptee, no-arg constructor, adaptee constructor
 					try {
-//						String typeName = fhirResourceManager.getFullyQualifiedJavaType(model.getName(), null);
-//						addAdapteeField(model, typeName);
-//						generateAdapteeGetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
-//						generateAdapteeSetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
-						List<Method> methods = command.getMethodsForClass(model.getName());
-						if(methods != null) {
-							model.addMethods(methods);
-						}
 						String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
 						CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
 					}catch(Exception e) {
@@ -212,8 +202,6 @@ public class InterfaceAdapterGenerator {
 					}
 				}
 			}
-//			String generatedProfileInterface = cleanUpWorkaroundInterface(interfaceAdapterPair.getResourceInterface(), true);
-//			String generatedProfileAdapter = cleanUpWorkaroundClass(interfaceAdapterPair.getResourceAdapter(), true);
 			String generatedProfileAdapter = cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(rootModel, generateAdapterName(javaSafeProfileName)), true);
 			String generatedProfileInterface = cleanUpWorkaroundInterface(CodeGenerationUtils.buildJavaInterface(rootModel, generateInterfaceName(javaSafeProfileName)), true);
 			CodeGenerationUtils.buildTargetPackageDirectoryStructure(getDestinationDirectory(), generatedPackage);
@@ -244,66 +232,6 @@ public class InterfaceAdapterGenerator {
 	}
 	
 	/**
-	 * Method iterates through all element definitions in a FHIR StructureDefinition and generates
-	 * from these definitions the method signatures required for code generation.
-	 * 
-	 * @param profile
-	 * @return
-	 */
-//	public List<Method> generateMethodsFromFhirProfileDefinition(StructureDefinition profile) {
-//		List<Method> methodDefinitions = new ArrayList<Method>();
-//		List<ElementDefinitionDt> elements = profile.getSnapshot().getElement();
-//		for(ElementDefinitionDt element: elements) {
-//			if(skipProcessing(element)) {
-//				continue;
-//			}
-//			String extensionDefUri = null;
-//			if(FhirExtensionManager.isFhirExtension(element)) {
-//				extensionDefUri = fhirResourceManager.handleExtensionElement(element);
-//			}
-//			
-//			try {
-//				methodDefinitions.addAll(FhirMethodGenerator.generateAccessorMethods(profile, element, fhirResourceManager, extensionDefUri));
-//			} catch(Exception e) {
-//				LOGGER.error("Error processing element " + element.getName() + ". Skipping element", e);
-//			}
-//		}
-//		return methodDefinitions;
-//	}
-	
-//	public List<Method> generateMethodsFromFhirProfileDefinition(StructureDefinition profile) {
-// 		List<Method> methodDefinitions = new ArrayList<Method>();
-//		generateExtendedTypes(profile);
-//		List<ElementDefinitionDt> elements = profile.getSnapshot().getElement();
-//		for(ElementDefinitionDt element: elements) {
-//			if(skipProcessing(element)) {
-//				continue;
-//			}
-//			handleElement(profile, methodDefinitions, element);
-//		}
-//		return methodDefinitions;
-//	}
-	
-//	public void generateExtendedTypes(StructureDefinition profile) {
-//		ExtensionGenerator generator = new ExtensionGenerator();
-//		generator.processProfile(profile);
-//		for(Node<ElementDefinitionDt> node: generator.getExtensionGraphs().values()) {
-//			ElementCommand command = new ElementCommand(profile);
-//			command.setTemplate(templateUtils);
-//			command.setFhirResourceManager(fhirResourceManager);
-//			node.executeCommandBreadthFirst(command);
-//			if(node.hasChildren()) {
-//				ClassModel classModel = command.getClassModels().get(node.getName());
-//				JavaClassSource source = CodeGenerationUtils.buildJavaClass(classModel);
-//				//TODO remove hard coding
-//				CodeGenerationUtils.writeJavaClassFile("generated-source/java", "org.socraticgrid.fhir.generated", classModel.getName(), source.toString());
-//				//System.out.println(source);
-//				
-//			}
-//		}
-//	}
-	
-	/**
 	 * Method generates corresponding methods for element argument.
 	 * 
 	 * @param profile
@@ -324,27 +252,6 @@ public class InterfaceAdapterGenerator {
 	}
 	
 	/**
-	 * Method generates a Java Interface and its corresponding adapter 
-	 * from a set of method definitions
-	 * 
-	 * definition.
-	 * 
-	 * @param profile
-	 * @return
-	 */
-//	public InterfaceAdapterPair generateCodeFromFhirProfile(String safeProfileName, StructureDefinition profile, List<Method> methodDefinitions) {
-//		String resourceName = getUnderlyingFhirCoreResourceName(profile);
-//		generateAdapteeGetter(methodDefinitions, fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-//		generateAdapteeSetter(methodDefinitions, fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-//		String interfaceName = "I" + safeProfileName;
-//		String className = safeProfileName + "Adapter";
-//		JavaInterfaceSource interfaceSource = buildLogicalInterface(interfaceName, resourceName, methodDefinitions);
-//		JavaClassSource classSource = buildAdapter(className, resourceName, methodDefinitions, generatedPackage + "." + interfaceName);
-//		InterfaceAdapterPair implementation = new InterfaceAdapterPair(interfaceSource, classSource);
-//		return implementation;
-//	}
-	
-	/**
 	 * Method returns the name of the profile and, if the name of the profile does not correspond to a core 
 	 * FHIR resource, the name of the base resource from which this profile is derived. (Assumes a single 
 	 * level profile hierarchy from FHIR core at this time. Profiles derived from profiles not supported at this
@@ -360,47 +267,6 @@ public class InterfaceAdapterGenerator {
 		}
 		return name;
 	}
-	
-	/**
-	 * Method builds a Java interface for this profile (represented as a name and set of method definitions)
-	 * 
-	 * @param cleanedName
-	 * @param resourceName
-	 * @param methodDefinitions
-	 * @return
-	 */
-//	public JavaInterfaceSource buildLogicalInterface(String interfaceName, String resourceName, List<Method> methodDefinitions) {
-//		ClassModel classModel = new ClassModel(generatedPackage, interfaceName);
-//		classModel.getMethods().addAll(methodDefinitions);
-//		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-//		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
-//		JavaInterfaceSource interfaceSource = CodeGenerationUtils.buildJavaInterface(classModel);
-//		return interfaceSource;
-//	}
-	
-	/**
-	 * Method builds a Java Adapter for this profile (represented as a name and set of method definitions)
-	 * 
-	 * @param cleanedName
-	 * @param resourceName
-	 * @param methodDefinitions
-	 * @param interfaceSource
-	 * @return
-	 */
-//	public JavaClassSource buildAdapter(String className, String resourceName, List<Method> methodDefinitions, String anInterface) {
-//		ClassModel classModel = new ClassModel(generatedPackage, className);
-//		classModel.addInterface(anInterface);
-//		classModel.getMethods().addAll(methodDefinitions);
-//		ClassField field = new ClassField("adaptedClass");
-//		field.setType(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getCanonicalName());
-//		field.addModifier(ModifierEnum.PRIVATE);
-//		field.setInitializer("new " + fhirResourceManager.getResourceNameToClassMap().get(resourceName).getSimpleName() + "()");
-//		classModel.addField(field);
-//		classModel.addImport(fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
-//		classModel.addImport(ca.uhn.fhir.model.api.ExtensionDt.class.getCanonicalName());
-//		JavaClassSource classSource = CodeGenerationUtils.buildJavaClass(classModel);
-//		return classSource;
-//	}
 	
 	public void buildAdapter(ClassModel classModel, String resourceName, String interfaceName) {
 		classModel.addInterface(interfaceName);
@@ -569,5 +435,9 @@ public class InterfaceAdapterGenerator {
 			profileInterfaceValue = adapterClass.toString();
 		}
 		return profileInterfaceValue;
+	}
+	
+	private static boolean canProcess(ClassModel model) {
+		return !model.hasTaggedValue(PROCESSING_INSTRUCTION) || (model.hasTaggedValue(PROCESSING_INSTRUCTION) && !model.getTaggedValue(PROCESSING_INSTRUCTION).equals(DO_NOT_PROCESS));
 	}
 }
