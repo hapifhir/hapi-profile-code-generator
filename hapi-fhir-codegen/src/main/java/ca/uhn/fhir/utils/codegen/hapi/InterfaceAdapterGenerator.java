@@ -194,7 +194,7 @@ public class InterfaceAdapterGenerator {
 //			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			for(ClassModel model : command.getClassMap().values()) {
 				//fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
-				if(model != rootModel && model.getMethods().size() > 4) {//getAdaptee, setAdaptee, no-arg constructor, adaptee constructor
+				if(model != rootModel && model.getMethodCount() > 4) {//getAdaptee, setAdaptee, no-arg constructor, adaptee constructor
 					try {
 //						String typeName = fhirResourceManager.getFullyQualifiedJavaType(model.getName(), null);
 //						addAdapteeField(model, typeName);

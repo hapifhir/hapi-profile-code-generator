@@ -197,7 +197,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		clone.addType().setCode(generatedType);
 		List<Method> methods = handleUserDefinedExtensionType(clone, false);
 		ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-		rootClass.getMethods().addAll(methods);
+		rootClass.addMethods(methods);
 	}
 	
 	public void handleInnerNonRootNonExtensionNode(Node<ElementDefinitionDt> node) {
@@ -227,12 +227,12 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			handler.initialize();
 			handler.setExtendedStructureName(parentClass.getName());
 			List<Method> methods = handler.buildCorrespondingMethods();//FhirMethodGenerator.generateAccessorMethodsForExtendedTypes(profile, node.getPayload(), parentClassName, fhirResourceManager, extensionDefUri);
-			parentClass.getMethods().addAll(methods);
+			parentClass.addMethods(methods);
 		} else {
 			if(node.getParent().isRoot()) { //A leaf extension on root
 				List<Method> extensionMethods = handleStructureDefinitionElement(node.getPayload(), false);
 				ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-				rootClass.getMethods().addAll(extensionMethods);
+				rootClass.addMethods(extensionMethods);
 			} else { //Leaf extension on a type or backbone element
 				//List<Method> extensionMethods = handleStructureDefinitionElement(node.getPayload(), true);
 				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
@@ -260,7 +260,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 				handler.setAddExtensionsToThis(false);
 				handler.setExtendedStructure(true);
 				handler.setExtendedTypeName(parentClass.getName());
-				parentClass.getMethods().addAll(handler.buildCorrespondingMethods());
+				parentClass.addMethods(handler.buildCorrespondingMethods());
 			}
 		}
 	}
@@ -314,7 +314,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 //				UriDt profile = node.getPayload().getTypeFirstRep().getProfileFirstRep();
 				List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false);
 				ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-				rootClass.getMethods().addAll(methods);
+				rootClass.addMethods(methods);
 			} else { //a leaf on a type or backbone element
 //				System.out.println("NON EXTENSION LEAF NODE: " + node.getParent().getName() + "." + node);
 //				if(node.getParent().getName().equals("Address")) {
@@ -359,14 +359,14 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 			}
 			List<Method> methods = handler.buildCorrespondingMethods();
 			ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-			rootClass.getMethods().addAll(methods);
+			rootClass.addMethods(methods);
 			//Add the original set from HAPI FHIR as well
 			methods = handleStructureDefinitionElement(node.getPayload(), false);
-			rootClass.getMethods().addAll(methods);
+			rootClass.addMethods(methods);
 		} else {
 			List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false);
 			ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-			rootClass.getMethods().addAll(methods);
+			rootClass.addMethods(methods);
 		}
 	}
 	
