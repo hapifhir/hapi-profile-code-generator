@@ -93,14 +93,14 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 			node.getPayload().setPath(node.getParent().getName() + "." + node.getName());
 			String parentClassName = StringUtils.capitalize(CodeGenerationUtils.makeIdentifierJavaSafe(node.getParent().getName()));
 			ClassModel parentClass = classModels.get(parentClassName);
-			String type = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
+			//String type = fhirResourceManager.getFullyQualifiedJavaType(profile, node.getPayload().getTypeFirstRep());
 //			ClassField field = new ClassField(StringUtils.uncapitalize(node.getOriginalName()), type);
 //			field.addModifier(ModifierEnum.PRIVATE);
 //			ClassField fieldUri = buildUriField(node.getOriginalName() + "Uri", extensionDefUri);
 			ExtendedStructureAttributeHandler handler = new ExtendedStructureAttributeHandler(fhirResourceManager, template, profile, node.getPayload());
 			handler.initialize();
 			List<Method> methods = handler.buildCorrespondingMethods();//FhirMethodGenerator.generateAccessorMethodsForExtendedTypes(profile, node.getPayload(), parentClassName, fhirResourceManager, extensionDefUri);
-			parentClass.getMethods().addAll(methods);
+			parentClass.addMethods(methods);
 //			parentClass.addField(field);
 //			parentClass.addField(fieldUri);
 		}

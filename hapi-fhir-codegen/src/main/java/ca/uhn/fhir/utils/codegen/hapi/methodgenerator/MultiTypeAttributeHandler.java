@@ -12,6 +12,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 
@@ -165,7 +166,19 @@ public class MultiTypeAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public String getFullyQualifiedType(Type type) {
-		return getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type);
+		System.out.println(getElement().getPath());
+		System.out.println(type.getCode());
+		System.out.println(type.getProfile());
+		String tentativeType = null;
+		if(type.getCode().equals("Reference")) {
+			System.out.println("Stop here");
+			//tentativeType = getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type);
+			tentativeType = ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt.class.getName(); //TODO Talk to James about this case.
+		} else {
+			//tentativeType = getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type);
+			tentativeType = HapiFhirUtils.getDataTypeClass(getFhirResourceManager().getFhirContext(), type).getName();
+		}
+		return tentativeType;
 	}
 	
 	/**

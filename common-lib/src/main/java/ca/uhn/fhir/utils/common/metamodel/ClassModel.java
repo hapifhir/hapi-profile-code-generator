@@ -1,6 +1,7 @@
 package ca.uhn.fhir.utils.common.metamodel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ public class ClassModel {
 	private List<String> supertypes;
 	private List<String> imports;
 	private Map<String, Object> taggedValues;
+	private boolean allowDuplicateMethods = false;
 	
 	public ClassModel() {
 		fields = new ArrayList<ClassField>();
@@ -45,17 +47,96 @@ public class ClassModel {
 		this.name = name;
 		return this;
 	}
-
-	public List<Method> getMethods() {
-		return methods;
+	
+	/**
+	 * Method returns a shallow clone of the list
+	 * of methods contained by this class.
+	 * 
+	 * @return
+	 */
+	public List<Method> getClassMethods() {
+		List<Method> shallowClone = new ArrayList<Method>();
+		shallowClone.addAll(methods);
+		return shallowClone;
 	}
-
-	public void setMethods(List<Method> methods) {
+	
+	/**
+	 * Method returns the list of methods defined
+	 * for this class. Its use to add new methods
+	 * is discourage. Please use addMethod() or
+	 * addMethods() instead as they check for any
+	 * duplicate methods prior to adding to the list
+	 * of class methods.
+	 * 
+	 * @return
+	 */
+	protected List<Method> getMethods() {
+		return this.methods;
+	}
+	
+	/**
+	 * Sets a new list of method definitions for this class.
+	 * 
+	 * @param methods
+	 */
+	protected void setMethods(List<Method> methods) {
 		this.methods = methods;
 	}
 	
+	/**
+	 * Adds a new method definition safely to this class. If 
+	 * allowDuplicateMethods is true, method will not prevent method 
+	 * definitions with the same signature from being added. If
+	 * allowDuplicateMethod is false, method will only add
+	 * method definition if it is not already present in the list.
+	 * 
+	 * @param method
+	 */
 	public void addMethod(Method method) {
-		this.methods.add(method);
+		if(allowDuplicateMethods || doesNotContainMethod(method)) {
+			this.methods.add(method);
+		}
+	}
+	
+	/**
+	 * Adds a collection of method definitions safely. See
+	 * definition of addMethod(..)
+	 * 
+	 * @param methods
+	 */
+	public void addMethods(Collection<Method> methods) {
+		for(Method method : methods) {
+			addMethod(method);
+		}
+	}
+	
+	/**
+	 * Adds a method at a specific index in a list. 
+	 * 
+	 * 
+	 * @param index a valid index
+	 * @param method
+	 */
+	public void addMethodAtIndex(int index, Method method) {
+		if(allowDuplicateMethods || doesNotContainMethod(method)) {
+			this.methods.add(index, method);
+		}
+	}
+	
+	/**
+	 * Removes all methods associated with the class definition
+	 */
+	public void clearMethods() {
+		this.methods.clear();
+	}
+	
+	/**
+	 * Returns the method definition count for this class
+	 * 
+	 * @return
+	 */
+	public int getMethodCount() {
+		return this.methods.size();
 	}
 	
 	public void addMethods(List<Method> methods) {
@@ -142,6 +223,14 @@ public class ClassModel {
 	
 	public boolean hasTaggedValue(String key) {
 		return taggedValues.get(key) != null;
+	}
+	
+	public boolean containsMethod(Method method) {
+		return methods.contains(method);
+	}
+	
+	public boolean doesNotContainMethod(Method method) {
+		return !containsMethod(method);
 	}
 	
 	public String toString() {

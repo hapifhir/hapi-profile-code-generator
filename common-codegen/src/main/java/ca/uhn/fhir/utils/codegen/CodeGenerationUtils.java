@@ -169,7 +169,7 @@ public class CodeGenerationUtils {
 																							// meta);}"
 																							// );
 		javaInterface.setPackage(interfaceModel.getNamespace()).setName(interfaceName);
-		for (Method accessor : interfaceModel.getMethods()) {
+		for (Method accessor : interfaceModel.getClassMethods()) {
 			if (accessor.isConstructor()) {// Interfaces don't specify
 											// constructors
 				continue;
@@ -218,7 +218,7 @@ public class CodeGenerationUtils {
 																				// inheritance
 			javaClass.setSuperType(classModel.getSupertypes().get(0));
 		}
-		for (Method methodDefinition : classModel.getMethods()) {
+		for (Method methodDefinition : classModel.getClassMethods()) {
 			for (String importString : methodDefinition.getImports()) {
 				javaClass.addImport(importString);
 			}

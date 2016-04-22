@@ -69,7 +69,8 @@ public class ContainedAttributeHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		//setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		setFullyQualifiedType(ca.uhn.fhir.model.dstu2.composite.ContainedDt.class.getName());
 	}
 	
 	/**

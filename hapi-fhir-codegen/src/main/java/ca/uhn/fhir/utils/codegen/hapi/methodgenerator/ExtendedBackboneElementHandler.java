@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
@@ -30,8 +31,14 @@ public class ExtendedBackboneElementHandler extends BaseMethodGenerator {
 	 * TODO Fix if there is a more elegant way of doing this.
 	 * @param supertype
 	 */
-	public void setExtendedSupertype(Type supertype) {
-		this.extendedSupertype = getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), supertype);
+	public void setExtendedSupertype(String resourceName, String attributePath) {
+//		this.extendedSupertype = getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), supertype);
+		if(resourceName != null) {
+			this.extendedSupertype = HapiFhirUtils.getStructureTypeClass(getFhirResourceManager().getFhirContext(), resourceName, attributePath).getName();
+		} else {
+			this.extendedSupertype = HapiFhirUtils.getPrimitiveTypeClassName(getFhirResourceManager().getFhirContext(), attributePath);
+		}
+		System.out.println(this.extendedSupertype);
 	}
 
 	@Override
@@ -76,7 +83,10 @@ public class ExtendedBackboneElementHandler extends BaseMethodGenerator {
 	}
 	
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+//		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		if(getFhirResourceManager().generatedTypeExists(type.getCode())) {
+			setFullyQualifiedType(type.getCode());
+		}
 	}
 	
 	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {

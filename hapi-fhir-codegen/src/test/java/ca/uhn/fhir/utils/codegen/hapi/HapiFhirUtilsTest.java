@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.api.ExtensionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 
@@ -80,6 +81,15 @@ public class HapiFhirUtilsTest {
 		type = new Type();
 		type.setCode("Quantity");
 		assertEquals(ca.uhn.fhir.model.dstu2.composite.QuantityDt.class, HapiFhirUtils.getDataTypeClass(ctx, type));
+		
+		type = new Type();
+		type.setCode("reference");
+		assertEquals(ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt.class, ctx.getElementDefinition("reference").getImplementingClass());
+		
+		type = new Type();
+		type.setCode("Extension");
+		assertEquals(ca.uhn.fhir.model.api.ExtensionDt.class, ctx.getElementDefinition("Extension").getImplementingClass());
+		
 	}
 
 }

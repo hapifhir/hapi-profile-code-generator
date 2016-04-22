@@ -47,7 +47,8 @@ public enum FhirDatatypeEnum {
 	CODEABLE_CONCEPT("CodeableConcept"),
 	SIGNATURE("Signature"),
 	CODING("Coding"),
-	TIMING("Timing");
+	TIMING("Timing"),
+	REFERENCE("Reference");
 	
 	/**
 	 * The FHIR string value for this datatype

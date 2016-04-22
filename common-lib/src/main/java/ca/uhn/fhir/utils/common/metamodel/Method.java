@@ -76,7 +76,7 @@ public class Method {
 	}
 	
 	public String toString() {
-		return returnType + " " + name;
+		return returnType + " " + ((name!=null)?name:"Constructor");
 	}
 	
 	public boolean isConstructor() {

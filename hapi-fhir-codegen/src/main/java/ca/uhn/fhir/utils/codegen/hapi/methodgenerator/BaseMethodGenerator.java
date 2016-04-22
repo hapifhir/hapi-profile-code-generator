@@ -106,7 +106,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	}
 	
 	public String getBackboneElementName() {
-		return getResourceName() + "." + StringUtils.capitalize(getTopLevelCoreAttribute());
+		return getResourceName() + "." + getTopLevelCoreAttribute();
 	}
 	
 	/**

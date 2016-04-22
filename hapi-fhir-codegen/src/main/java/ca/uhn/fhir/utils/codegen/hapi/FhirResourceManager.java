@@ -301,13 +301,13 @@ public class FhirResourceManager {
 	 * @param type
 	 * @return
 	 */
-	public String getFullyQualifiedJavaType(StructureDefinition profile, Type type) {
-		String typeProfile = null;
-		if(type.getProfileFirstRep() != null) {
-			typeProfile = type.getProfileFirstRep().getValueAsString();
-		}
-		return getFullyQualifiedJavaType(profile, type.getCode(), typeProfile); //TODO Handle multi-profiles later
-	}
+//	public String getFullyQualifiedJavaType(StructureDefinition profile, Type type) {
+//		String typeProfile = null;
+//		if(type.getProfileFirstRep() != null) {
+//			typeProfile = type.getProfileFirstRep().getValueAsString();
+//		}
+//		return getFullyQualifiedJavaType(profile, type.getCode(), typeProfile); //TODO Handle multi-profiles later
+//	}
 
 	/**
 	 * Method returns the fully qualified Java class name
@@ -317,7 +317,8 @@ public class FhirResourceManager {
 	 * @param type
 	 * @return
 	 */
-	public String getFullyQualifiedJavaType(StructureDefinition profile, String typeCode, String typeProfile) {
+//	public String getFullyQualifiedJavaType(StructureDefinition profile, String typeCode, String typeProfile) {
+//		if(true){throw new RuntimeException("Find me");}
 //		String typeClass = null;
 //		if(generatedTypeExists(typeCode)) {
 //			typeClass = typeCode;
@@ -338,34 +339,34 @@ public class FhirResourceManager {
 //				typeClass = getHapiTypeForFhirType(profile, typeCode);
 //			}
 //		}
-		String typeClass = primitiveMap.get(typeCode);
-		if(typeClass != null) {
-			//throw new RuntimeException("Check what is happening here " + typeClass);
-		}
-		if(typeClass != null) {
-			typeClass = handlePrimitiveSpecializations(typeClass, typeProfile);
-		}
-		if(typeClass == null && generatedTypeExists(typeCode)) {
-			typeClass = typeCode;
-		}
-		if(typeClass == null && typeCode.equals("DomainResource")) {//TODO Figure how to handle this
-			typeClass = "ca.uhn.fhir.model.dstu2.resource.BaseResource";
-		}
-		if(typeClass != null) {
-			return typeClass;
-		} else if(typeCode.equals("*")){
-			throw new RuntimeException("Invalid type: *"); //TODO Handle at a later time
-		} else {
-			RuntimeResourceDefinition def = ctx.getResourceDefinition(typeCode);
-			if(def == null) {
-				throw new RuntimeException("Unknown type " + typeCode);
-			} else {
-				typeClass = def.getImplementingClass().getName();
-				primitiveMap.put(typeCode, typeClass);
-			}
-		}
-		return typeClass;
-	}
+//		String typeClass = primitiveMap.get(typeCode);
+//		if(typeClass != null) {
+//			//throw new RuntimeException("Check what is happening here " + typeClass);
+//		}
+//		if(typeClass != null) {
+//			typeClass = handlePrimitiveSpecializations(typeClass, typeProfile);
+//		}
+//		if(typeClass == null && generatedTypeExists(typeCode)) {
+//			typeClass = typeCode;
+//		}
+//		if(typeClass == null && typeCode.equals("DomainResource")) {//TODO Figure how to handle this
+//			typeClass = "ca.uhn.fhir.model.dstu2.resource.BaseResource";
+//		}
+//		if(typeClass != null) {
+//			return typeClass;
+//		} else if(typeCode.equals("*")){
+//			throw new RuntimeException("Invalid type: *"); //TODO Handle at a later time
+//		} else {
+//			RuntimeResourceDefinition def = ctx.getResourceDefinition(typeCode);
+//			if(def == null) {
+//				throw new RuntimeException("Unknown type " + typeCode);
+//			} else {
+//				typeClass = def.getImplementingClass().getName();
+//				primitiveMap.put(typeCode, typeClass);
+//			}
+//		}
+//		return typeClass;
+//	}
 	
 	/**
 	 * For attributes that are references to other resources, method returns the type of the reference.

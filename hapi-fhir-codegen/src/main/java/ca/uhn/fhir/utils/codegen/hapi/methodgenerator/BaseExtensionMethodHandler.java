@@ -2,11 +2,13 @@ package ca.uhn.fhir.utils.codegen.hapi.methodgenerator;
 
 import org.apache.commons.lang3.StringUtils;
 
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
 
@@ -128,7 +130,30 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 	 * @param type
 	 */
 	public void handleType(Type type) {
-		setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		Class<?> tentativeTypeClass = null;
+		//setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+		if(type.getCode().equals("CodeableConcept")) {//type.getCode().equals("CodeableConcept")) {
+			//setFullyQualifiedType(getFhirResourceManager().getFullyQualifiedJavaType(getProfile(), type));
+			//tentativeTypeClass = HapiFhirUtils.getDataTypeClass(getFhirResourceManager().getFhirContext(), type);
+			tentativeTypeClass = CodeableConceptDt.class;//TODO Fix this!
+		} else {
+			tentativeTypeClass = HapiFhirUtils.getDataTypeClass(getFhirResourceManager().getFhirContext(), type);
+		}
+		if(tentativeTypeClass != null) {
+			setFullyQualifiedType(tentativeTypeClass.getName());
+		} else {
+			if(getFhirResourceManager().generatedTypeExists(type.getCode())) {
+				setFullyQualifiedType(type.getCode());
+			} else {
+				if(type.getCode().equals("Reference")) {
+					setFullyQualifiedType(ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt.class.getName());
+				} else if(type.getCode().equals("Extension")){
+					setFullyQualifiedType(ca.uhn.fhir.model.api.ExtensionDt.class.getName());
+				} else {
+					throw new RuntimeException("Unknown type " + type.getCode());
+				}
+			}
+		}
 	}
 
 }
