@@ -100,7 +100,7 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 			ExtendedStructureAttributeHandler handler = new ExtendedStructureAttributeHandler(fhirResourceManager, template, profile, node.getPayload());
 			handler.initialize();
 			List<Method> methods = handler.buildCorrespondingMethods();//FhirMethodGenerator.generateAccessorMethodsForExtendedTypes(profile, node.getPayload(), parentClassName, fhirResourceManager, extensionDefUri);
-			parentClass.addMethods(methods);
+			parentClass.getMethods().addAll(methods);
 //			parentClass.addField(field);
 //			parentClass.addField(fieldUri);
 		}

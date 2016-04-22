@@ -70,7 +70,7 @@ public class ClassModel {
 	 * 
 	 * @return
 	 */
-	protected List<Method> getMethods() {
+	public List<Method> getMethods() {
 		return this.methods;
 	}
 	
@@ -79,7 +79,7 @@ public class ClassModel {
 	 * 
 	 * @param methods
 	 */
-	protected void setMethods(List<Method> methods) {
+	public void setMethods(List<Method> methods) {
 		this.methods = methods;
 	}
 	

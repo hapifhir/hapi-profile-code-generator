@@ -169,7 +169,7 @@ public class CodeGenerationUtils {
 																							// meta);}"
 																							// );
 		javaInterface.setPackage(interfaceModel.getNamespace()).setName(interfaceName);
-		for (Method accessor : interfaceModel.getClassMethods()) {
+		for (Method accessor : interfaceModel.getMethods()) {
 			if (accessor.isConstructor()) {// Interfaces don't specify
 											// constructors
 				continue;

@@ -194,17 +194,16 @@ public class InterfaceAdapterGenerator {
 //			generateAdapteeSetter(rootModel.getMethods(), fhirResourceManager.getResourceNameToClassMap().get(resourceName).getName());
 			for(ClassModel model : command.getClassMap().values()) {
 				//fhirResourceManager.getFullyQualifiedJavaType(node.getParent().getPayload().getTypeFirstRep());
-				System.out.println("MODEL NAME: " + model.getName());
-				if(model.getName().contains("Position")){
-					System.out.println("MODEL NAME: " + model.getName());
-				}
-				if(model != rootModel && model.getMethodCount() > 4) {//getAdaptee, setAdaptee, no-arg constructor, adaptee constructor
+				if(model != rootModel && model.getMethods().size() > 4) {//getAdaptee, setAdaptee, no-arg constructor, adaptee constructor
 					try {
 //						String typeName = fhirResourceManager.getFullyQualifiedJavaType(model.getName(), null);
 //						addAdapteeField(model, typeName);
 //						generateAdapteeGetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
 //						generateAdapteeSetter(model.getMethods(), typeName);//fhirResourceManager.getResourceNameToClassMap().get(typeName).getName());
-//						List<Method> methods = model.getClassMethods();
+						List<Method> methods = command.getMethodsForClass(model.getName());
+						if(methods != null) {
+							model.addMethods(methods);
+						}
 						String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
 						CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
 					}catch(Exception e) {
@@ -441,17 +440,17 @@ public class InterfaceAdapterGenerator {
 	 * @param adapterType
 	 * @param accessors
 	 */
-	public static void generateConstructors(MethodBodyGenerator bodyGenerator, String adapterType, ClassModel model) {
+	public static void generateConstructors(MethodBodyGenerator bodyGenerator, String constructorName, String adapterType, List<Method> accessors) {
 		Method noArgConstructor = new Method();
 		noArgConstructor.isConstructor(true);
 		noArgConstructor.setBody(bodyGenerator.getInitializeVariableStatement(ADAPTER_FIELD_NAME, adapterType));
-		model.addMethodAtIndex(0, noArgConstructor);
+		accessors.add(0, noArgConstructor);
 		
 		Method singleArgConstructor = new Method();
 		singleArgConstructor.addParameter("adaptee", adapterType);
 		singleArgConstructor.isConstructor(true);
 		singleArgConstructor.setBody(bodyGenerator.getAssignVariableStatement(ADAPTER_FIELD_NAME, "adaptee"));
-		model.addMethodAtIndex(1, singleArgConstructor);
+		accessors.add(1, singleArgConstructor);
 	}
 	
 	/**
@@ -460,15 +459,15 @@ public class InterfaceAdapterGenerator {
 	 * @param accessors
 	 * @param resourcePath
 	 */
-	protected static void generateAdapteeGetter(ClassModel model, String resourcePath) {
+	protected static void generateAdapteeGetter(List<Method> accessors, String resourcePath) {
 		Method method = new Method();
 		method.setName("getAdaptee");
 		method.setReturnType(resourcePath);
 		method.setBody("return adaptedClass;");
-		if(model.getMethodCount() > 2) { //TODO Document why we do this
-			model.addMethodAtIndex(2, method);
+		if(accessors.size() > 2) {
+			accessors.add(2, method);
 		} else {
-			model.addMethod(method);
+			accessors.add(method);
 		}
 	}
 	
@@ -478,17 +477,17 @@ public class InterfaceAdapterGenerator {
 	 * @param accessors
 	 * @param resourcePath
 	 */
-	protected static void generateAdapteeSetter(ClassModel model, String resourcePath) {
+	protected static void generateAdapteeSetter(List<Method> accessors, String resourcePath) {
 		Method method = new Method();
 		method.setName("setAdaptee");
 		List<MethodParameter> params = new ArrayList<MethodParameter>();
 		params.add(new MethodParameter("param", resourcePath));
 		method.setParameters(params);
 		method.setBody("this.adaptedClass = param;");
-		if(model.getMethodCount() > 3) {
-			model.addMethodAtIndex(3, method);
+		if(accessors.size() > 3) {
+			accessors.add(3, method);
 		} else {
-			model.addMethod(method);
+			accessors.add(method);
 		}
 	}
 	
