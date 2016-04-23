@@ -322,5 +322,9 @@ public class CodeGenerationUtils {
 		}
 		return pathComponents;
 	}
+	
+	public static String buildGeneratedClassName(String classPackage, String namespace, String typeName) {
+		return classPackage + "." + makeIdentifierJavaSafe(namespace) + makeIdentifierJavaSafe(typeName);
+	}
 
 }
