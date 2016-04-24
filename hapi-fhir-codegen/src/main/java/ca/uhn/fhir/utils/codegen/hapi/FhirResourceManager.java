@@ -39,6 +39,7 @@ public class FhirResourceManager {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(FhirResourceManager.class);
 	public static final String CORE_PROFILE_PREFIX = "http://hl7.org/fhir/StructureDefinition/";
+	public static final String CORE_BASE_RESOURCE_PROFILE = "http://hl7.org/fhir/StructureDefinition/DomainResource";
 	
 	private Map<String,Class<?>> resourceNameToClassMap;
 	private Map<String, StructureDefinition> profileNameToProfileMap;

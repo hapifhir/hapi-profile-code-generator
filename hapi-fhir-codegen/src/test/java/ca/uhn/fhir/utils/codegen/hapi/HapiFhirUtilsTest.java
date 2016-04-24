@@ -25,11 +25,11 @@ public class HapiFhirUtilsTest {
 
 	@Test
 	public void testGetBoundCode() {
-		Class<? extends Enum<?>> genderEnumClass = HapiFhirUtils.getBoundCode(ctx, Patient.class, "gender");
+		Class<? extends Enum<?>> genderEnumClass = HapiFhirUtils.getBoundCode(ctx, Patient.class, "gender").getEnumerationTypeClass();
 		assertNotNull(genderEnumClass);
 		assertEquals("ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum", genderEnumClass.getName());
 		
-		genderEnumClass = HapiFhirUtils.getBoundCode(ctx, "Patient", "gender");
+		genderEnumClass = HapiFhirUtils.getBoundCode(ctx, "Patient", "gender").getEnumerationTypeClass();
 		assertNotNull(genderEnumClass);
 		assertEquals("ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum", genderEnumClass.getName());
 	}

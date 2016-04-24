@@ -48,7 +48,8 @@ public enum FhirDatatypeEnum {
 	SIGNATURE("Signature"),
 	CODING("Coding"),
 	TIMING("Timing"),
-	REFERENCE("Reference");
+	REFERENCE("reference"),
+	EXTENSION("Extension");
 	
 	/**
 	 * The FHIR string value for this datatype

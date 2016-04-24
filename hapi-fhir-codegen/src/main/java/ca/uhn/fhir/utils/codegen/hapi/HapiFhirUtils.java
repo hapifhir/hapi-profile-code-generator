@@ -41,28 +41,29 @@ public class HapiFhirUtils {
 																						// =
 																						// org.slf4j.LoggerFactory.getLogger(FhirContextDstu2Test.class);
 
-	public static Class<? extends Enum<?>> getBoundCode(FhirContext ctx, String resourceName, String fieldName) {
+	public static HapiType getBoundCode(FhirContext ctx, String resourceName, String fieldName) {
 		Class<? extends IBaseResource> resourceClass = getResourceClass(ctx, resourceName);
 		return getBoundCode(ctx, resourceClass, fieldName);
 	}
 
-	public static Class<? extends Enum<?>> getBoundCode(FhirContext ctx, Class<? extends IBaseResource> resourceClass,
+	public static HapiType getBoundCode(FhirContext ctx, Class<? extends IBaseResource> resourceClass,
 			String fieldName) {
-		RuntimeResourceDefinition resourceType = ctx.getResourceDefinition(resourceClass);
-		BaseRuntimeChildDatatypeDefinition field = (BaseRuntimeChildDatatypeDefinition) resourceType
-				.getChildByName(fieldName);
-		LOGGER.trace(field.getClass().getName());
-
-		return ((BaseRuntimeChildDatatypeDefinition) field).getBoundEnumType();
+//		RuntimeResourceDefinition resourceType = ctx.getResourceDefinition(resourceClass);
+//		BaseRuntimeChildDatatypeDefinition field = (BaseRuntimeChildDatatypeDefinition) resourceType
+//				.getChildByName(fieldName);
+//		LOGGER.trace(field.getClass().getName());
+//
+//		return ((BaseRuntimeChildDatatypeDefinition) field).getBoundEnumType();
+		return getStructureTypeDef(ctx, resourceClass, fieldName);
 	}
 
-	public static HapiFhirUtils.TypeDefinition getBoundCodeableConcept(FhirContext ctx, String resourceName,
+	public static HapiType getBoundCodeableConcept(FhirContext ctx, String resourceName,
 			String fieldName) {
 		Class<? extends IBaseResource> resourceClass = getResourceClass(ctx, resourceName);
 		return getBoundCodeableConcept(ctx, resourceClass, fieldName);
 	}
 
-	public static HapiFhirUtils.TypeDefinition getBoundCodeableConcept(FhirContext ctx,
+	public static HapiType getBoundCodeableConcept(FhirContext ctx,
 			Class<? extends IBaseResource> resourceClass, String fieldName) {
 		return getStructureTypeDef(ctx, resourceClass, fieldName);
 	}
@@ -148,10 +149,10 @@ public class HapiFhirUtils {
 	 *            The FHIR primitive type whose HAPI type we are looking for
 	 * @return
 	 */
-	public static Class<?> getPrimitiveTypeClass(FhirContext ctx, String fhirPrimitiveType) {
+	public static Class<? extends IBase> getPrimitiveTypeClass(FhirContext ctx, String fhirPrimitiveType) {
 		BaseRuntimeElementDefinition<?> elementDefinition = ctx.getElementDefinition(fhirPrimitiveType);
 		if (elementDefinition != null) {
-			Class<?> primitiveClassName = elementDefinition.getImplementingClass();
+			Class<? extends IBase> primitiveClassName = elementDefinition.getImplementingClass();
 			LOGGER.trace(primitiveClassName.getName());
 			return primitiveClassName;
 		} else {
@@ -179,6 +180,15 @@ public class HapiFhirUtils {
 		}
 		return clazz;
 	}
+	
+	public static String getResourceClassName(FhirContext ctx, String resourceName) {
+		Class<? extends IBaseResource> resourceClass = getResourceClass(ctx, resourceName);
+		String resourceClassName = null;
+		if(resourceClass != null) {
+			resourceClassName = resourceClass.getName();
+		}
+		return resourceClassName;
+	}
 
 	/**
 	 * 
@@ -188,11 +198,11 @@ public class HapiFhirUtils {
 	 * @param structurePath
 	 *            E.g., "address.line"
 	 */
-	public static Class<?> getStructureTypeClass(FhirContext ctx, String resourceName, String structurePath) {
+	public static Class<? extends IBase> getStructureTypeClass(FhirContext ctx, String resourceName, String structurePath) {
 
 		BaseRuntimeElementCompositeDefinition<?> parentDef = ctx.getResourceDefinition(resourceName);
 
-		Class<?> childType = null;
+		Class<? extends IBase> childType = null;
 		for (Iterator<String> iter = Arrays.asList(structurePath.split("\\.")).iterator(); iter.hasNext();) {
 
 			String nextPart = iter.next();
@@ -226,11 +236,11 @@ public class HapiFhirUtils {
 	 * @param structurePath
 	 *            E.g., "address.line"
 	 */
-	public static HapiFhirUtils.TypeDefinition getStructureTypeDef(FhirContext ctx,
+	public static HapiType getStructureTypeDef(FhirContext ctx,
 			Class<? extends IBaseResource> resourceClass, String structurePath) {
 		BaseRuntimeElementCompositeDefinition<?> parentDef = ctx.getResourceDefinition(resourceClass);
 
-		HapiFhirUtils.TypeDefinition childType = null;
+		HapiType childType = null;
 		for (Iterator<String> iter = Arrays.asList(structurePath.split("\\.")).iterator(); iter.hasNext();) {
 
 			String nextPart = iter.next();
@@ -258,54 +268,10 @@ public class HapiFhirUtils {
 				} else {
 					throw new RuntimeException("Unknown type " + child.getClass().getName());
 				}
-				childType = new HapiFhirUtils.TypeDefinition(datatype, enumerationType);
+				childType = new HapiType(datatype, enumerationType);
 			}
 		}
 
 		return childType;
-	}
-
-	public static final class TypeDefinition {
-		private final Class<? extends IBase> datatype;
-		private final Class<? extends Enum<?>> enumerationType;
-
-		public TypeDefinition(Class<? extends IBase> datatype, Class<? extends Enum<?>> enumerationType) {
-			this.datatype = datatype;
-			this.enumerationType = enumerationType;
-		}
-
-		public String getDatatype() {
-			return datatype.getName();
-		}
-
-		public Class<? extends IBase> getDatatypeClass() {
-			return datatype;
-		}
-
-		public String getEnumerationType() {
-			return enumerationType.getName();
-		}
-
-		public Class<? extends Enum<?>> getEnumerationTypeClass() {
-			return enumerationType;
-		}
-
-		public boolean isEnumerationType() {
-			return enumerationType != null;
-		}
-
-		public String toString() {
-			return "Datatype: " + datatype + ", Enumeration Type: " + enumerationType;
-		}
-
-		public String getCodedTypeAsString() {
-			String boundType = null;
-			if (isEnumerationType()) {
-				boundType = getDatatype() + "<" + getEnumerationType() + ">";
-			} else {
-				boundType = getDatatype();
-			}
-			return boundType;
-		}
 	}
 }

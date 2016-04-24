@@ -23,7 +23,7 @@ import ca.uhn.fhir.utils.common.metamodel.ClassField;
 import ca.uhn.fhir.utils.common.metamodel.ClassModel;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
-import ca.uhn.fhir.utils.fhir.ProfileWalker;
+import ca.uhn.fhir.utils.fhir.ProfileTreeBuilder;
 
 /**
  * Command visits a StructureDefinition hierarchical tree using post-depth-first search
@@ -351,7 +351,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	}
 	
 	public boolean isExtensionNode(Node<ElementDefinitionDt> node) {
-		return ProfileWalker.isFhirExtension(node.getPayload());
+		return ProfileTreeBuilder.isFhirExtension(node.getPayload());
 	}
 	
 	public boolean isNotExtensionNode(Node<ElementDefinitionDt> node) {
@@ -599,7 +599,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 * @return
 	 */
 	private boolean ifParentIsExtension(Node<ElementDefinitionDt> node) {
-		return ProfileWalker.isFhirExtension(node.getParent().getPayload());
+		return ProfileTreeBuilder.isFhirExtension(node.getParent().getPayload());
 	}
 	
 }

@@ -11,9 +11,9 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.common.graph.Node;
 
-public class ProfileWalker {
+public class ProfileTreeBuilder {
 	
-	public static final Logger LOGGER = LoggerFactory.getLogger(ProfileWalker.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(ProfileTreeBuilder.class);
 	
 	private StructureDefinition profile;
 	private ElementDefinitionDt rootElement;
@@ -22,7 +22,7 @@ public class ProfileWalker {
 	private Map<String, ElementDefinitionDt> valueReferenceElementIndex;
 	private Node<ElementDefinitionDt> root;
 	
-	public ProfileWalker(StructureDefinition profile) {
+	public ProfileTreeBuilder(StructureDefinition profile) {
 		this.profile = profile;
 		this.elementIndex = new HashMap<String, ElementDefinitionDt>();
 		this.metaElementIndex = new HashMap<String, ElementDefinitionDt>();

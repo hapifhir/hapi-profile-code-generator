@@ -21,7 +21,7 @@ import ca.uhn.fhir.utils.common.metamodel.ClassModel;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.common.metamodel.MethodParameter;
 import ca.uhn.fhir.utils.common.metamodel.ModifierEnum;
-import ca.uhn.fhir.utils.fhir.ProfileWalker;
+import ca.uhn.fhir.utils.fhir.ProfileTreeBuilder;
 
 /**
  * Class processes FHIR profiles and generates a logical interface
@@ -66,7 +66,7 @@ public class InterfaceAdapterGenerator {
 	private MethodBodyGenerator templateUtils;
 	private List<String> resourceGenerationPlan;
 	private MethodHandlerResolver resolver;
-	private ProfileWalker profileWalker;
+	private ProfileTreeBuilder profileTreeBuilder;
 	
 	/**
 	 * Precondition: 
@@ -183,11 +183,11 @@ public class InterfaceAdapterGenerator {
 			//List<Method> methodDefinitions = generateMethodsFromFhirProfileDefinition(profile);
 			//InterfaceAdapterPair interfaceAdapterPair = generateCodeFromFhirProfile(javaSafeProfileName, profile, methodDefinitions);
 			//Node<ElementDefinitionDt> root = profileWalker.getRoot();
-			profileWalker = new ProfileWalker(profile);
-			profileWalker.initialize();
+			profileTreeBuilder = new ProfileTreeBuilder(profile);
+			profileTreeBuilder.initialize();
 			GenerateLogicalViewCommand command = new GenerateLogicalViewCommand(profile, fhirResourceManager, templateUtils, resolver, "org.socraticgrid.fhir.generated");
-			profileWalker.getRoot().executeCommandDepthFirstPost(command);
-			ClassModel rootModel = command.getClassMap().get(profileWalker.getRoot().getPathFromRoot());
+			profileTreeBuilder.getRoot().executeCommandDepthFirstPost(command);
+			ClassModel rootModel = command.getClassMap().get(profileTreeBuilder.getRoot().getPathFromRoot());
 			String resourceName = getUnderlyingFhirCoreResourceName(profile);
 			buildAdapter(rootModel, resourceName, generatedPackage + "." + generateInterfaceName(javaSafeProfileName));
 			for(ClassModel model : command.getClassMap().values()) {

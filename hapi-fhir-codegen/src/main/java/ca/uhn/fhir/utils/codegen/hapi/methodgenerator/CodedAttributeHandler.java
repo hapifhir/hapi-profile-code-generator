@@ -3,23 +3,18 @@ package ca.uhn.fhir.utils.codegen.hapi.methodgenerator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Binding;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
-import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.HapiType;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
-import ca.uhn.fhir.utils.fhir.PathUtils;
 
 /**
  * Class handles top-level, non-multi-type FHIR attributes that represent coded fields.
@@ -200,7 +195,7 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	public void handleCodeableConcept() {
 		String attributePath = getElement().getPath();
 		String fieldName = CodeGenerationUtils.getSuffix(getResourceName(), attributePath);
-		HapiFhirUtils.TypeDefinition boundType = HapiFhirUtils.getBoundCodeableConcept(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
+		HapiType boundType = HapiFhirUtils.getBoundCodeableConcept(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
 		if(boundType.isEnumerationType()) {
 			enumType = boundType.getEnumerationType();
 			imports.add(boundType.getEnumerationType());

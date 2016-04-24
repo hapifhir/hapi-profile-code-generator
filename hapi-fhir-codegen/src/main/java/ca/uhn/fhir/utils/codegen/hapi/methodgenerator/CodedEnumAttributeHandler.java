@@ -15,6 +15,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
+import ca.uhn.fhir.utils.codegen.hapi.HapiType;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
@@ -183,7 +184,7 @@ public class CodedEnumAttributeHandler extends BaseMethodGenerator {
 	public void handleCode() {
 		String attributePath = getElement().getPath();
 		String fieldName = CodeGenerationUtils.getSuffix(getResourceName(), attributePath);
-		HapiFhirUtils.TypeDefinition boundType = HapiFhirUtils.getBoundCodeableConcept(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
+		HapiType boundType = HapiFhirUtils.getBoundCodeableConcept(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
 		if(boundType.isEnumerationType()) {
 			enumType = boundType.getEnumerationType();
 			imports.add(boundType.getEnumerationType());
