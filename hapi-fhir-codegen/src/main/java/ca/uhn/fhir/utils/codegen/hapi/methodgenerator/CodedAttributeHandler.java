@@ -195,7 +195,7 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	public void handleCodeableConcept() {
 		String attributePath = getElement().getPath();
 		String fieldName = CodeGenerationUtils.getSuffix(getResourceName(), attributePath);
-		HapiType boundType = HapiFhirUtils.getBoundCodeableConcept(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
+		HapiType boundType = HapiFhirUtils.resolveBoundedAttributeTypes(getFhirResourceManager().getFhirContext(), getResourceName(), fieldName);
 		if(boundType.isEnumerationType()) {
 			enumType = boundType.getEnumerationType();
 			imports.add(boundType.getEnumerationType());

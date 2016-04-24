@@ -25,22 +25,22 @@ public class HapiFhirUtilsTest {
 
 	@Test
 	public void testGetBoundCode() {
-		Class<? extends Enum<?>> genderEnumClass = HapiFhirUtils.getBoundCode(ctx, Patient.class, "gender").getEnumerationTypeClass();
+		Class<? extends Enum<?>> genderEnumClass = HapiFhirUtils.resolveBoundedAttributeTypes(ctx, Patient.class, "gender").getEnumerationTypeClass();
 		assertNotNull(genderEnumClass);
 		assertEquals("ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum", genderEnumClass.getName());
 		
-		genderEnumClass = HapiFhirUtils.getBoundCode(ctx, "Patient", "gender").getEnumerationTypeClass();
+		genderEnumClass = HapiFhirUtils.resolveBoundedAttributeTypes(ctx, "Patient", "gender").getEnumerationTypeClass();
 		assertNotNull(genderEnumClass);
 		assertEquals("ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum", genderEnumClass.getName());
 	}
 
 	@Test
 	public void testGetBoundCodeableConcept() {
-		Class<? extends Enum<?>> maritalStatusEnum = HapiFhirUtils.getBoundCodeableConcept(ctx, Patient.class, "maritalStatus").getEnumerationTypeClass();
+		Class<? extends Enum<?>> maritalStatusEnum = HapiFhirUtils.resolveBoundedAttributeTypes(ctx, Patient.class, "maritalStatus").getEnumerationTypeClass();
 		assertNotNull(maritalStatusEnum);
 		assertEquals("ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum", maritalStatusEnum.getName());
 		
-		maritalStatusEnum = HapiFhirUtils.getBoundCodeableConcept(ctx, "Patient", "maritalStatus").getEnumerationTypeClass();
+		maritalStatusEnum = HapiFhirUtils.resolveBoundedAttributeTypes(ctx, "Patient", "maritalStatus").getEnumerationTypeClass();
 		assertNotNull(maritalStatusEnum);
 		assertEquals("ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum", maritalStatusEnum.getName());
 	}

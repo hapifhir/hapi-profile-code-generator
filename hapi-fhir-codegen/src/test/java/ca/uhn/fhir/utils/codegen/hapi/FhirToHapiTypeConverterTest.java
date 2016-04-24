@@ -15,6 +15,8 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.primitive.BooleanDt;
+import ca.uhn.fhir.model.primitive.CodeDt;
+import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
 import ca.uhn.fhir.utils.fhir.model.datatype.dstu2.FhirDatatypeEnum;
 
@@ -56,6 +58,7 @@ public class FhirToHapiTypeConverterTest {
 		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
 		assertEquals(1, converter.getHapiTypes().size());
 		assertTrue(converter.isExtension());
+		assertFalse(converter.isMultiType());
 		assertFalse(converter.getHapiType().isReference());
 		assertEquals(CodeableConceptDt.class.getName(), converter.getHapiType().getDatatype());
 		
@@ -63,12 +66,17 @@ public class FhirToHapiTypeConverterTest {
 	
 	@Test
 	public void testExtensionTypeMultiConversion() {
-//		Type type = new Type();
-//		type.setCode(FhirDatatypeEnum.EXTENSION.toString());
-//		element.addType(type);
-//		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
-//		assertTrue(converter.getHapiType().isExtension());
-//		assertFalse(converter.getHapiType().isReference());
+		Type type = new Type();
+		type.setCode(FhirDatatypeEnum.EXTENSION.toString());
+		type.addProfile("http://hl7.org/fhir/StructureDefinition/qicore-procedurerequest-appropriatenessScore");
+		element.addType(type);
+		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+		assertEquals(2, converter.getHapiTypes().size());
+		assertTrue(converter.isExtension());
+		assertTrue(converter.isMultiType());
+		assertFalse(converter.getHapiType().isReference());
+		assertEquals(CodeDt.class.getName(), converter.getHapiType().getDatatype());
+		assertEquals(DecimalDt.class.getName(), converter.getHapiTypes().get(1).getDatatype());
 	}
 
 	@Test

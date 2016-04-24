@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.model.primitive.CodeDt;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
 import ca.uhn.fhir.utils.fhir.model.datatype.dstu2.FhirDatatypeEnum;
@@ -72,7 +73,7 @@ public final class FhirToHapiTypeConverter {
 	
 	private void processElement(ElementDefinitionDt elt) {
 		if(elt != null && elt.getType() != null && elt.getType().size() > 0) {
-			if(elt.getType().size() > 0) {
+			if(elt.getType().size() > 1) {
 				isMultiType = true;
 			}
 			for(Type type : elt.getType()) {
@@ -96,14 +97,16 @@ public final class FhirToHapiTypeConverter {
 				processBackboneElement();
 			} else {
 				HapiType hapiType = new HapiType();
-				if(code.equalsIgnoreCase("CodeableConcept")) {
+				if(code.equalsIgnoreCase("CodeableConcept") || code.equalsIgnoreCase("code")) {
 					if(base != null) {
-						hapiType.configureFrom(HapiFhirUtils.getBoundCodeableConcept(ctx, base, relativePath));
+						hapiType.configureFrom(HapiFhirUtils.resolveBoundedAttributeTypes(ctx, base, relativePath));
 					} else {
-						hapiType.setDatatypeClass(CodeableConceptDt.class);
+						if(code.equalsIgnoreCase("CodeableConcept")) {
+							hapiType.setDatatypeClass(CodeableConceptDt.class);
+						} else {
+							hapiType.setDatatypeClass(CodeDt.class);
+						}
 					}
-				} else if(code.equalsIgnoreCase("code")) {
-					
 				} else if(isFhirDatatype(code)) {
 					hapiType.setDatatypeClass(HapiFhirUtils.getPrimitiveTypeClass(ctx, code));
 				} else if(isResource(code)){
@@ -144,10 +147,11 @@ public final class FhirToHapiTypeConverter {
 	}
 	
 	private void processExtension(Type type) {
-		//MultiType not yet implemented
-		FhirExtensionDefinition extensionDef = manager.getExtensionManager().getFromRegistry("http://hl7.org/fhir/StructureDefinition/us-core-race");
-		ElementDefinitionDt element = extensionDef.getExtensionByName("us-core-race");
-		processElement(element);
+		String extensionUri = type.getProfileFirstRep().getValueAsString();
+		FhirExtensionDefinition extensionDef = manager.getFhirExtension(PathUtils.getExtensionRootPath(extensionUri));
+		String extensionName = PathUtils.getExtensionName(extensionUri);
+		ElementDefinitionDt extendedElement = extensionDef.getExtensionByName(extensionName);
+		processElement(extendedElement);
 	}
 	
 	private boolean isFhirDatatype(String code) {

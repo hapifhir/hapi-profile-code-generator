@@ -41,29 +41,13 @@ public class HapiFhirUtils {
 																						// =
 																						// org.slf4j.LoggerFactory.getLogger(FhirContextDstu2Test.class);
 
-	public static HapiType getBoundCode(FhirContext ctx, String resourceName, String fieldName) {
-		Class<? extends IBaseResource> resourceClass = getResourceClass(ctx, resourceName);
-		return getBoundCode(ctx, resourceClass, fieldName);
-	}
-
-	public static HapiType getBoundCode(FhirContext ctx, Class<? extends IBaseResource> resourceClass,
-			String fieldName) {
-//		RuntimeResourceDefinition resourceType = ctx.getResourceDefinition(resourceClass);
-//		BaseRuntimeChildDatatypeDefinition field = (BaseRuntimeChildDatatypeDefinition) resourceType
-//				.getChildByName(fieldName);
-//		LOGGER.trace(field.getClass().getName());
-//
-//		return ((BaseRuntimeChildDatatypeDefinition) field).getBoundEnumType();
-		return getStructureTypeDef(ctx, resourceClass, fieldName);
-	}
-
-	public static HapiType getBoundCodeableConcept(FhirContext ctx, String resourceName,
+	public static HapiType resolveBoundedAttributeTypes(FhirContext ctx, String resourceName,
 			String fieldName) {
 		Class<? extends IBaseResource> resourceClass = getResourceClass(ctx, resourceName);
-		return getBoundCodeableConcept(ctx, resourceClass, fieldName);
+		return resolveBoundedAttributeTypes(ctx, resourceClass, fieldName);
 	}
 
-	public static HapiType getBoundCodeableConcept(FhirContext ctx,
+	public static HapiType resolveBoundedAttributeTypes(FhirContext ctx,
 			Class<? extends IBaseResource> resourceClass, String fieldName) {
 		return getStructureTypeDef(ctx, resourceClass, fieldName);
 	}
