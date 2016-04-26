@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedStructureAttributeHandler;
 import ca.uhn.fhir.utils.common.graph.CommandInterface;
 import ca.uhn.fhir.utils.common.graph.Node;
@@ -18,7 +19,7 @@ import ca.uhn.fhir.utils.common.metamodel.Method;
 
 public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 	
-	private FhirResourceManager fhirResourceManager;
+	private FhirResourceManagerDstu2 fhirResourceManager;
 	private MethodBodyGenerator template;
 	private StructureDefinition profile;
 	private Map<String, ClassModel> classModels;
@@ -32,11 +33,11 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 		this.profile = profile;
 	}
 	
-	public FhirResourceManager getFhirResourceManager() {
+	public FhirResourceManagerDstu2 getFhirResourceManager() {
 		return fhirResourceManager;
 	}
 
-	public void setFhirResourceManager(FhirResourceManager fhirResourceManager) {
+	public void setFhirResourceManager(FhirResourceManagerDstu2 fhirResourceManager) {
 		this.fhirResourceManager = fhirResourceManager;
 	}
 

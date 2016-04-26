@@ -12,7 +12,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
@@ -46,7 +46,7 @@ public class ExtendedAttributeHandler extends BaseExtensionMethodHandler {
 	 */
 	private String extendedTypeName;
 	
-	public ExtendedAttributeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public ExtendedAttributeHandler(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
 	}
 	
@@ -197,10 +197,10 @@ public class ExtendedAttributeHandler extends BaseExtensionMethodHandler {
 	 * @return
 	 */
 	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		if(FhirResourceManager.elementHasNoType(element)/* || FhirResourceManager.isMultiTypeAttribute(element)*/) { //TODO Figure out if commenting multitype is an issue
+		if(FhirResourceManagerDstu2.elementHasNoType(element)/* || FhirResourceManager.isMultiTypeAttribute(element)*/) { //TODO Figure out if commenting multitype is an issue
 			return false;
 		} else {
-			if(FhirResourceManager.isFhirExtension(element)) {
+			if(FhirResourceManagerDstu2.isFhirExtension(element)) {
 				return true;
 			} else {
 				return false;

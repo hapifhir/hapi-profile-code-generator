@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.common.graph.Node;
-import ca.uhn.fhir.utils.fhir.ProfileTreeBuilder;
+import ca.uhn.fhir.utils.fhir.dstu2.ProfileTreeBuilder;
 
 @Deprecated
 public class ExtensionGenerator {

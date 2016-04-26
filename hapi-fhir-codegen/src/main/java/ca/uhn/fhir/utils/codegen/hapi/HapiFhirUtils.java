@@ -1,7 +1,9 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -13,6 +15,7 @@ import ca.uhn.fhir.context.BaseRuntimeChildDefinition;
 import ca.uhn.fhir.context.BaseRuntimeElementCompositeDefinition;
 import ca.uhn.fhir.context.BaseRuntimeElementDefinition;
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.RuntimeChildChoiceDefinition;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.utils.fhir.PathUtils;
@@ -228,6 +231,7 @@ public class HapiFhirUtils {
 		for (Iterator<String> iter = Arrays.asList(structurePath.split("\\.")).iterator(); iter.hasNext();) {
 
 			String nextPart = iter.next();
+
 			BaseRuntimeChildDefinition child = parentDef.getChildByName(nextPart);
 			BaseRuntimeElementDefinition<?> childDef = child.getChildByName(nextPart);
 
@@ -248,14 +252,82 @@ public class HapiFhirUtils {
 					enumerationType = ((BaseRuntimeChildDatatypeDefinition) child).getBoundEnumType();
 					datatype = ((BaseRuntimeChildDatatypeDefinition) child).getDatatype();
 				} else if (child instanceof ca.uhn.fhir.context.RuntimeChildPrimitiveDatatypeDefinition) {
+					enumerationType = ((BaseRuntimeChildDatatypeDefinition) child).getBoundEnumType();
 					datatype = ((BaseRuntimeChildDatatypeDefinition) child).getDatatype();
 				} else {
-					throw new RuntimeException("Unknown type " + child.getClass().getName());
+					throw new RuntimeException("Unknown type " + child.getClass().getName() + " - " + structurePath);
 				}
 				childType = new HapiType(datatype, enumerationType);
 			}
 		}
 
 		return childType;
+	}
+	
+	/**
+	 * 
+	 * @param ctx
+	 * @param resourceName
+	 *            E.g., "Patient"
+	 * @param structurePath
+	 *            E.g., "address.line"
+	 */
+	public static List<HapiType> getChoiceTypes(FhirContext ctx,
+			Class<? extends IBaseResource> resourceClass, String structurePath) {
+		BaseRuntimeElementCompositeDefinition<?> parentDef = ctx.getResourceDefinition(resourceClass);
+
+		List<HapiType> childrenType = new ArrayList<HapiType>();
+		
+		for (Iterator<String> iter = Arrays.asList(structurePath.split("\\.")).iterator(); iter.hasNext();) {
+
+			String nextPart = iter.next();
+			BaseRuntimeChildDefinition child = parentDef.getChildByName(nextPart);
+			if(child == null) {
+				System.out.println("HERE");
+			}
+			BaseRuntimeElementDefinition<?> childDef = child.getChildByName(nextPart);
+
+			if (iter.hasNext()) {
+				parentDef = (BaseRuntimeElementCompositeDefinition<?>) childDef;
+			} else {
+				Class<? extends IBase> datatype = null;
+				Class<? extends Enum<?>> enumerationType = null;
+
+				if (child instanceof RuntimeChildChoiceDefinition) {
+					RuntimeChildChoiceDefinition choice = (RuntimeChildChoiceDefinition) child;
+					List<Class<? extends IBase>> items = choice.getChoices();
+					for(Class<? extends IBase> item : items) {
+						boolean isReference = false;
+						Class<? extends IBase> reference = null;
+						String itemName = choice.getChildNameByDatatype(item);
+						HapiType hapiType = null;
+						if(itemName == null) {
+							isReference = true;
+							reference = org.hl7.fhir.dstu3.model.Reference.class;//Try this
+							itemName = choice.getChildNameByDatatype(reference);
+						}
+						System.out.println("Processing multi " + structurePath + ", item name: " + itemName);
+						if(isReference) {
+							BaseRuntimeElementDefinition<?> definition = choice.getChildElementDefinitionByDatatype(reference);
+							datatype = item;
+							hapiType = new HapiType(datatype, null);
+							hapiType.setReference(true);
+							
+						} else {
+							BaseRuntimeElementDefinition<?> definition = choice.getChildElementDefinitionByDatatype(item);
+							datatype = definition.getImplementingClass();
+							hapiType = new HapiType(datatype, null);
+
+						}
+						hapiType.setAssignedName(itemName);
+						childrenType.add(hapiType);
+					}
+				} else {
+					throw new RuntimeException("Unknown type " + child.getClass().getName() + " - " + structurePath);
+				}
+			}
+		}
+
+		return childrenType;
 	}
 }

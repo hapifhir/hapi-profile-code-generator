@@ -3,7 +3,7 @@
 		<profileSourceFilePath>/Users/cnanjo/repository/fhir/trunk/build/publish/profiles-resources.xml</profileSourceFilePath>
 	</profileSourceFilePaths>
 	<profileDirectoryPaths>
-		<profileDirectoryPath>/Users/cnanjo/work/qicore/profiles</profileDirectoryPath>
+		<profileDirectoryPath>/Users/cnanjo/work/qicore/profiles_dstu2</profileDirectoryPath>
 	</profileDirectoryPaths>
 	<generatedCodePackage>org.socraticgrid.fhir.generated</generatedCodePackage>
 	<targetCodeGenerationDirectory>generated-source/java/</targetCodeGenerationDirectory>

@@ -12,8 +12,11 @@ public class HapiType {
 	
 	private boolean isReference;
 	private boolean isBackboneElement;
-	private Class<? extends IBase> datatype;
+	private boolean isMultipleCardinality;
+	private String fhirType;
+	private Class<?> datatype;
 	private Class<? extends Enum<?>> enumerationType;
+	private String assignedName;
 	
 	public HapiType() {}
 	
@@ -26,6 +29,14 @@ public class HapiType {
 	public void configureFrom(HapiType hapiType) {
 		this.datatype = hapiType.getDatatypeClass();
 		this.enumerationType = hapiType.getEnumerationTypeClass();
+	}
+	
+	public void setFhirType(String fhirType) {
+		this.fhirType = fhirType;
+	}
+	
+	public String getFhirType() {
+		return fhirType;
 	}
 	
 	public boolean isReference() {
@@ -47,7 +58,18 @@ public class HapiType {
 			return null;
 		}
 	}
-	public Class<? extends IBase> getDatatypeClass() {
+	public String getDatatypeOrList() {
+		if(datatype != null) {
+			if(isMultipleCardinality) {
+				return "java.util.List<" + datatype.getName() + ">";
+			} else {
+				return datatype.getName();
+			}
+		} else {
+			return null;
+		}
+	}
+	public Class<?> getDatatypeClass() {
 		return datatype;
 	}
 	public void setDatatypeClass(Class<? extends IBase>  hapiType) {
@@ -78,6 +100,19 @@ public class HapiType {
 		}
 		return boundType;
 	}
+	public void setMultipleCardinality(boolean multiple) {
+		this.isMultipleCardinality = multiple;
+	}
+	public boolean isMultipleCardinality() {
+		return isMultipleCardinality;
+	}
+	public String getAssignedName() {
+		return assignedName;
+	}
+	public void setAssignedName(String assignedName) {
+		this.assignedName = assignedName;
+	}
+
 	public String toString() {
 		return "Datatype: " + datatype + ", Enumeration Type: " + enumerationType;
 	}

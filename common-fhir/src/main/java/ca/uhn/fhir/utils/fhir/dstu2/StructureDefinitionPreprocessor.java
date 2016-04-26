@@ -1,9 +1,10 @@
-package ca.uhn.fhir.utils.fhir;
+package ca.uhn.fhir.utils.fhir.dstu2;
 
 import org.apache.commons.lang3.StringUtils;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
+import ca.uhn.fhir.utils.fhir.PathUtils;
 
 /**
  * Handles path slicing by providing full named paths in element.name

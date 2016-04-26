@@ -10,7 +10,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
@@ -39,7 +39,7 @@ public class ExtendedStructureAttributeHandler extends BaseExtensionMethodHandle
 	private boolean unsupported = false;
 	private String extendedStructureName;
 	
-	public ExtendedStructureAttributeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public ExtendedStructureAttributeHandler(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
 	}
 	

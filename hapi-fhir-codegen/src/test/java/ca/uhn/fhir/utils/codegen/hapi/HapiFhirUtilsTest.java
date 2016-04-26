@@ -90,6 +90,13 @@ public class HapiFhirUtilsTest {
 		type.setCode("Extension");
 		assertEquals(ca.uhn.fhir.model.api.ExtensionDt.class, ctx.getElementDefinition("Extension").getImplementingClass());
 		
+		//Class condition = HapiFhirUtils.getResourceClass(ctx, "Condition");
+		Class contained = HapiFhirUtils.getStructureTypeClass(ctx, "Condition", "contained");
+		
+		Class language = HapiFhirUtils.getStructureTypeClass(ctx, "Condition", "language");
+		
+		Class meta = HapiFhirUtils.getStructureTypeClass(ctx, "Condition", "meta");
+		
 	}
 
 }

@@ -17,13 +17,15 @@ import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.model.primitive.BooleanDt;
 import ca.uhn.fhir.model.primitive.CodeDt;
 import ca.uhn.fhir.model.primitive.DecimalDt;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirToHapiTypeConverter;
 import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
 import ca.uhn.fhir.utils.fhir.model.datatype.dstu2.FhirDatatypeEnum;
 
 public class FhirToHapiTypeConverterTest {
 
 	private ElementDefinitionDt element;
-	private static FhirResourceManager manager;
+	private static FhirResourceManagerDstu2 manager;
 	
 	@BeforeClass
 	public static void setupSuite() {

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.jboss.forge.roaster:roaster-jdt:2.11.2-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/forge/roaster/roaster-jdt/2.11.2-SNAPSHOT/roaster-jdt-2.11.2-20150130.162158-11.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/forge/roaster/roaster-jdt/2.11.2-SNAPSHOT/roaster-jdt-2.11.2-20150130.162158-11-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/jboss/forge/roaster/roaster-jdt/2.11.2-SNAPSHOT/roaster-jdt-2.11.2-20150130.162158-11-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

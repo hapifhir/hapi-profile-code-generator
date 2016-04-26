@@ -204,6 +204,21 @@ public class MethodBodyGenerator extends TemplateUtils {
 		return st.render();
 	}
 	
+	/**
+	 * Method delegating to the adapter's class getter. Catches any
+	 * exception and rethrows as a runtime exception.
+	 * 
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getAdapterGetMethodDelegationWithTryCatchBody(String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("getMethodInvocationWithTryCatch");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+	
 	public String getAdapterGetMethodDelegationWithCastBody(String propertyName, String castTo) {
 		propertyName = StringUtils.capitalize(propertyName);
 		ST st = getGroupMain().getInstanceOf("getAndCastToExtendedType");
@@ -351,6 +366,21 @@ public class MethodBodyGenerator extends TemplateUtils {
 		st.add("uri", uri);
 		return st.render();
 	}
+
+	/**
+	 * Method returning getter body for extensions of a single type with multiple cardinality.
+	 *
+	 * @param type - The return type
+	 * @param uri - The URI for the FHIR extension
+	 *
+	 * @return
+	 */
+	public String getExtensionListGetterBodyDstu3(String type, String uri) {
+		ST st = getGroupMain().getInstanceOf("extensionListGetterBodyDstu3");
+		st.add("type", type);
+		st.add("uri", uri);
+		return st.render();
+	}
 	
 	/**
 	 * Method returning setter body for extensions of a single type with multiple cardinality.
@@ -362,6 +392,21 @@ public class MethodBodyGenerator extends TemplateUtils {
 	 */
 	public String getExtensionListSetterBody(String type, String uri) {
 		ST st = getGroupMain().getInstanceOf("extensionListSetterBody");
+		st.add("type", type);
+		st.add("uri", uri);
+		return st.render();
+	}
+
+	/**
+	 * Method returning setter body for extensions of a single type with multiple cardinality.
+	 *
+	 * @param type - The argument type
+	 * @param uri - The URI for the FHIR extension
+	 *
+	 * @return
+	 */
+	public String getExtensionListSetterBodyDstu3(String type, String uri) {
+		ST st = getGroupMain().getInstanceOf("extensionListSetterBodyDstu3");
 		st.add("type", type);
 		st.add("uri", uri);
 		return st.render();
@@ -381,6 +426,21 @@ public class MethodBodyGenerator extends TemplateUtils {
 		st.add("uri", uri);
 		return st.render();
 	}
+
+	/**
+	 * Method returning setter body for extensions of a single type with multiple cardinality.
+	 *
+	 * @param type - The argument type
+	 * @param uri - The URI for the FHIR extension
+	 *
+	 * @return
+	 */
+	public String getExtensionSetterBodyDstu3(String rootClassName, String uri) {
+		ST st = getGroupMain().getInstanceOf("extensionSetterBodyDstu3");
+		st.add("rootClassName", rootClassName);
+		st.add("uri", uri);
+		return st.render();
+	}
 	
 	public String getExtensionSetterBody(String uri) {
 		return getExtensionSetterBody("adaptedClass", uri);
@@ -396,6 +456,23 @@ public class MethodBodyGenerator extends TemplateUtils {
 	 */
 	public String getExtensionGetterBody(String rootClassName, String type, String uri, String fieldName) {
 		ST st = getGroupMain().getInstanceOf("extensionGetterBody");
+		st.add("rootClassName", rootClassName);
+		st.add("uri", uri);
+		st.add("type", type);
+		st.add("fieldName", fieldName);
+		return st.render();
+	}
+
+	/**
+	 * Method returning setter body for extensions of a single type with multiple cardinality.
+	 *
+	 * @param type - The argument type
+	 * @param uri - The URI for the FHIR extension
+	 *
+	 * @return
+	 */
+	public String getExtensionGetterBodyDstu3(String rootClassName, String type, String uri, String fieldName) {
+		ST st = getGroupMain().getInstanceOf("extensionGetterBodyDstu3");
 		st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		st.add("type", type);

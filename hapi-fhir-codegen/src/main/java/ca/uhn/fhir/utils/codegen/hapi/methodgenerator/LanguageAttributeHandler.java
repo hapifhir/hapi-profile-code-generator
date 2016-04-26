@@ -10,7 +10,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Cardinality;
@@ -40,7 +40,7 @@ public class LanguageAttributeHandler extends BaseMethodGenerator {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(LanguageAttributeHandler.class);
 	
-	public LanguageAttributeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public LanguageAttributeHandler(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
 	}
 	
@@ -57,7 +57,7 @@ public class LanguageAttributeHandler extends BaseMethodGenerator {
 		boolean appliesTo = false;
 		if(element == null || element.getPath() == null) {
 			return appliesTo;
-		} else if(element.getPath().endsWith(".language") && FhirResourceManager.isRootLevelAttribute(element.getPath())) {
+		} else if(element.getPath().endsWith(".language") && FhirResourceManagerDstu2.isRootLevelAttribute(element.getPath())) {
 			appliesTo = true;
 		}
 		return appliesTo;

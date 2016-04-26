@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 
 /**
@@ -42,7 +42,7 @@ public class JavaTypeHandler extends BaseMethodGenerator {
 	
 	private String javaType;
 	
-	public JavaTypeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public JavaTypeHandler(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
 	}
 	
@@ -80,12 +80,12 @@ public class JavaTypeHandler extends BaseMethodGenerator {
 	 * @return
 	 */
 	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		if(FhirResourceManager.elementHasNoType(element) || FhirResourceManager.isMultiTypeAttribute(element)) {
+		if(FhirResourceManagerDstu2.elementHasNoType(element) || FhirResourceManagerDstu2.isMultiTypeAttribute(element)) {
 			return false;
 		} else {
-			if(element.getTypeFirstRep().getCode() == null || FhirResourceManager.isFhirExtension(element)) {
+			if(element.getTypeFirstRep().getCode() == null || FhirResourceManagerDstu2.isFhirExtension(element)) {
 				return false;
-			} else if(!FhirResourceManager.hasEquivalentJavaType(element.getTypeFirstRep())) {
+			} else if(!FhirResourceManagerDstu2.hasEquivalentJavaType(element.getTypeFirstRep())) {
 				return false;
 			} else if(element.getTypeFirstRep().getCode().equals("code")) {//Make exception for Code Enums
 				return false;
@@ -216,7 +216,7 @@ public class JavaTypeHandler extends BaseMethodGenerator {
 //			throw new RuntimeException("Types are mismatched");
 //		}
 		setFullyQualifiedType(primitiveClass.getName());
-		javaType = FhirResourceManager.getPrimitiveEquivalent(getFullyQualifiedType());
+		javaType = FhirResourceManagerDstu2.getPrimitiveEquivalent(getFullyQualifiedType());
 	}
 
 }

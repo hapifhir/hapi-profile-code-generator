@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
-import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
-import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.common.metamodel.Method;
+import ca.uhn.fhir.utils.fhir.PathUtils;
 
 /**
  * Class handles top-level, non-multi-type FHIR attributes that do not map to
@@ -39,8 +39,33 @@ public class MultiTypeAttributeHandler extends BaseMethodGenerator {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(MultiTypeAttributeHandler.class);
 	
-	public MultiTypeAttributeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public MultiTypeAttributeHandler(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
+	}
+	
+	/**
+	 * Method assesses whether the handler can process the ElementDefinitionDt argument.
+	 * If the method can process the argument, it returns true. Otherwise, it returns false.
+	 * This method will return true only if:
+	 * <ul>
+	 * <li>The element has a single type</li>
+	 * <li>The element has a HAPI FHIR type that does not correspond to a java type (e.g., CodeableConceptDt)</li>
+	 * </ul>
+	 * 
+	 * @param profile
+	 * @param element
+	 * @return
+	 */
+	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
+		if(FhirResourceManagerDstu2.elementHasNoType(element) || element.getType().size() == 1  || FhirResourceManagerDstu2.isFhirExtension(element)) {
+			return false;
+		} else {
+			if(PathUtils.isMultivaluedAttribute(element.getPath())) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 	
 	/**
@@ -73,7 +98,7 @@ public class MultiTypeAttributeHandler extends BaseMethodGenerator {
 			if(!appliesTo(getProfile(), getElement()) || ignoreField()) {
 				return methods;
 			} else {
-				List<ElementDefinitionDt> flattenedElements = FhirResourceManager.flattenElementByType(getElement());
+				List<ElementDefinitionDt> flattenedElements = FhirResourceManagerDstu2.flattenElementByType(getElement());
 				for(ElementDefinitionDt flattenedElement : flattenedElements) {
 					if(isMultipleCardinality()) {
 						handleMultipleCardinality(methods, flattenedElement);
@@ -122,7 +147,7 @@ public class MultiTypeAttributeHandler extends BaseMethodGenerator {
 		String qualifiedAttribute = getTopLevelCoreAttribute() + StringUtils.capitalize(typeString);
 		String fullyQualifiedType = getFullyQualifiedType(element.getTypeFirstRep());
 		String fluentReturnType = getFluentReturnType();
-		String javaType = FhirResourceManager.getPrimitiveEquivalent(fullyQualifiedType);
+		String javaType = FhirResourceManagerDstu2.getPrimitiveEquivalent(fullyQualifiedType);
 		if(javaType == null) {
 			accessors.add(constructGetMethodFromField(qualifiedAttribute, fullyQualifiedType).setBody(buildMultivaluedGetterBody(fullyQualifiedType)));
 			accessors.add(constructSetMethodFromField(qualifiedAttribute, fullyQualifiedType, fluentReturnType).setBody(buildDelegatedSetterBody(getTopLevelCoreAttribute())));
@@ -180,30 +205,4 @@ public class MultiTypeAttributeHandler extends BaseMethodGenerator {
 		}
 		return tentativeType;
 	}
-	
-	/**
-	 * Method assesses whether the handler can process the ElementDefinitionDt argument.
-	 * If the method can process the argument, it returns true. Otherwise, it returns false.
-	 * This method will return true only if:
-	 * <ul>
-	 * <li>The element has a single type</li>
-	 * <li>The element has a HAPI FHIR type that does not correspond to a java type (e.g., CodeableConceptDt)</li>
-	 * </ul>
-	 * 
-	 * @param profile
-	 * @param element
-	 * @return
-	 */
-	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		if(FhirResourceManager.elementHasNoType(element) || element.getType().size() == 1  || FhirResourceManager.isFhirExtension(element)) {
-			return false;
-		} else {
-			if(FhirResourceManager.isMultivaluedAttribute(element.getPath())) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-
 }

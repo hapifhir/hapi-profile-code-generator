@@ -7,7 +7,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
@@ -20,7 +20,7 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 	private boolean isExtendedStructure = false;
 	
 
-	public BaseExtensionMethodHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public BaseExtensionMethodHandler(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
 	}
 	
@@ -87,7 +87,7 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 			extensionName = extensionName.substring(extensionName.lastIndexOf('-') + 1);
 			extendedElement.setName(extensionName);
 		}
-		extendedElement = FhirResourceManager.shallowCloneElement(extendedElement);
+		extendedElement = FhirResourceManagerDstu2.shallowCloneElement(extendedElement);
 		if(extendedElement.getType().size() == 1) {
 			handleType(extendedElement.getTypeFirstRep());
 		} else if(extendedElement.getType().size() == 0){

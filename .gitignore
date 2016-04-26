@@ -19,6 +19,7 @@ target/*
 .settings/
 .project
 .classpath
+.idea
 
 # Project-specific
 hapi-fhir-codegen/generated-source/*

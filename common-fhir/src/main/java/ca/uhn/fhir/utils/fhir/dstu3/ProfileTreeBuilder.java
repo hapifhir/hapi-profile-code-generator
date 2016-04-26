@@ -1,32 +1,34 @@
-package ca.uhn.fhir.utils.fhir;
+package ca.uhn.fhir.utils.fhir.dstu3;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hl7.fhir.dstu3.model.ElementDefinition;
+import org.hl7.fhir.dstu3.model.StructureDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.common.graph.Node;
+import ca.uhn.fhir.utils.fhir.PathUtils;
+import ca.uhn.fhir.utils.fhir.dstu3.StructureDefinitionPreprocessor;
 
 public class ProfileTreeBuilder {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(ProfileTreeBuilder.class);
 	
 	private StructureDefinition profile;
-	private ElementDefinitionDt rootElement;
-	private Map<String, ElementDefinitionDt> elementIndex;
-	private Map<String, ElementDefinitionDt> metaElementIndex;
-	private Map<String, ElementDefinitionDt> valueReferenceElementIndex;
-	private Node<ElementDefinitionDt> root;
+	private ElementDefinition rootElement;
+	private Map<String, ElementDefinition> elementIndex;
+	private Map<String, ElementDefinition> metaElementIndex;
+	private Map<String, ElementDefinition> valueReferenceElementIndex;
+	private Node<ElementDefinition> root;
 	
 	public ProfileTreeBuilder(StructureDefinition profile) {
 		this.profile = profile;
-		this.elementIndex = new HashMap<String, ElementDefinitionDt>();
-		this.metaElementIndex = new HashMap<String, ElementDefinitionDt>();
-		this.valueReferenceElementIndex = new HashMap<String, ElementDefinitionDt>();
+		this.elementIndex = new HashMap<String, ElementDefinition>();
+		this.metaElementIndex = new HashMap<String, ElementDefinition>();
+		this.valueReferenceElementIndex = new HashMap<String, ElementDefinition>();
 	}
 	
 	/**
@@ -48,7 +50,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 */
 	protected void populateElementIndices() {
-		for(ElementDefinitionDt element : profile.getSnapshot().getElement()) {
+		for(ElementDefinition element : profile.getSnapshot().getElement()) {
 			if(isRootElement(element)) {
 				rootElement = element;
 			} else if(StructureDefinitionPreprocessor.isProfileMetaElement(element)) {
@@ -68,9 +70,9 @@ public class ProfileTreeBuilder {
 	 * paths.
 	 */
 	protected void populateElementGraph() {
-		root = new Node<ElementDefinitionDt>(rootElement.getPath());
+		root = new Node<ElementDefinition>(rootElement.getPath());
 		root.setPayload(rootElement);
-		for(ElementDefinitionDt element : elementIndex.values()) {
+		for(ElementDefinition element : elementIndex.values()) {
 			String path = PathUtils.generateExtensionPath(element.getPath(), element.getName());
 			LOGGER.debug(path);
 			if(path.contains("Patient.clinicalTrial")) {
@@ -93,7 +95,7 @@ public class ProfileTreeBuilder {
 	 * @param key
 	 * @return
 	 */
-	public ElementDefinitionDt getFromElementIndex(String key) {
+	public ElementDefinition getFromElementIndex(String key) {
 		return elementIndex.get(key);
 	}
 	
@@ -103,7 +105,7 @@ public class ProfileTreeBuilder {
 	 * @param key
 	 * @return
 	 */
-	public ElementDefinitionDt getFromMetaElementIndex(String key) {
+	public ElementDefinition getFromMetaElementIndex(String key) {
 		return metaElementIndex.get(key);
 	}
 	
@@ -113,7 +115,7 @@ public class ProfileTreeBuilder {
 	 *  
 	 * @param element
 	 */
-	public void addToElementIndex(ElementDefinitionDt element) {
+	public void addToElementIndex(ElementDefinition element) {
 		String key = generateElementSignature(element);
 		if(elementIndex.get(key) != null) {
 			LOGGER.error("Key for element " + key + " already exists in index and is not unique");
@@ -127,7 +129,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @param element
 	 */
-	public void addToMetaElementIndex(ElementDefinitionDt element) {
+	public void addToMetaElementIndex(ElementDefinition element) {
 		String key = element.getPath();
 		if(StructureDefinitionPreprocessor.isProfileMetaElement(element)) {
 			metaElementIndex.put(key, element);
@@ -136,7 +138,7 @@ public class ProfileTreeBuilder {
 		}
 	}
 	
-	public void addToValueRefElementIndex(ElementDefinitionDt element) {
+	public void addToValueRefElementIndex(ElementDefinition element) {
 		valueReferenceElementIndex.put(generateElementSignature(element), element);
 	}
 	
@@ -168,7 +170,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @return
 	 */
-	public ElementDefinitionDt getRootElement() {
+	public ElementDefinition getRootElement() {
 		return rootElement;
 	}
 	
@@ -177,7 +179,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @param rootElement
 	 */
-	public void setRootElement(ElementDefinitionDt rootElement) {
+	public void setRootElement(ElementDefinition rootElement) {
 		this.rootElement = rootElement;
 	}
 	
@@ -187,7 +189,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @return
 	 */
-	public Map<String, ElementDefinitionDt> getElementIndex() {
+	public Map<String, ElementDefinition> getElementIndex() {
 		return elementIndex;
 	}
 	
@@ -196,7 +198,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @param elementIndex
 	 */
-	public void setElementIndex(Map<String, ElementDefinitionDt> elementIndex) {
+	public void setElementIndex(Map<String, ElementDefinition> elementIndex) {
 		this.elementIndex = elementIndex;
 	}
 	
@@ -205,7 +207,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @return
 	 */
-	public Map<String, ElementDefinitionDt> getMetaElementIndex() {
+	public Map<String, ElementDefinition> getMetaElementIndex() {
 		return metaElementIndex;
 	}
 	
@@ -214,7 +216,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @param metaElementIndex
 	 */
-	public void setMetaElementIndex(Map<String, ElementDefinitionDt> metaElementIndex) {
+	public void setMetaElementIndex(Map<String, ElementDefinition> metaElementIndex) {
 		this.metaElementIndex = metaElementIndex;
 	}
 	
@@ -223,7 +225,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @return
 	 */
-	public Node<ElementDefinitionDt> getRoot() {
+	public Node<ElementDefinition> getRoot() {
 		return root;
 	}
 	
@@ -232,7 +234,7 @@ public class ProfileTreeBuilder {
 	 * 
 	 * @param root
 	 */
-	protected void setRoot(Node<ElementDefinitionDt> root) {
+	protected void setRoot(Node<ElementDefinition> root) {
 		this.root = root;
 	}
 	
@@ -248,9 +250,9 @@ public class ProfileTreeBuilder {
 	 * @param element
 	 * @return
 	 */
-	public static boolean isFhirExtension(ElementDefinitionDt element) {
+	public static boolean isFhirExtension(ElementDefinition element) {
 		boolean success = false;
-		for(Type type : element.getType()) {
+		for(ElementDefinition.TypeRefComponent type : element.getType()) {
 			if(type != null && type.getCode() != null && type.getCode().equals("Extension")) {
 				success = true;
 				break;
@@ -275,12 +277,12 @@ public class ProfileTreeBuilder {
 	 * @param element
 	 * @return
 	 */
-	public static boolean isRootElement(ElementDefinitionDt element) {
+	public static boolean isRootElement(ElementDefinition element) {
 		String path = element.getPath();
 		return !path.contains(".");
 	}
 	
-	public static boolean isValueRefElement(ElementDefinitionDt element) {
+	public static boolean isValueRefElement(ElementDefinition element) {
 		boolean valueRefElement = false;
 		String path = element.getPath();
 		if(path != null && path.endsWith("valueReference")) {
@@ -296,7 +298,7 @@ public class ProfileTreeBuilder {
 	 * @param element
 	 * @return
 	 */
-	public static String generateElementSignature(ElementDefinitionDt element) {
+	public static String generateElementSignature(ElementDefinition element) {
 		String pathAndName = element.getPath() + ": " + element.getName();
 		return pathAndName;
 	}

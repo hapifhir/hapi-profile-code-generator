@@ -12,7 +12,7 @@ import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.common.metamodel.Method;
@@ -42,7 +42,7 @@ public class ReferenceTypeHandler extends BaseMethodGenerator {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(ReferenceTypeHandler.class);
 	
-	public ReferenceTypeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public ReferenceTypeHandler(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
 	}
 	
@@ -123,7 +123,7 @@ public class ReferenceTypeHandler extends BaseMethodGenerator {
 		String profileUrl = getElement().getTypeFirstRep().getProfileFirstRep().getValueAsString();
 		boolean isProfiledResource = false;
 		String adapterClass = null;
-		String resourceName = FhirResourceManager.getProfileSuffix(profileUrl);
+		String resourceName = FhirResourceManagerDstu2.getProfileSuffix(profileUrl);
 		if(getElement().getType().size() > 1) {
 			descriminator = resourceName;
 		}
@@ -131,7 +131,7 @@ public class ReferenceTypeHandler extends BaseMethodGenerator {
 		if(resourceClass == null) {
 			StructureDefinition profile = getFhirResourceManager().getProfileFromProfileUri(profileUrl);
 			String profileName = CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName());
-			resourceName = FhirResourceManager.getProfileSuffix(profile.getBase());
+			resourceName = FhirResourceManagerDstu2.getProfileSuffix(profile.getBase());
 			resourceClass = getFhirResourceManager().addResourceToIndex(resourceName);
 			isProfiledResource = (resourceClass != null);
 			adapterClass = getGeneratedCodePackage() + "." + profileName + "Adapter";
@@ -199,10 +199,10 @@ public class ReferenceTypeHandler extends BaseMethodGenerator {
 	 * @return
 	 */
 	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		if(FhirResourceManager.elementHasNoType(element) || FhirResourceManager.isMultiTypeAttribute(element)) {
+		if(FhirResourceManagerDstu2.elementHasNoType(element) || FhirResourceManagerDstu2.isMultiTypeAttribute(element)) {
 			return false;
 		} else {
-			if(element.getTypeFirstRep().getCode() == null || FhirResourceManager.isFhirExtension(element)) {
+			if(element.getTypeFirstRep().getCode() == null || FhirResourceManagerDstu2.isFhirExtension(element)) {
 				return false;
 			} else if(element.getTypeFirstRep().getCode().equals("Reference")) {
 				return true;

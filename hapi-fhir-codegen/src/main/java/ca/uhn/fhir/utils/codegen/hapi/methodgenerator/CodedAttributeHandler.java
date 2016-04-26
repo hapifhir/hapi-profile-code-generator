@@ -10,10 +10,10 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.HapiType;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 
 /**
@@ -37,7 +37,7 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	private String enumType;
 	private List<String> imports;
 	
-	public CodedAttributeHandler(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public CodedAttributeHandler(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		super(manager, template, profile, element);
 		imports = new ArrayList<String>();
 	}
@@ -57,10 +57,10 @@ public class CodedAttributeHandler extends BaseMethodGenerator {
 	 * @return
 	 */
 	public static boolean appliesTo(StructureDefinition profile, ElementDefinitionDt element) {
-		if(FhirResourceManager.elementHasNoType(element) || FhirResourceManager.isMultiTypeAttribute(element)) {
+		if(FhirResourceManagerDstu2.elementHasNoType(element) || FhirResourceManagerDstu2.isMultiTypeAttribute(element)) {
 			return false;
 		} else {
-			if(element.getTypeFirstRep().getCode() == null || FhirResourceManager.isFhirExtension(element)) {
+			if(element.getTypeFirstRep().getCode() == null || FhirResourceManagerDstu2.isFhirExtension(element)) {
 				return false;
 			} else if(element.getTypeFirstRep().getCode().equals("CodeableConcept")) {
 				return true;

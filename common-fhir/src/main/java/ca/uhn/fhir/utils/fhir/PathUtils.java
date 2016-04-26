@@ -318,4 +318,33 @@ public class PathUtils {
 			return path.substring(path.lastIndexOf('/') + 1);
 		}
 	}
+	
+	/**
+	 * A FHIR attribute is a multivalued attribute if it has the form
+	 * Resource.attribute[x] and/or has multiple types associated with it.
+	 * <p>
+	 * This method removes the [x] suffix from the name and returns the
+	 * prefix to the caller.
+	 * 
+	 * @return
+	 */
+	public static String cleanMultiValuedAttributeName(String attributeName) {
+		return attributeName.replace("[x]","");
+	}
+	
+	/**
+	 * A FHIR attribute is a multivalued attribute if it has the form
+	 * Resource.attribute[x] and/or has multiple types associated with it.
+	 * This method tests the former and looks for the present of [x] in
+	 * the name. If present it returns true, otherwise it returns false.
+	 * 
+	 * @return
+	 */
+	public static  boolean isMultivaluedAttribute(String attributeName) {
+		if (attributeName.contains("[x]")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

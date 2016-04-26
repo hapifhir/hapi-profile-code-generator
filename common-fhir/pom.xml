@@ -20,9 +20,14 @@
 			<artifactId>hapi-fhir-base</artifactId>
 			<version>1.5</version>
 		</dependency>
-		<dependency>
+ 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu2</artifactId>
+			<version>1.5</version>
+		</dependency> 
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>hapi-fhir-structures-dstu3</artifactId>
 			<version>1.5</version>
 		</dependency>
 	</dependencies>

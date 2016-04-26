@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
 
 public class FhirResourceLoaderTest {
@@ -21,7 +22,7 @@ public class FhirResourceLoaderTest {
 
 	@Test
 	public void testLoadResources() {
-		FhirResourceManager loader = new FhirResourceManager();
+		FhirResourceManagerDstu2 loader = new FhirResourceManagerDstu2();
 		try {
 			loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("profiles-resources.xml"));
 		} catch (Exception e) {
@@ -33,7 +34,7 @@ public class FhirResourceLoaderTest {
 	@Test
 	public void testLoadProfilesFromConfiguration() {
 		CodeGeneratorConfigurator configurator = CodeGeneratorConfigurator.buildConfigurator(ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan.xml"));
-		FhirResourceManager loader = CodeGeneratorConfigurator.buildFhirResourceManager(configurator, true);
+		FhirResourceManagerDstu2 loader = CodeGeneratorConfigurator.buildFhirResourceManager(configurator, true);
 		try {
 			String hapiAddressType = loader.getHapiTypeForFhirType(loader.getProfile("Patient"), "address");
 			assertEquals(ca.uhn.fhir.model.dstu2.composite.AddressDt.class.getName(), hapiAddressType);

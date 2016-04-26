@@ -153,9 +153,19 @@ public class Method {
 	 * @return
 	 */
 	public static Method constructSimpleGetterMethod(String attributeName, String attributeType) {
-		Method getter = constructNoArgMethod("get" + StringUtils.capitalize(attributeName), attributeType);
+		Method getter = constructNoArgMethod(buildGetterName(attributeName), attributeType);
 		getter.setBody("return " + StringUtils.uncapitalize(attributeName) + ";");
 		return getter;
+	}
+	
+	/**
+	 * Builds getter signature name using the JavaBean convention
+	 * 
+	 * @param fieldName
+	 * @return
+	 */
+	public static String buildGetterName(String fieldName) {
+		return "get" + StringUtils.capitalize(fieldName);
 	}
 	
 	/**

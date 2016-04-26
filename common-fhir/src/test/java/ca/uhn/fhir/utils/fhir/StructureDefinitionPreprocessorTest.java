@@ -7,6 +7,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
+import ca.uhn.fhir.utils.fhir.dstu2.StructureDefinitionPreprocessor;
 
 public class StructureDefinitionPreprocessorTest {
 	

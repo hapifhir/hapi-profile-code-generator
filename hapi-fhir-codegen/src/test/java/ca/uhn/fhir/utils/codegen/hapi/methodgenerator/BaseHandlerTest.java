@@ -11,17 +11,17 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.model.primitive.UriDt;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 
 public class BaseHandlerTest {
 	
 	private MethodBodyGenerator template;
-	private FhirResourceManager fhirResourceManager;
+	private FhirResourceManagerDstu2 fhirResourceManager;
 	
 	public BaseHandlerTest() {
 		template = new MethodBodyGenerator().initialize();
-		fhirResourceManager = new FhirResourceManager();
+		fhirResourceManager = new FhirResourceManagerDstu2();
 	}
 	
 	public MethodBodyGenerator getTemplate() {
@@ -32,11 +32,11 @@ public class BaseHandlerTest {
 		this.template = template;
 	}
 	
-	public FhirResourceManager getFhirResourceManager() {
+	public FhirResourceManagerDstu2 getFhirResourceManager() {
 		return fhirResourceManager;
 	}
 
-	public void setFhirResourceManager(FhirResourceManager fhirResourceManager) {
+	public void setFhirResourceManager(FhirResourceManagerDstu2 fhirResourceManager) {
 		this.fhirResourceManager = fhirResourceManager;
 	}
 

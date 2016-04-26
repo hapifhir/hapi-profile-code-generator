@@ -1,4 +1,4 @@
-package ca.uhn.fhir.utils.codegen.hapi;
+package ca.uhn.fhir.utils.codegen.hapi.dstu2;
 
 import java.io.File;
 import java.io.Reader;
@@ -9,18 +9,20 @@ import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.RuntimeResourceDefinition;
-import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
+import ca.uhn.fhir.utils.codegen.hapi.CodeGeneratorConfigurator;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
+import ca.uhn.fhir.utils.codegen.hapi.IFhirResourceManager;
 import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
 import ca.uhn.fhir.utils.fhir.FhirExtensionManager;
 import ca.uhn.fhir.utils.fhir.PathUtils;
@@ -35,9 +37,9 @@ import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
  * @author Claude Nanjo
  *
  */
-public class FhirResourceManager {
+public class FhirResourceManagerDstu2 implements IFhirResourceManager<StructureDefinition> {
 	
-	public static final Logger LOGGER = LoggerFactory.getLogger(FhirResourceManager.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(FhirResourceManagerDstu2.class);
 	public static final String CORE_PROFILE_PREFIX = "http://hl7.org/fhir/StructureDefinition/";
 	public static final String CORE_BASE_RESOURCE_PROFILE = "http://hl7.org/fhir/StructureDefinition/DomainResource";
 	
@@ -53,7 +55,7 @@ public class FhirResourceManager {
 	private Map<String, String> codeEnumTypeOverride;
 	private List<String> generatedType;
 	
-	public FhirResourceManager() {
+	public FhirResourceManagerDstu2() {
 		super();
 		resourceNameToClassMap = new HashMap<String,Class<?>>();
 		profileNameToProfileMap = new HashMap<String,StructureDefinition>();
@@ -175,7 +177,7 @@ public class FhirResourceManager {
 	 */
 	public void loadResourceProfiles(Reader resourceProfiles) {
 		try (Reader reader = resourceProfiles) {
-			IResource resource = (IResource) ctx.newXmlParser().parseResource(resourceProfiles);
+			IBaseResource resource = (IBaseResource) ctx.newXmlParser().parseResource(resourceProfiles);
 			if(resource instanceof Bundle) {
 				List<Bundle.Entry> entries = ((Bundle)resource).getEntry();
 				for(Bundle.Entry entry : entries) {
@@ -192,6 +194,7 @@ public class FhirResourceManager {
 			populateResourceNameToClassMap();
 		} catch(Exception e) {
 			LOGGER.error("Error loading profile from reader", e);
+			e.printStackTrace();
 			throw new RuntimeException("Error loading profile from reader", e);
 		}
 	}
@@ -670,35 +673,6 @@ public class FhirResourceManager {
 	
 	public String getResource(String profileUri) {
 		return profileUriToResourceNameMap.get(profileUri);
-	}
-	
-	/**
-	 * A FHIR attribute is a multivalued attribute if it has the form
-	 * Resource.attribute[x] and/or has multiple types associated with it.
-	 * This method tests the former and looks for the present of [x] in
-	 * the name. If present it returns true, otherwise it returns false.
-	 * 
-	 * @return
-	 */
-	public static  boolean isMultivaluedAttribute(String attributeName) {
-		if (attributeName.contains("[x]")) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * A FHIR attribute is a multivalued attribute if it has the form
-	 * Resource.attribute[x] and/or has multiple types associated with it.
-	 * <p>
-	 * This method removes the [x] suffix from the name and returns the
-	 * prefix to the caller.
-	 * 
-	 * @return
-	 */
-	public static  String cleanMultiValuedAttributeName(String attributeName) {
-		return attributeName.replace("[x]","");
 	}
 	
 	/**

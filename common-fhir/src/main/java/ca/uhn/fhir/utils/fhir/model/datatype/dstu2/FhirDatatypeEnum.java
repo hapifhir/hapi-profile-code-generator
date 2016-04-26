@@ -1,5 +1,6 @@
 package ca.uhn.fhir.utils.fhir.model.datatype.dstu2;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,22 +13,22 @@ import java.util.List;
  */
 public enum FhirDatatypeEnum {
 	
-	INSTANT("instant"),
-	TIME("time"),
-	DATE("date"),
-	DATE_TIME("dateTime"),
-	DECIMAL("decimal"),
-	BOOLEAN("boolean"),
-	UNSIGNED_INT("unsignedInt"),
-	POSITIVE_INT("positiveInt"),
-	INTEGER("integer", Arrays.asList(FhirDatatypeEnum.UNSIGNED_INT, FhirDatatypeEnum.POSITIVE_INT)),
-	CODE("code"),
-	MARKDOWN("markdown"),
-	ID("id"),
-	STRING("string", Arrays.asList(FhirDatatypeEnum.CODE, FhirDatatypeEnum.MARKDOWN, FhirDatatypeEnum.ID)),
-	OID("oid"),
-	URI("uri", Arrays.asList(FhirDatatypeEnum.OID)),
-	RATION("Ratio"),
+	INSTANT("instant", true, java.util.Date.class.getName()),
+	TIME("time", true, java.util.Date.class.getName()),
+	DATE("date", true, java.util.Date.class.getName()),
+	DATE_TIME("dateTime", true, java.util.Date.class.getName()),
+	DECIMAL("decimal", true, java.lang.Double.class.getName()),
+	BOOLEAN("boolean", true, java.lang.Boolean.class.getName()),
+	UNSIGNED_INT("unsignedInt", true, java.lang.Integer.class.getName()),
+	POSITIVE_INT("positiveInt", true, java.lang.Integer.class.getName()),
+	INTEGER("integer", Arrays.asList(FhirDatatypeEnum.UNSIGNED_INT, FhirDatatypeEnum.POSITIVE_INT), true, java.lang.Integer.class.getName()),
+	CODE("code", true, java.lang.String.class.getName()),
+	MARKDOWN("markdown", true, java.lang.String.class.getName()),
+	ID("id", true, java.lang.String.class.getName()),
+	STRING("string", Arrays.asList(FhirDatatypeEnum.CODE, FhirDatatypeEnum.MARKDOWN, FhirDatatypeEnum.ID), true, java.lang.String.class.getName()),
+	OID("oid", true, java.net.URI.class.getName()),
+	URI("uri", Arrays.asList(FhirDatatypeEnum.OID), true, java.net.URI.class.getName()),
+	RATIO("Ratio"),
 	PERIOD("Period"),
 	RANGE("Range"),
 	ATTACHMENT("Attachment"),
@@ -55,6 +56,10 @@ public enum FhirDatatypeEnum {
 	 * The FHIR string value for this datatype
 	 */
 	private String value;
+	
+	private boolean isPrimitiveDatatype;
+	
+	private String javaClassEquivalent;
 	
 	/**
 	 * Specializations of this datatype if any
@@ -88,7 +93,20 @@ public enum FhirDatatypeEnum {
 	 */
 	private FhirDatatypeEnum(String value, List<FhirDatatypeEnum> children) {
 		this(value);
-		this.children.addAll(children);
+		if(children != null) {
+			this.children.addAll(children);
+		}
+	}
+	
+	
+	private FhirDatatypeEnum(String value, List<FhirDatatypeEnum> children, boolean isPrimitiveDatatype, String javaClassEquivalent) {
+		this(value, children);
+		this.isPrimitiveDatatype = isPrimitiveDatatype;
+		this.javaClassEquivalent = javaClassEquivalent;
+	}
+	
+	private FhirDatatypeEnum(String value, boolean isPrimitiveDatatype, String javaClassEquivalent) {
+		this(value, null, isPrimitiveDatatype, javaClassEquivalent);
 	}
 	
 	/**
@@ -149,6 +167,22 @@ public enum FhirDatatypeEnum {
 	
 	public boolean hasSpecialization(FhirDatatypeEnum type) {
 	    return children.contains(type);
+	}
+
+	public boolean isPrimitiveDatatype() {
+		return isPrimitiveDatatype;
+	}
+
+	public void setPrimitiveDatatype(boolean isPrimitiveDatatype) {
+		this.isPrimitiveDatatype = isPrimitiveDatatype;
+	}
+
+	public String getJavaClassEquivalent() {
+		return javaClassEquivalent;
+	}
+
+	public void setJavaClassEquivalent(String javaClassEquivalent) {
+		this.javaClassEquivalent = javaClassEquivalent;
 	}
 	
 }

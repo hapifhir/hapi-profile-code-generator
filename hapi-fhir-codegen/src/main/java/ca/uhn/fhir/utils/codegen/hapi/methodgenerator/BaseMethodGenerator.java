@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
 import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
 import ca.uhn.fhir.utils.common.metamodel.Cardinality;
 import ca.uhn.fhir.utils.common.metamodel.Method;
@@ -24,7 +24,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(BaseMethodGenerator.class);
 	
-	private FhirResourceManager fhirResourceManager;
+	private FhirResourceManagerDstu2 fhirResourceManager;
 	private StructureDefinition profile;
 	private String parentClass;
 	private String resourceName;
@@ -43,7 +43,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * @param profile
 	 * @param element
 	 */
-	public BaseMethodGenerator(FhirResourceManager manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
+	public BaseMethodGenerator(FhirResourceManagerDstu2 manager, MethodBodyGenerator template, StructureDefinition profile, ElementDefinitionDt element) {
 		this.fhirResourceManager = manager;
 		this.template = template;
 		this.profile = profile;
@@ -92,7 +92,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * 
 	 * @return
 	 */
-	public FhirResourceManager getFhirResourceManager() {
+	public FhirResourceManagerDstu2 getFhirResourceManager() {
 		return fhirResourceManager;
 	}
 	
@@ -101,7 +101,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * 
 	 * @param fhirResourceManager
 	 */
-	public void setFhirResourceManager(FhirResourceManager fhirResourceManager) {
+	public void setFhirResourceManager(FhirResourceManagerDstu2 fhirResourceManager) {
 		this.fhirResourceManager = fhirResourceManager;
 	}
 	
@@ -346,8 +346,8 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 			}
 		}
 		if(suffix != null && suffix.indexOf('.') < 0) {
-			if(FhirResourceManager.isMultivaluedAttribute(suffix)) {
-				suffix = FhirResourceManager.cleanMultiValuedAttributeName(suffix);
+			if(PathUtils.isMultivaluedAttribute(suffix)) {
+				suffix = PathUtils.cleanMultiValuedAttributeName(suffix);
 			}
 		}
 		if(suffix != null && suffix.equalsIgnoreCase("class")) {
@@ -389,7 +389,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	public boolean ignoreField() {
 		boolean ignoreField = false;
 		if(topLevelCoreAttribute == null) {
-			if(!FhirResourceManager.isFhirExtension(element)) {
+			if(!FhirResourceManagerDstu2.isFhirExtension(element)) {
 				//ignoreField = true;
 				LOGGER.debug("Top level attribute is null for " + element.getPath() + ". It is probably a FHIR structure.");
 			} else {
@@ -426,16 +426,6 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	/*
 	 * Method construction helpers
 	 */
-	
-	/**
-	 * Builds getter signature name using the JavaBean convention
-	 * 
-	 * @param fieldName
-	 * @return
-	 */
-	public String buildGetterName(String fieldName) {
-		return "get" + StringUtils.capitalize(fieldName);
-	}
 	
 	/**
 	 * Builds setter signature name using the JavaBean convention
@@ -490,7 +480,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 * @return
 	 */
 	public Method constructGetMethodFromField(String fieldName, String type) {
-		return Method.constructNoArgMethod(buildGetterName(fieldName), type);
+		return Method.constructNoArgMethod(Method.buildGetterName(fieldName), type);
 	}
 	
 	/**
@@ -537,7 +527,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	 */
 	public Method constructGetMethodForMultiCardinalityField(String fieldName, String type) {
 		String listType = "List<" + type + ">";
-		Method method = Method.constructNoArgMethod(buildGetterName(fieldName), listType);
+		Method method = Method.constructNoArgMethod(Method.buildGetterName(fieldName), listType);
 		method.addImport("java.util.List");
 		method.addImport(type);
 		return method;

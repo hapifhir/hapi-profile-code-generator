@@ -1,4 +1,4 @@
-package ca.uhn.fhir.utils.codegen.hapi;
+package ca.uhn.fhir.utils.codegen.hapi.dstu2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,19 +11,22 @@ import org.slf4j.LoggerFactory;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
+import ca.uhn.fhir.utils.codegen.hapi.GenerateLogicalViewCommandBase;
+import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
+import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
+import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.BaseMethodGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedAttributeHandler;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedBackboneElementHandler;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedStructureAttributeHandler;
 import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.MethodHandlerResolver;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
-import ca.uhn.fhir.utils.common.graph.CommandInterface;
 import ca.uhn.fhir.utils.common.graph.Node;
 import ca.uhn.fhir.utils.common.metamodel.ClassField;
 import ca.uhn.fhir.utils.common.metamodel.ClassModel;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
-import ca.uhn.fhir.utils.fhir.ProfileTreeBuilder;
+import ca.uhn.fhir.utils.fhir.dstu2.ProfileTreeBuilder;
 
 /**
  * Command visits a StructureDefinition hierarchical tree using post-depth-first search
@@ -32,27 +35,26 @@ import ca.uhn.fhir.utils.fhir.ProfileTreeBuilder;
  * @author cnanjo
  *
  */
-public class GenerateLogicalViewCommand implements CommandInterface<ElementDefinitionDt> {
+public class GenerateLogicalViewCommandDstu2 extends GenerateLogicalViewCommandBase<ElementDefinitionDt> {
 	
-	public static final Logger LOGGER = LoggerFactory.getLogger(FhirResourceManager.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(FhirResourceManagerDstu2.class);
 	
 	public static final String EXTENDED_TYPE = "extended_type";
 	
 	private MethodHandlerResolver resolver;
-	private FhirResourceManager fhirResourceManager;
+	private FhirResourceManagerDstu2 fhirResourceManager;
 	private MethodBodyGenerator templateUtils;
 	private Map<String, ClassModel> itemClassMap;
 	private StructureDefinition profile;
 	private String generatedCodePackage;
-	private Node<ElementDefinitionDt> rootNode;
 	private String rootNodeName;
 	
-	public GenerateLogicalViewCommand() {
+	public GenerateLogicalViewCommandDstu2() {
 		itemClassMap = new HashMap<>();
 	}
 	
-	public GenerateLogicalViewCommand(StructureDefinition profile,
-							FhirResourceManager fhirResourceManager,
+	public GenerateLogicalViewCommandDstu2(StructureDefinition profile,
+							FhirResourceManagerDstu2 fhirResourceManager,
 							MethodBodyGenerator templateUtils,
 							MethodHandlerResolver resolver, 
 							String generatedCodePackage) {
@@ -147,7 +149,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 * @param node
 	 */
 	public void handleRootNode(Node<ElementDefinitionDt> node) {
-		rootNode = node;
+		setRootNode(node);
 	}
 	
 	public void handleInnerNonRootNode(Node<ElementDefinitionDt> node) {
@@ -166,7 +168,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 */
 	public void handleInnerNonRootExtensionNode(Node<ElementDefinitionDt> node) {
 		//1. Clone the node as we are going to override its type (currently set to 'Extension' with a profile URI) with the new generated type
-		ElementDefinitionDt clone = FhirResourceManager.shallowCloneElement(node.getPayload());
+		ElementDefinitionDt clone = FhirResourceManagerDstu2.shallowCloneElement(node.getPayload());
 		//2. Build the canonical class path for this to-be-generated type
 		String generatedType = CodeGenerationUtils.buildGeneratedClassName(generatedCodePackage, profile.getName(), node.getName());
 		//3. Keep track of user-defined types
@@ -315,7 +317,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 		ClassModel currentClass = retrieveClassModel(node, node.getName());
 		if(currentClass.hasTaggedValue(EXTENDED_TYPE)) {
 			//Clone the payload so as not to change the original
-			ElementDefinitionDt clone = FhirResourceManager.shallowCloneElement(node.getPayload());
+			ElementDefinitionDt clone = FhirResourceManagerDstu2.shallowCloneElement(node.getPayload());
 			//Set new type
 			clone.getType().clear();
 			clone.addType().setCode(generatedCodePackage + "." + CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName());
@@ -370,7 +372,7 @@ public class GenerateLogicalViewCommand implements CommandInterface<ElementDefin
 	 * @return
 	 */
 	public ClassModel getRootNodeClassModel() {
-		return getClassMap().get(rootNode.getPathFromRoot()).setName(rootNodeName);
+		return getClassMap().get(getRootNode().getPathFromRoot()).setName(rootNodeName);
 	}
 	
 	/**

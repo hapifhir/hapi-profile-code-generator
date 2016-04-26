@@ -11,6 +11,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
+import ca.uhn.fhir.utils.codegen.hapi.dstu3.FhirResourceManagerDstu3;
 import ca.uhn.fhir.utils.common.xml.XmlUtils;
 import ca.uhn.fhir.utils.fhir.FhirExtensionManager;
 
@@ -237,10 +239,39 @@ public class CodeGeneratorConfigurator {
 	 * @return configured CoreResourceLoader.
 	 * 
 	 */
-	public static FhirResourceManager buildFhirResourceManager(
+	public static FhirResourceManagerDstu2 buildFhirResourceManager(
 			CodeGeneratorConfigurator config, boolean loadExtensions) {
 		try {
-			FhirResourceManager loader = new FhirResourceManager();
+			FhirResourceManagerDstu2 loader = new FhirResourceManagerDstu2();
+			loader.loadResourceProfiles(config);
+			if(loadExtensions) {
+				FhirExtensionManager manager = new FhirExtensionManager();
+				manager.addAllProfileRepositoryLocation(config
+						.getExtensionRepositories());
+				manager.initialize();
+				loader.setExtensionManager(manager);
+			}
+			return loader;
+		} catch (Exception e) {
+			LOGGER.error("Error creating and configurating resource loader", e);
+			throw new RuntimeException(
+					"Error creating and configurating resource loader", e);
+		}
+	}
+	
+	/**
+	 * Builds a new resource loader based on the configuration metadata associated
+	 * with the argument.
+	 * 
+	 * @param config Configuration to use for configuring the CoreFhirResourceLoader.
+	 * @param loadExtensions Flag indicating whether to preload FHIR Extensions.
+	 * @return configured CoreResourceLoader.
+	 * 
+	 */
+	public static FhirResourceManagerDstu3 buildFhirResourceManagerDstu3(
+			CodeGeneratorConfigurator config, boolean loadExtensions) {
+		try {
+			FhirResourceManagerDstu3 loader = new FhirResourceManagerDstu3();
 			loader.loadResourceProfiles(config);
 			if(loadExtensions) {
 				FhirExtensionManager manager = new FhirExtensionManager();
@@ -266,7 +297,24 @@ public class CodeGeneratorConfigurator {
 	 * @return
 	 */
 	public static InterfaceAdapterGenerator buildInterfaceAdapterGenerator(
-			CodeGeneratorConfigurator config, FhirResourceManager resourceLoader) {
+			CodeGeneratorConfigurator config, FhirResourceManagerDstu2 resourceLoader) {
+		MethodBodyGenerator templateUtils = new MethodBodyGenerator().initialize();
+		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator(
+				config.getGeneratedCodePackage(), resourceLoader, templateUtils);
+		generator.setResourceLoadingPlan(config.getProfileNameList());
+		return generator;
+	}
+	
+	/**
+	 * Factory method for building and configurating the ProfileInterfaceGenerator from
+	 * the metadata specified in the config file.
+	 * 
+	 * @param config
+	 * @param resourceLoader
+	 * @return
+	 */
+	public static InterfaceAdapterGenerator buildInterfaceAdapterGeneratorDstu3(
+			CodeGeneratorConfigurator config, FhirResourceManagerDstu3 resourceLoader) {
 		MethodBodyGenerator templateUtils = new MethodBodyGenerator().initialize();
 		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator(
 				config.getGeneratedCodePackage(), resourceLoader, templateUtils);

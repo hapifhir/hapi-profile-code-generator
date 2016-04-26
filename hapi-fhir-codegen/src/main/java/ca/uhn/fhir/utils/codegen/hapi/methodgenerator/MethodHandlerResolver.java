@@ -7,7 +7,7 @@ import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.FhirResourceManager;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
 
 /**
@@ -22,7 +22,7 @@ public class MethodHandlerResolver {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(MethodHandlerResolver.class);
 	
-	private FhirResourceManager fhirResourceManager;
+	private FhirResourceManagerDstu2 fhirResourceManager;
 	private MethodBodyGenerator codeTemplateUtils;
 	
 	/**
@@ -31,7 +31,7 @@ public class MethodHandlerResolver {
 	 * @param fhirResourceManager
 	 * @param codeTemplateUtils
 	 */
-	public MethodHandlerResolver(FhirResourceManager fhirResourceManager, MethodBodyGenerator codeTemplateUtils) {
+	public MethodHandlerResolver(FhirResourceManagerDstu2 fhirResourceManager, MethodBodyGenerator codeTemplateUtils) {
 		this.fhirResourceManager = fhirResourceManager;
 		this.codeTemplateUtils = codeTemplateUtils;
 	}
@@ -41,7 +41,7 @@ public class MethodHandlerResolver {
 	 * 
 	 * @return
 	 */
-	public FhirResourceManager getFhirResourceManager() {
+	public FhirResourceManagerDstu2 getFhirResourceManager() {
 		return fhirResourceManager;
 	}
 
@@ -50,7 +50,7 @@ public class MethodHandlerResolver {
 	 * 
 	 * @param fhirResourceManager
 	 */
-	public void setManager(FhirResourceManager fhirResourceManager) {
+	public void setManager(FhirResourceManagerDstu2 fhirResourceManager) {
 		this.fhirResourceManager = fhirResourceManager;
 	}
 	
