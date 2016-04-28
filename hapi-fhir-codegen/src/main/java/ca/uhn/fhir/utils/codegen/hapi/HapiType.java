@@ -1,5 +1,8 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
+import org.hl7.fhir.dstu3.model.DomainResource;
+import org.hl7.fhir.dstu3.model.PrimitiveType;
+import org.hl7.fhir.dstu3.model.Type;
 import org.hl7.fhir.instance.model.api.IBase;
 
 /**
@@ -15,6 +18,7 @@ public class HapiType {
 	private boolean isMultipleCardinality;
 	private String fhirType;
 	private Class<?> datatype;
+	private String generatedType;
 	private Class<? extends Enum<?>> enumerationType;
 	private String assignedName;
 	
@@ -82,6 +86,24 @@ public class HapiType {
 			return null;
 		}
 	}
+	public String getGeneratedType() {
+		return generatedType;
+	}
+	public String getGeneratedTypeOrList() {
+		if(generatedType != null) {
+			if(isMultipleCardinality) {
+				return "java.util.List<" + generatedType + ">";
+			} else {
+				return generatedType;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	public void setGeneratedType(String generatedType) {
+		this.generatedType = generatedType;
+	}
 	public Class<? extends Enum<?>> getEnumerationTypeClass() {
 		return enumerationType;
 	}
@@ -111,6 +133,15 @@ public class HapiType {
 	}
 	public void setAssignedName(String assignedName) {
 		this.assignedName = assignedName;
+	}
+	public boolean isResource() {
+		return this.datatype != null && DomainResource.class.isAssignableFrom(this.datatype);
+	}
+	public boolean isPrimitive() {
+		return this.datatype != null && PrimitiveType.class.isAssignableFrom(this.datatype);
+	}
+	public boolean isType() {
+		return this.datatype != null && Type.class.isAssignableFrom(this.datatype);
 	}
 
 	public String toString() {

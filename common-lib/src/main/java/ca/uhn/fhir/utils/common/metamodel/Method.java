@@ -64,7 +64,11 @@ public class Method {
 	}
 	
 	public void addImport(String importString) {
-		imports.add(importString);
+		if(importString != null) {
+			imports.add(importString);
+		} else {
+			//throw new RuntimeException("An import cannot be null");
+		}
 	}
 	
 	public void addImports(List<String> imports) {

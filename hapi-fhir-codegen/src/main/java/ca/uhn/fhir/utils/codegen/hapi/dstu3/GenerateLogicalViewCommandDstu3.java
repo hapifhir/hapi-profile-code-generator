@@ -1,33 +1,25 @@
 package ca.uhn.fhir.utils.codegen.hapi.dstu3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import ca.uhn.fhir.utils.codegen.hapi.dstu2.*;
-import org.hl7.fhir.dstu3.model.ElementDefinition;
-import org.hl7.fhir.dstu3.model.StructureDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import ca.uhn.fhir.utils.codegen.hapi.GenerateLogicalViewCommandBase;
-import ca.uhn.fhir.utils.codegen.hapi.HapiFhirUtils;
 import ca.uhn.fhir.utils.codegen.hapi.InterfaceAdapterGenerator;
 import ca.uhn.fhir.utils.codegen.hapi.MethodBodyGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.BaseMethodGenerator;
-import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedAttributeHandler;
-import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedBackboneElementHandler;
-import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.ExtendedStructureAttributeHandler;
-import ca.uhn.fhir.utils.codegen.hapi.methodgenerator.MethodHandlerResolver;
-import ca.uhn.fhir.utils.codegen.methodgenerators.IMethodHandler;
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
 import ca.uhn.fhir.utils.common.graph.Node;
 import ca.uhn.fhir.utils.common.metamodel.ClassField;
 import ca.uhn.fhir.utils.common.metamodel.ClassModel;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.dstu3.ProfileTreeBuilder;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.dstu3.model.ElementDefinition;
+import org.hl7.fhir.dstu3.model.StructureDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Command visits a StructureDefinition hierarchical tree using post-depth-first
@@ -96,11 +88,21 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
         }
     }
 
+    public String buildAdaptedTypeName(String adaptedType) {
+        String adaptedName = null;
+        if(profile != null) {
+            adaptedName = CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + StringUtils.capitalize(adaptedType) + "Adapter";
+        } else {
+            //Log error
+        }
+        return adaptedName;
+    }
+
     @Override
     public void execute(Node<ElementDefinition> node) {
         boolean found = false;
         if (node.getPayload() != null) {
-            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("race"));
+            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("patient"));
         }
         if (found) {// && profile.getName().equals("Immunization")) {
             LOGGER.debug("Found!");
@@ -170,7 +172,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
         if (node.isRoot()) {
             handleRootNode(node);
         } else {
-            // handleInnerNonRootNode(node);
+            handleInnerNonRootNode(node);
         }
     }
 
@@ -186,9 +188,9 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
 
     public void handleInnerNonRootNode(Node<ElementDefinition> node) {
         if (isExtensionNode(node)) {
-            // handleInnerNonRootExtensionNode(node);
+            //handleInnerNonRootExtensionNode(node);
         } else {
-            // handleInnerNonRootNonExtensionNode(node);
+            handleInnerNonRootNonExtensionNode(node);
         }
     }
 
@@ -229,9 +231,9 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
      */
     public void handleInnerNonRootNonExtensionNode(Node<ElementDefinition> node) {
         if (node.isInnerL1()) {
-            // handleInnerL1Node(node);
+            handleInnerL1Node(node);
         } else {
-            // handleInnerLnNode(node);
+            handleInnerLnNode(node);
         }
     }
 
@@ -282,38 +284,33 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
                 ClassModel rootClass = retrieveRootClassModel(node.getParent(),
                         getAdapterName());
                 rootClass.addMethods(methods);
-				List<Method> extensionMethods = handleStructureDefinitionElement(node.getPayload(), false);
 			} else {
 //				// Leaf extension on a type or backbone element
-//				ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-//
-//				// 1. Flag the parent FHIR Core datatype as containing
-//				// extensions and thus
-//				// indicating that it will need special processing when it is
-//				// visited
-//				if (!parentClass.hasTaggedValue(EXTENDED_TYPE)) {
-//					parentClass.addTaggedValue(EXTENDED_TYPE, EXTENDED_TYPE);
-//				}
-//
-//				// 2. Since FHIR CORE type has extensions, remove the
-//				// DO_NOT_PROCESS flag (which tells the framework to handle this
-//				// type as any other type)
-//				if (parentClass.hasTaggedValue(InterfaceAdapterGenerator.PROCESSING_INSTRUCTION)) {
-//					parentClass.removeTaggedValue(InterfaceAdapterGenerator.PROCESSING_INSTRUCTION);
-//				}
-//
-//				// 3. Create the logical accessors for this extension. Note that
-//				// unlike the original ones, these
-//				// must return the wrapped type rather than the original type
-//				ExtendedAttributeHandler handler = new ExtendedAttributeHandler(fhirResourceManager, templateUtils,
-//						profile, node.getPayload());
-//				handler.initialize();
-//				handler.setGeneratedCodePackage(generatedCodePackage);
-//				handler.setAddExtensionsToThis(false);
-//				handler.setExtendedStructure(true);
-//				handler.setExtendedTypeName(parentClass.getName());
-//				// 4. Add accessors to parent
-//				parentClass.addMethods(handler.buildCorrespondingMethods());
+                FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(fhirResourceManager, node.getParent().getPayload());
+				ClassModel parentClass = retrieveClassModel(node.getParent(), buildAdaptedTypeName(node.getParent().getName()));
+
+				// 1. Flag the parent FHIR Core datatype as containing
+				// extensions and thus
+				// indicating that it will need special processing when it is
+				// visited
+				if (!parentClass.hasTaggedValue(EXTENDED_TYPE)) {
+					parentClass.addTaggedValue(EXTENDED_TYPE, EXTENDED_TYPE);
+				}
+
+				// 2. Since FHIR CORE type has extensions, remove the
+				// DO_NOT_PROCESS flag (which tells the framework to handle this
+				// type as any other type)
+				if (parentClass.hasTaggedValue(InterfaceAdapterGenerator.PROCESSING_INSTRUCTION)) {
+					parentClass.removeTaggedValue(InterfaceAdapterGenerator.PROCESSING_INSTRUCTION);
+				}
+
+				// 3. Create the logical accessors for this extension. Note that
+				// unlike the original ones, these
+				// must return the wrapped type rather than the original type
+                MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, node);
+                handler.setParentType(generatedCodePackage + "." + buildAdaptedTypeName(node.getParent().getName()));
+                List<Method> methods = handler.generateMethods();
+                parentClass.addMethods(methods);
 			}
 		}
     }
@@ -365,13 +362,13 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
                 rootClass.addMethods(methods);
             } else {
                 //a leaf on a type or backbone element
-//                List<Method> methods =
-//                        handleStructureDefinitionElement(node.getPayload(), false,
-//                                node.getParent().getName());
-//                ClassModel parentClass =
-//                        retrieveDoNotProcessClassModel(node.getParent(),
-//                                node.getParent().getName());
-//                parentClass.addMethods(methods);
+                MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, node);
+                FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(fhirResourceManager, node.getParent().getPayload());
+                handler.setParentType(generatedCodePackage + "." + buildAdaptedTypeName(node.getParent().getName()));
+                List<Method> methods = handler.generateMethods();
+                ClassModel parentClass =
+                        retrieveDoNotProcessClassModel(node.getParent(), buildAdaptedTypeName(node.getParent().getName()));
+                parentClass.addMethods(methods);
             }
         }
     }
@@ -383,37 +380,37 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
      * @param node
      */
     public void handleInnerL1Node(Node<ElementDefinition> node) {
-//		ClassModel currentClass = retrieveClassModel(node, node.getName());
-//		if (currentClass.hasTaggedValue(EXTENDED_TYPE)) {
-//			// Clone the payload so as not to change the original
-//			ElementDefinition clone = FhirResourceManagerDstu3.shallowCloneElement(node.getPayload());
-//			// Set new type
-//			clone.getType().clear();
-//			clone.addType().setCode(generatedCodePackage + "."
+		ClassModel currentClass = retrieveClassModel(node, node.getName());
+		if (currentClass.hasTaggedValue(EXTENDED_TYPE)) {
+			//1. Creating an element definition that is the same as the existing one (clone) but where the
+            //   type is now the wrapped type we are about to create rather than the original type.
+            //   The wrapped type should expose the same interface as the original type but with
+            //   fields either constrained out or new ones added.
+//			ElementDefinition clonedElement = FhirResourceManagerDstu3.shallowCloneElement(node.getPayload());
+//            Node<ElementDefinition> clonedNode = node.shallowClone();
+//            clonedNode.setPayload(clonedElement);
+			//2. Clear the current type and set the new wrapped type instead
+//            clonedElement.getType().clear();
+//            clonedElement.addType().setCode(generatedCodePackage + "."
 //					+ CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName());
-//			fhirResourceManager.addGeneratedType(generatedCodePackage + "."
-//					+ CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName());
-//			// Rest is the same
-//			ExtendedBackboneElementHandler handler = new ExtendedBackboneElementHandler(fhirResourceManager,
-//					templateUtils, profile, clone);
-//			handler.initialize();
-//			String supertype = node.getPayload().getType().get(0).getCode();
-//			if (supertype != null && supertype.equals("BackboneElement")) {
-//				handler.setExtendedSupertype(handler.getResourceName(), handler.getTopLevelCoreAttribute());
-//			} else {
-//				handler.setExtendedSupertype(null, node.getPayload().getType().get(0).getCode());
-//			}
-//			List<Method> methods = handler.buildCorrespondingMethods();
-//			ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-//			rootClass.addMethods(methods);
-//			// Add the original set from HAPI FHIR as well
-//			methods = handleStructureDefinitionElement(node.getPayload(), false);
-//			rootClass.addMethods(methods);
-//		} else {
-//			List<Method> methods = handleStructureDefinitionElement(node.getPayload(), false);
-//			ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-//			rootClass.addMethods(methods);
-//		}
+            node.getPayload().addType().setCode(generatedCodePackage + "."
+                    + CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName() + "Adapter");
+			fhirResourceManager.addGeneratedType(generatedCodePackage + "."
+					+ CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName() + "Adapter");
+
+            MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, node);
+            handler.setParentType(generatedCodePackage + "." + getInterfaceName());
+            List<Method> updatedAccessors = handler.generateMethods();
+            ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+            rootClass.addMethods(updatedAccessors);
+		}
+
+        //TODO This may not be needed any longer. Should lead to duplicate method signatures
+//        MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, node);
+//        List<Method> methods = handler.generateMethods();
+//        ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+//        rootClass.addMethods(methods);
+
     }
 
     /**
@@ -546,6 +543,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
         if (model == null) {
             model = new ClassModel(CodeGenerationUtils.makeIdentifierJavaSafe(className));
             model.setNamespace(generatedCodePackage);
+            model.addImport("org.hl7.fhir.dstu3.model.*");
             if (taggedValues != null) {
                 for (String key : taggedValues.keySet()) {
                     model.addTaggedValue(key, taggedValues.get(key));
@@ -575,6 +573,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
         if (model == null) {
             model = new ClassModel(CodeGenerationUtils.makeIdentifierJavaSafe(className));
             model.setNamespace(generatedCodePackage);
+            model.addImport("org.hl7.fhir.dstu3.model.*");
             model.addTaggedValue(InterfaceAdapterGenerator.PROCESSING_INSTRUCTION,
                     InterfaceAdapterGenerator.DO_NOT_PROCESS);
             initializeAdaptedModel(node, model);

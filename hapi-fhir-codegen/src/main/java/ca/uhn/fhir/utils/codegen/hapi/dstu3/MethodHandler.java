@@ -3,6 +3,8 @@ package ca.uhn.fhir.utils.codegen.hapi.dstu3;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 
 import ca.uhn.fhir.utils.codegen.hapi.BaseMethodHandler;
@@ -17,261 +19,398 @@ import org.hl7.fhir.dstu3.model.Extension;
 import org.hl7.fhir.dstu3.model.Patient;
 
 public class MethodHandler extends BaseMethodHandler {
-	
-	private Node<ElementDefinition> node;
-	private FhirResourceManagerDstu3 manager;
-	
-	public MethodHandler(FhirResourceManagerDstu3 manager, MethodBodyGenerator template, Node<ElementDefinition> node) {
-		super(template);
-		this.node = node;
-		this.manager = manager;
-	}
-	
-	public List<Method> generateMethods() {
-		List<Method> methods = new ArrayList<Method>();
-		try {
-			FhirToHapiTypeConverter converter = createConverter();
-			if(converter.isExtension()) {
-				generateLogicalAccessors(converter, methods);
-			} else {
-				generateMethods(converter, methods);
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-			//Investigate
-		}
-		return methods;
-	}
-	
-	public FhirToHapiTypeConverter createConverter() {
-		ElementDefinition element = node.getPayload();
-		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
-		return converter;
-	}
-	
-	public void generateMethods(FhirToHapiTypeConverter converter, List<Method> methods) {
-		List<HapiType> types = converter.getHapiTypes();
-		if(types == null || types.isEmpty() || converter.getCardinality() == Cardinality.CONSTRAINED_OUT) {
-			return;
-		} else {
-			for(HapiType type: types) {
-				if(type.isBackboneElement()) {
-					
-				} else if(type.isEnumerationType()) {
-					handleEnumTypeMethods(converter, type, methods);
-				} else if(type.isReference()) {
-					
-				} else {
-					FhirDatatypeEnum datatype = FhirDatatypeEnum.getEnumeratedDatatype(type.getFhirType());
-					if(datatype != null && datatype.isPrimitiveDatatype()) {
-						handlePrimitiveTypeMethods(converter, type, methods);
-						//TODO Create methods that return the equivalent java type
-					} else {
-						handleDatatypeMethods(converter, type, methods);
-					}
-				}
-			}
-			if(converter.isMultiType()) {
-				//TODO Add org.hl7.fhir.dstu3.model.Type method
-			}
-		}
-	}
-	
-	public void handlePrimitiveTypeMethods(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
-		String attributeName = parseAttributeName(converter.getFullAttributePath());
-		if(converter.isMultiType()) {
-			//Getter
-			Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + PathUtils.getLastPathComponent(type.getDatatype())), type.getDatatypeOrList());
-			method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + PathUtils.getLastPathComponent(type.getDatatype())));
-			if(type.getDatatype() == null) {
-				System.out.println("STOP HERE");
-			}
-			method.addImport(type.getDatatype());
-			methods.add(method);
-		} else {
-			//Getter that return HAPI FHIR datatypes
-			Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX), type.getDatatypeOrList());
-			if(converter.isExtension()) {
-				method.setBody(getTemplate().getExtensionGetterBody("adaptedClass", type.getDatatype(), converter.getExtensionUri(), attributeName));
-			} else {
-				method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX));
-			}
-			if(type.getDatatype() == null) {
-				System.out.println("STOP HERE");
-			}
-			method.addImport(type.getDatatype());
-			methods.add(method);
 
-			//Setter that take HAPI FHIR datatypes
-			method = constructSetMethodFromField(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype(), getParentType());
-			method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX));
-			if (type.getDatatype() == null) {
-				System.out.println("STOP HERE");
-			} else {
-				method.addImport(type.getDatatype());
-				if(!methods.contains(method)) {
-					methods.add(method);
-				}
-			}
-		}
-	}
-	
-	public void handleDatatypeMethods(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
-		String attributeName = parseAttributeName(converter.getFullAttributePath());
-		if(converter.isMultiType()) {
-			//Getter
-			Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + PathUtils.getLastPathComponent(type.getDatatype())), type.getDatatypeOrList());
-			method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + PathUtils.getLastPathComponent(type.getDatatype())));
-			if(type.getDatatype() == null) {
-				System.out.println("STOP HERE");
-			}
-			method.addImport(type.getDatatype());
-			method.addImport("org.hl7.fhir.dstu3.model.Enumerations"); //Todo fix this as it will result in a lot of duplication
-			methods.add(method);
+    private Node<ElementDefinition> node;
+    private FhirResourceManagerDstu3 manager;
 
-			//Setter
-			method = constructSetMethodFromField(attributeName, "org.hl7.fhir.dstu3.model.Type", getParentType());
-			method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
-			if (type.getDatatype() == null) {
-				System.out.println("STOP HERE");
-			} else {
-				method.addImport("org.hl7.fhir.dstu3.model.Type");
-				if(!methods.contains(method)) {
-					methods.add(method);
-				}
-			}
-		} else {
+    public MethodHandler(FhirResourceManagerDstu3 manager, MethodBodyGenerator template, Node<ElementDefinition> node) {
+        super(template);
+        this.node = node;
+        this.manager = manager;
+    }
 
-			//Getter
-			Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), type.getDatatypeOrList());
-			method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
-			if(type.getDatatype() == null) {
-				System.out.println("STOP HERE");
-			} else {
-				method.addImport(type.getDatatype());
-				methods.add(method);
-			}
+    public List<Method> generateMethods() {
+        List<Method> methods = new ArrayList<Method>();
+        try {
+            FhirToHapiTypeConverter converter = createConverter();
+            if (converter.isExtension()) {
+                generateLogicalAccessors(converter, methods);
+            } else {
+                generateMethods(converter, methods);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            //Investigate
+        }
+        return methods;
+    }
 
-			//Setter
-			if(!converter.isMultipleCardinality()) {//No setters on lists in HAPI at this time
-				method = constructSetMethodFromField(attributeName, type.getDatatypeOrList(), getParentType());
-				method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
-				if (type.getDatatype() == null) {
-					System.out.println("STOP HERE");
-				} else {
-					method.addImport(type.getDatatype());
-					methods.add(method);
-				}
-			}
-		}
-	}
-	
-	public void handleEnumTypeMethods(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
-		String attributeName = parseAttributeName(converter.getFullAttributePath());
-		if(converter.isMultiType()) {
+    public void addMethod(List<Method> methods, Method method) {
+        if(method != null && !methods.contains(method)) { //Check is needed for multi-type method
+            methods.add(method);
+        }
+    }
+
+    public FhirToHapiTypeConverter createConverter() {
+        ElementDefinition element = node.getPayload();
+        FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+        return converter;
+    }
+
+    public void generateMethods(FhirToHapiTypeConverter converter, List<Method> methods) {
+        List<HapiType> types = converter.getHapiTypes();
+        if (types == null || types.isEmpty() || converter.getCardinality() == Cardinality.CONSTRAINED_OUT) {
+            return;
+        } else {
+            for (HapiType type : types) {
+                if (type.getDatatype() == null && type.getGeneratedType() == null) {
+                    System.out.println("Investigate");
+                    //TODO Currently not handled: text, meta, references
+                    continue;
+                }
+                if (type.getGeneratedType() != null) {
+                    handleGeneratedType(converter, type, methods);
+                } else if (type.isBackboneElement()) {
+
+                } else if (type.isEnumerationType()) {
+                    handleEnumTypeMethods(converter, type, methods);
+                } else if (type.isReference()) {
+                    handleReferenceTypes(converter, type, methods);
+                } else {
+                    FhirDatatypeEnum datatype = FhirDatatypeEnum.getEnumeratedDatatype(type.getFhirType());
+                    if (datatype != null && datatype.isPrimitiveDatatype()) {
+                        handlePrimitiveTypeMethods(converter, type, methods);
+                        //TODO Create methods that return the equivalent java type
+                    } else {
+                        handleDatatypeMethods(converter, type, methods);
+                    }
+                }
+            }
+            if (converter.isMultiType()) {
+                //TODO Add org.hl7.fhir.dstu3.model.Type method
+            }
+        }
+    }
+
+    public void handlePrimitiveTypeMethods(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
+        String attributeName = converter.parseAttributeName();
+        if (converter.isMultiType()) {
+            //Getter
+            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + PathUtils.getLastPathComponent(type.getDatatype())), type.getDatatypeOrList());
+            method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + PathUtils.getLastPathComponent(type.getDatatype())));
+            if (type.getDatatype() == null) {
+                System.out.println("STOP HERE");
+            }
+            method.addImport(type.getDatatype());
+            addMethod(methods, method);
+        } else {
+            //Getter that return HAPI FHIR datatypes
+            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX), type.getDatatypeOrList());
+            if (converter.isExtension()) {
+                method.setBody(getTemplate().getExtensionGetterBody("adaptedClass", type.getDatatype(), converter.getExtensionUri(), attributeName));
+            } else {
+                method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX));
+            }
+            if (type.getDatatype() == null) {
+                System.out.println("STOP HERE");
+            }
+            method.addImport(type.getDatatype());
+            addMethod(methods, method);
+
+            //Setter that take HAPI FHIR datatypes
+            method = constructSetMethodFromField(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype(), getParentType());
+            method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX));
+            if (type.getDatatype() == null) {
+                System.out.println("STOP HERE");
+            } else {
+                method.addImport(type.getDatatype());
+                if (!methods.contains(method)) {
+                    addMethod(methods, method);
+                }
+            }
+        }
+    }
+
+    public void handleDatatypeMethods(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
+        String attributeName = converter.parseAttributeName();
+        if (converter.isMultiType()) {
+            //Getter
+            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + PathUtils.getLastPathComponent(type.getDatatype())), type.getDatatypeOrList());
+            method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + PathUtils.getLastPathComponent(type.getDatatype())));
+            if (type.getDatatype() == null) {
+                System.out.println("STOP HERE");
+            }
+            method.addImport(type.getDatatype());
+            method.addImport("org.hl7.fhir.dstu3.model.Enumerations"); //Todo fix this as it will result in a lot of duplication
+            addMethod(methods, method);
+
+            //Setter
+            method = constructSetMethodFromField(attributeName, "org.hl7.fhir.dstu3.model.Type", getParentType());
+            method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
+            if (type.getDatatype() == null) {
+                System.out.println("STOP HERE");
+            } else {
+                method.addImport("org.hl7.fhir.dstu3.model.Type");
+                if (!methods.contains(method)) {
+                    addMethod(methods, method);
+                }
+            }
+        } else {
+
+            //Getter
+            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), type.getDatatypeOrList());
+            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
+            if (type.getDatatype() == null) {
+                System.out.println("STOP HERE");
+            } else {
+                method.addImport(type.getDatatype());
+                addMethod(methods, method);
+            }
+
+            //Setter
+            if (!converter.isMultipleCardinality()) {//No setters on lists in HAPI at this time
+                method = constructSetMethodFromField(attributeName, type.getDatatypeOrList(), getParentType());
+                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
+                if (type.getDatatype() == null) {
+                    System.out.println("STOP HERE");
+                } else {
+                    method.addImport(type.getDatatype());
+                    addMethod(methods, method);
+                }
+            }
+        }
+    }
+
+    public void handleEnumTypeMethods(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
+        String attributeName = converter.parseAttributeName();
+        if (converter.isMultiType()) {
 //			Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + PathUtils.getLastPathComponent(type.getDatatype())), type.getDatatypeOrList());
 //			method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + PathUtils.getLastPathComponent(type.getDatatype())));
 //			if(type.getDatatype() == null) {
 //				System.out.println("STOP HERE");
 //			}
 //			method.addImport(type.getDatatype());
-//			methods.add(method);
-			throw new RuntimeException("Multi Enum Types Not implemented yet " + converter.getFullAttributePath());
-		} else {
-			//Getter style 1
-			Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), type.getEnumerationType());
-			method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
-			if(type.getDatatype() == null) {
-				System.out.println("Enum datatype is null!");
-			} else {
-				method.addImport(type.getEnumerationType());
-				methods.add(method);
-			}
+//			addMethod(methods, method);
+            throw new RuntimeException("Multi Enum Types Not implemented yet " + converter.getFullAttributePath());
+        } else {
+            //Getter style 1
+            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), type.getEnumerationType());
+            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
+            if (type.getDatatype() == null) {
+                System.out.println("Enum datatype is null!");
+            } else {
+                method.addImport(type.getEnumerationType());
+                addMethod(methods, method);
+            }
 
-			//Setter style 1
-			method = constructSetMethodFromField(attributeName, type.getEnumerationType(), getParentType());
-			method.setBody(getTemplate().getSetMethodDelegationBody(attributeName, "param"));
-			if(type.getDatatype() == null) {
-				System.out.println("Enum datatype is null!");
-			} else {
-				method.addImport(type.getEnumerationType());
-				methods.add(method);
-			}
+            //Setter style 1
+            method = constructSetMethodFromField(attributeName, type.getEnumerationType(), getParentType());
+            method.setBody(getTemplate().getSetMethodDelegationBody(attributeName, "param"));
+            if (type.getDatatype() == null) {
+                System.out.println("Enum datatype is null!");
+            } else {
+                method.addImport(type.getEnumerationType());
+                addMethod(methods, method);
+            }
 
-			//Getter style 2
-			method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX), type.getDatatype() + "<" + type.getEnumerationType() + ">");
-			method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX));
-			if(type.getDatatype() == null) {
-				System.out.println("Enum datatype is null!");
-			} else {
-				method.addImport(type.getDatatype());
-				method.addImport(type.getEnumerationType());
-				method.addImport("org.hl7.fhir.dstu3.model.Enumerations"); //Todo fix this as it will result in a lot of duplication
-				methods.add(method);
-			}
+            //Getter style 2
+            method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX), type.getDatatype() + "<" + type.getEnumerationType() + ">");
+            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX));
+            if (type.getDatatype() == null) {
+                System.out.println("Enum datatype is null!");
+            } else {
+                method.addImport(type.getDatatype());
+                method.addImport(type.getEnumerationType());
+                method.addImport("org.hl7.fhir.dstu3.model.Enumerations"); //Todo fix this as it will result in a lot of duplication
+                addMethod(methods, method);
+            }
 
-			//Setter style 2
-			method = constructSetMethodFromField(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", getParentType());
-			method.setBody(getTemplate().getSetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, "param"));
-			if(type.getDatatype() == null) {
-				System.out.println("Enum datatype is null!");
-			} else {
-				method.addImport(type.getEnumerationType());
-				methods.add(method);
-			}
-		}
-	}
-	
-	public void generateLogicalAccessors(FhirToHapiTypeConverter converter, List<Method> methods) {
-		List<HapiType> types = converter.getHapiTypes();
-		String attributeName = parseAttributeName(converter.getFullAttributePath());
-		if(types == null || types.isEmpty() || converter.getCardinality() == Cardinality.CONSTRAINED_OUT) {
-			return;
-		} else {
-			for (HapiType type : types) {
-				if(!converter.isMultipleCardinality()) {//No setters on lists in HAPI at this time
-					//Getter
-					Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), type.getDatatypeOrList());
-					method.setBody(getTemplate().getExtensionGetterBodyDstu3("adaptedClass", type.getDatatype(), converter.getExtensionUri(), attributeName));
-					if (type.getDatatype() == null) {
-						System.out.println("STOP HERE");
-					} else {
-						method.addImport(type.getDatatype());
-						methods.add(method);
-					}
+            //Setter style 2
+            method = constructSetMethodFromField(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", getParentType());
+            method.setBody(getTemplate().getSetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, "param"));
+            if (type.getDatatype() == null) {
+                System.out.println("Enum datatype is null!");
+            } else {
+                method.addImport(type.getEnumerationType());
+                addMethod(methods, method);
+            }
+        }
+    }
 
-					//Setter
-					method = constructSetMethodFromField(attributeName, type.getDatatypeOrList(), getParentType());
-					method.setBody(getTemplate().getExtensionSetterBodyDstu3("adaptedClass", converter.getExtensionUri()));
-					if (type.getDatatype() == null) {
-						System.out.println("STOP HERE");
-					} else {
-						method.addImport(type.getDatatype());
-						methods.add(method);
-					}
-				} else {
-					//Getter
-					Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), type.getDatatypeOrList());
-					method.setBody(getTemplate().getExtensionListGetterBodyDstu3(type.getDatatype(), converter.getExtensionUri()));
-					if (type.getDatatype() == null) {
-						System.out.println("STOP HERE");
-					} else {
-						method.addImport(type.getDatatype());
-						methods.add(method);
-					}
+    public void handleGeneratedType(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
+        String attributeName = converter.parseAttributeName();
+        if (converter.isMultiType()) {
+            //Getter
+            throw new RuntimeException("Multi generated types should not exist. If so, this is not implemented");
+        } else {
+            //Getter that return HAPI FHIR datatypes
+            Method method = Method.constructNoArgMethod(Method.buildGetterName("Wrapped" + StringUtils.capitalize(attributeName)), type.getGeneratedTypeOrList());
+            method.setBody(getTemplate().getGeneratedClassMultiCardinalityGetter(type.getGeneratedType(), type.getDatatype(), StringUtils.capitalize(attributeName)));
+            method.addImport(type.getGeneratedType());
+            addMethod(methods, method);
 
-					//Setter
-					method = constructSetMethodFromField(attributeName, type.getDatatypeOrList(), getParentType());
-					method.setBody(getTemplate().getExtensionListSetterBodyDstu3(type.getDatatype(), converter.getExtensionUri()));
-					if (type.getDatatype() == null) {
-						System.out.println("STOP HERE");
-					} else {
-						method.addImport(type.getDatatype());
-						methods.add(method);
-					}
-				}
-			}
-		}
-	}
+            //Setter that take HAPI FHIR datatypes
+            method = constructSetMethodFromField("Wrapped" + StringUtils.capitalize(attributeName), type.getGeneratedTypeOrList(), getParentType());
+            method.setBody(getTemplate().getGeneratedClassMultiCardinalitySetter(type.getGeneratedType(), type.getDatatype(), StringUtils.capitalize(attributeName)));
+            method.addImport(type.getGeneratedType());
+            if (!methods.contains(method)) {
+                addMethod(methods, method);
+            }
+        }
+    }
+
+    public void handleReferenceTypes(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
+        String attributeName = converter.parseAttributeName();
+        String disambiguationGetterSuffix = "";
+        if (converter.isReferenceMultiType()) {
+            disambiguationGetterSuffix = PathUtils.getLastPathComponent(type.getDatatype());
+        }
+        if (converter.isMultipleCardinality()) {
+
+            if(converter.isReferenceMultiType()) {
+                //Getter
+                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "Target", "java.util.List<" + type.getDatatype() + ">");
+                method.setBody(getTemplate().getReferenceListAsTypedList("adaptedClass", attributeName + "Target", type.getDatatype()));
+                method.addImport(type.getGeneratedType());
+                addMethod(methods, method);
+            } else {
+                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + "Target"), "java.util.List<" + type.getDatatype() + ">");
+                method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
+                method.addImport(type.getDatatype());
+            }
+
+            //Getter
+            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), "java.util.List<org.hl7.fhir.dstu3.model.Reference>");
+            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
+            method.addImport("org.hl7.fhir.dstu3.model.Reference");
+            addMethod(methods, method);
+        } else {
+            if(converter.isMultiType()) {
+                //Getter
+                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + "Reference"), "org.hl7.fhir.dstu3.model.Reference");
+                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName +  "Reference"));
+                method.addImport(type.getDatatype());
+                method.addImport("org.hl7.fhir.dstu3.model.Reference"); //Todo fix this as it will result in a lot of duplication
+                addMethod(methods, method);
+
+                //Getter
+                method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "Target", type.getDatatype());
+                method.setBody(getTemplate().castTypeToReferenceAndReturnTarget(attributeName, type.getDatatype()));
+                method.addImport(type.getDatatype());
+                addMethod(methods, method);
+
+                //Setter
+                method = constructSetMethodFromField(attributeName, "org.hl7.fhir.dstu3.model.Reference", getParentType());
+                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
+                method.addImport(type.getDatatype());
+                addMethod(methods, method);
+
+                //Setter
+                method = constructSetMethodFromField(attributeName + "Target", type.getDatatype(), getParentType());
+                method.setBody(getTemplate().wrapResourceInReferenceAndSet(attributeName));
+                method.addImport(type.getDatatype());
+                addMethod(methods, method);
+
+            } else {
+                //Getter
+                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix), "org.hl7.fhir.dstu3.model.Reference");
+                method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
+                method.addImport(type.getDatatype());
+                addMethod(methods, method);
+
+                //Getter
+                method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "Target", type.getDatatype());
+                method.setBody(getTemplate().getAdapterGetWithCastMethodDelegationBody(attributeName + "Target", type.getDatatype()));
+                method.addImport(type.getDatatype());
+                addMethod(methods, method);
+
+                //Setter
+                method = constructSetMethodFromField(attributeName, "org.hl7.fhir.dstu3.model.Reference", getParentType());
+                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
+                method.addImport(type.getDatatype());
+                addMethod(methods, method);
+
+                //Setter
+                method = constructSetMethodFromField(attributeName + "Target", type.getDatatype(), getParentType());
+                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName + "Target"));
+                method.addImport(type.getDatatype());
+                addMethod(methods, method);
+            }
+        }
+    }
+
+    public void generateLogicalAccessors(FhirToHapiTypeConverter converter, List<Method> methods) {
+        List<HapiType> types = converter.getHapiTypes();
+        String attributeName = converter.parseAttributeName();
+        if (types == null || types.isEmpty() || converter.getCardinality() == Cardinality.CONSTRAINED_OUT) {
+            return;
+        } else {
+            boolean isMultitype = converter.isMultiType();
+            for (HapiType type : types) {
+                //Some prep for multi-type field to disambiguate getter signatures
+                String disambiguatingSuffix = "";
+                if (isMultitype) {
+                    disambiguatingSuffix = StringUtils.capitalize(type.getDatatypeClass().getSimpleName());
+                }
+                if (!converter.isMultipleCardinality()) {//No setters on lists in HAPI at this time
+                    //Getter
+                    Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguatingSuffix), type.getDatatypeOrList());
+                    if (type.isResource()) {
+                        method.setBody(getTemplate().getExtensionGetterBodyResourceDstu3("adaptedClass", type.getDatatype(), converter.getExtensionUri(), attributeName));
+                    } else {
+                        method.setBody(getTemplate().getExtensionGetterBodyDstu3("adaptedClass", type.getDatatype(), converter.getExtensionUri(), attributeName));
+                    }
+                    if (type.getDatatype() == null) {
+                        System.out.println("STOP HERE");
+                    } else {
+                        method.addImport(type.getDatatype());
+                        addMethod(methods, method);
+                    }
+
+                    //Setter
+                    method = constructSetMethodFromField(attributeName, type.getDatatypeOrList(), getParentType());
+                    if (type.isResource()) {
+                        method.setBody(getTemplate().getExtensionSetterBodyResourceDstu3("adaptedClass", converter.getExtensionUri()));
+                    } else {
+                        method.setBody(getTemplate().getExtensionSetterBodyDstu3("adaptedClass", converter.getExtensionUri()));
+                    }
+                    if (type.getDatatype() == null) {
+                        System.out.println("STOP HERE");
+                    } else {
+                        method.addImport(type.getDatatype());
+                        addMethod(methods, method);
+                    }
+                } else {
+                    //Getter
+                    Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguatingSuffix), type.getDatatypeOrList());
+                    if (type.isResource()) {
+                        method.setBody(getTemplate().getExtensionListGetterBodyResourceDstu3(type.getDatatype(), converter.getExtensionUri()));
+                    } else {
+                        method.setBody(getTemplate().getExtensionListGetterBodyDstu3(type.getDatatype(), converter.getExtensionUri()));
+                    }
+                    if (type.getDatatype() == null) {
+                        System.out.println("STOP HERE");
+                    } else {
+                        method.addImport(type.getDatatype());
+                        addMethod(methods, method);
+                    }
+
+                    //Setter
+                    method = constructSetMethodFromField(attributeName, type.getDatatypeOrList(), getParentType());
+                    if (type.isResource()) {
+                        method.setBody(getTemplate().getExtensionListSetterBodyResourceDstu3(converter.getExtensionUri()));
+                    } else {
+                        method.setBody(getTemplate().getExtensionListSetterBodyDstu3(type.getDatatype(), converter.getExtensionUri()));
+                    }
+                    if (type.getDatatype() == null) {
+                        System.out.println("STOP HERE");
+                    } else {
+                        method.addImport(type.getDatatype());
+                        addMethod(methods, method);
+                    }
+                }
+            }
+        }
+    }
 
 }

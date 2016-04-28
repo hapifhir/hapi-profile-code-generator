@@ -272,8 +272,8 @@ public class InterfaceAdapterGenerator {
 			for(ClassModel model : command.getClassMap().values()) {
 				if(model != rootModel && canProcess(model)) {
 					try {
-						String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, javaSafeProfileName + model.getName()), true);
-						CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, javaSafeProfileName + model.getName(), supportingClass);
+						String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, model.getName()), true);
+						CodeGenerationUtils.writeJavaClassFile(getDestinationDirectory(), generatedPackage, model.getName(), supportingClass);
 					}catch(Exception e) {
 						e.printStackTrace();
 						LOGGER.error("Error processing " + model.getName(), e);

@@ -34,29 +34,6 @@ public abstract class BaseMethodHandler {
 		this.parentType = parentType;
 	}
 
-	/**
-	 * A top level attribute is a direct child of the parent resource (e.g., Condition.id).
-	 * Lower level attributes are more deeply nested (e.g., Condition.location.code).
-	 * Method returns the name of the top level attribute or null if the attribute is a structure
-	 * containing more deeply nested attributes.
-	 * 
-	 *  TODO Does it belong here? Does this method do too much?
-	 * 
-	 * @return
-	 */
-	public String parseAttributeName(String attributePath) {
-		String suffix = PathUtils.getPathMinusRootComponent(attributePath);
-		if(suffix != null && suffix.indexOf('.') < 0) {
-			if(PathUtils.isMultivaluedAttribute(suffix)) {
-				suffix = PathUtils.cleanMultiValuedAttributeName(suffix);
-			}
-		}
-		if(suffix != null && suffix.equalsIgnoreCase("class")) {
-			suffix = suffix + "_"; //Class is a reserved word in java. Note for DSTU2, instead of "_", use "Element" TODO Fix
-		}
-		return suffix;
-	}
-
 	/****************************************************************
 	 * HELPER METHODS
 	 */

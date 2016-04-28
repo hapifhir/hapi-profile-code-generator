@@ -73,6 +73,22 @@ public class MethodBodyGenerator extends TemplateUtils {
 		st.add("canonicalClassPath", canonicalPath);
 		return st.render();
 	}
+
+	/**
+	 * Method returning method body for reference-type FHIR attributes.
+	 *
+	 * @param propertyName - The name of the property
+	 * @param canonicalPath - The full class name/path of the return type
+	 * @return
+	 */
+	public String getReferenceListAsTypedList(String callee, String propertyName, String propertyType) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("getReferenceListAsTypedList");
+		st.add("callee", callee);
+		st.add("propertyName", propertyName);
+		st.add("propertyType", propertyType);
+		return st.render();
+	}
 	
 	/**
 	 * Method returning method body for reference-type FHIR attributes.
@@ -177,6 +193,21 @@ public class MethodBodyGenerator extends TemplateUtils {
 		st.add("fieldUri", fieldUri);
 		return st.render();
 	}
+
+	public String castTypeToReferenceAndReturnTarget(String propertyName, String propertyType) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("castTypeToReferenceAndReturnTarget");
+		st.add("propertyName", propertyName);
+		st.add("propertyType", propertyType);
+		return st.render();
+	}
+
+	public String wrapResourceInReferenceAndSet(String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("wrapResourceInReferenceAndSet");
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
 	
 	/**
 	 * Method delegating to the adapter's class setter.
@@ -201,6 +232,21 @@ public class MethodBodyGenerator extends TemplateUtils {
 		ST st = getGroupMain().getInstanceOf("getMethodInvocation");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
+		return st.render();
+	}
+
+	/**
+	 * Method delegating to the adapter's class getter.
+	 *
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getAdapterGetWithCastMethodDelegationBody(String propertyName, String castType) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("getMethodInvocationWithCast");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		st.add("castType", castType);
 		return st.render();
 	}
 	
@@ -381,6 +427,21 @@ public class MethodBodyGenerator extends TemplateUtils {
 		st.add("uri", uri);
 		return st.render();
 	}
+
+	/**
+	 * Method returning getter body for extensions of a single type with multiple cardinality.
+	 *
+	 * @param type - The return type
+	 * @param uri - The URI for the FHIR extension
+	 *
+	 * @return
+	 */
+	public String getExtensionListGetterBodyResourceDstu3(String type, String uri) {
+		ST st = getGroupMain().getInstanceOf("extensionListGetterBodyResourceDstu3");
+		st.add("type", type);
+		st.add("uri", uri);
+		return st.render();
+	}
 	
 	/**
 	 * Method returning setter body for extensions of a single type with multiple cardinality.
@@ -411,6 +472,20 @@ public class MethodBodyGenerator extends TemplateUtils {
 		st.add("uri", uri);
 		return st.render();
 	}
+
+	/**
+	 * Method returning setter body for extensions of a single type with multiple cardinality.
+	 *
+	 * @param type - The argument type
+	 * @param uri - The URI for the FHIR extension
+	 *
+	 * @return
+	 */
+	public String getExtensionListSetterBodyResourceDstu3(String uri) {
+		ST st = getGroupMain().getInstanceOf("extensionListSetterBodyResourceDstu3");
+		st.add("uri", uri);
+		return st.render();
+	}
 	
 	/**
 	 * Method returning setter body for extensions of a single type with multiple cardinality.
@@ -438,6 +513,20 @@ public class MethodBodyGenerator extends TemplateUtils {
 	public String getExtensionSetterBodyDstu3(String rootClassName, String uri) {
 		ST st = getGroupMain().getInstanceOf("extensionSetterBodyDstu3");
 		st.add("rootClassName", rootClassName);
+		st.add("uri", uri);
+		return st.render();
+	}
+
+	/**
+	 * Method returning setter body for extensions of a single type with multiple cardinality.
+	 *
+	 * @param type - The argument type
+	 * @param uri - The URI for the FHIR extension
+	 *
+	 * @return
+	 */
+	public String getExtensionSetterBodyResourceDstu3(String rootClassName, String uri) {
+		ST st = getGroupMain().getInstanceOf("extensionSetterBodyResourceDstu3");
 		st.add("uri", uri);
 		return st.render();
 	}
@@ -473,6 +562,23 @@ public class MethodBodyGenerator extends TemplateUtils {
 	 */
 	public String getExtensionGetterBodyDstu3(String rootClassName, String type, String uri, String fieldName) {
 		ST st = getGroupMain().getInstanceOf("extensionGetterBodyDstu3");
+		st.add("rootClassName", rootClassName);
+		st.add("uri", uri);
+		st.add("type", type);
+		st.add("fieldName", fieldName);
+		return st.render();
+	}
+
+	/**
+	 * Method returning setter body for extensions of a single type with multiple cardinality.
+	 *
+	 * @param type - The argument type
+	 * @param uri - The URI for the FHIR extension
+	 *
+	 * @return
+	 */
+	public String getExtensionGetterBodyResourceDstu3(String rootClassName, String type, String uri, String fieldName) {
+		ST st = getGroupMain().getInstanceOf("extensionGetterBodyResourceDstu3");
 		st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		st.add("type", type);
@@ -598,6 +704,22 @@ public class MethodBodyGenerator extends TemplateUtils {
 
 	public String getUnsupportedSetter() {
 		ST st = getGroupMain().getInstanceOf("unsupportedSetter");
+		return st.render();
+	}
+
+	public String getGeneratedClassMultiCardinalityGetter(String generatedType, String wrappedType, String propertyName) {
+		ST st = getGroupMain().getInstanceOf("generatedClassMultiCardinalityGetter");
+		st.add("generatedType", generatedType);
+		st.add("wrappedType", wrappedType);
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+
+	public String getGeneratedClassMultiCardinalitySetter(String generatedType, String wrappedType, String propertyName) {
+		ST st = getGroupMain().getInstanceOf("generatedClassMultiCardinalitySetter");
+		st.add("generatedType", generatedType);
+		st.add("wrappedType", wrappedType);
+		st.add("propertyName", propertyName);
 		return st.render();
 	}
 	

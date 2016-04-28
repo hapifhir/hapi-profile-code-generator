@@ -1,0 +1,1 @@
+getMethodInvocationWithCast(className, propertyName, castType) ::= "return (<castType>)<className>.get<propertyName>();"

@@ -38,7 +38,17 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 	private String root;
 	private String fullAttributePath;
 	private String relativePath;
+
+	/**
+	 * Determines if field is an attribute[x] type field in FHIR
+	 */
 	private boolean isMultiType;
+
+	/**
+	 * Determines if field is a Reference(A|B|C) type field in FHIR
+	 */
+	private boolean isReferenceMultiType;
+
 	private boolean isExtension;
 	private Cardinality cardinality;
 	private String extensionUri;
@@ -148,7 +158,15 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 	public boolean isMultiType() {
 		return isMultiType;
 	}
-	
+
+	public boolean isReferenceMultiType() {
+		return isReferenceMultiType;
+	}
+
+	public void setReferenceMultiType(boolean referenceMultiType) {
+		isReferenceMultiType = referenceMultiType;
+	}
+
 	public boolean isExtension() {
 		return isExtension;
 	}
@@ -219,8 +237,15 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 						code = profileType;
 					}
 					hapiType.setDatatypeClass(HapiFhirUtils.getPrimitiveTypeClass(ctx, code));
+				} else if(isGeneratedType(code)) {
+					getHapiType().setGeneratedType(code);
+					skip = true;//We are modifying the first type rather than adding a new type for the generated type
 				} else if(isResource(code)){
-					hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(ctx, code));
+					if(code.equalsIgnoreCase("DomainResource")) {
+						hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(ctx, getRoot()));
+					} else {
+						hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(ctx, code));
+					}
 				} else {
 					throw new RuntimeException("Not yet implemented");
 				}
@@ -245,8 +270,12 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 		return (code != null && FhirDatatypeEnum.contains(code));
 	}
 	
-	private boolean isResource(String code) {
+	private boolean isResource(String code) { //TODO Fix to be more robust
 		return code !=  null && !isFhirDatatype(code);
+	}
+
+	private boolean isGeneratedType(String code) {
+		return getFhirResourceManager().generatedTypeExists(code);
 	}
 	
 	protected HapiType createHapiType(String fhirType) {
@@ -280,7 +309,26 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 			
 		}
 	}
-	
+
+	/**
+	 * Returns the attribute name cleaned up from other notations such
+	 * as the FHIR choice notation [x].
+	 *
+	 * @param attributePath
+	 * @return
+     */
+	public String parseAttributeName() {
+		String suffix = PathUtils.getLastPathComponent(fullAttributePath);
+		if(PathUtils.isMultivaluedAttribute(suffix)) {
+			suffix = PathUtils.cleanMultiValuedAttributeName(suffix);
+		}
+		if(suffix != null && suffix.equalsIgnoreCase("class")) {
+			suffix = suffix + "_"; //Class is a reserved word in java. Note for DSTU2, instead of "_", use "Element" TODO Fix
+		}
+		return suffix;
+	}
+
+
 	public boolean isMultipleCardinality() {
 		return (cardinality == Cardinality.OPTIONAL_MULTIPLE || cardinality == Cardinality.REQUIRED_MULTIPLE);
 	}

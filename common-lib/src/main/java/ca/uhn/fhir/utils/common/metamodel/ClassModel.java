@@ -210,7 +210,11 @@ public class ClassModel {
 	}
 	
 	public void addImport(String anImport) {
-		this.imports.add(anImport);
+		if(anImport != null) {
+			this.imports.add(anImport);
+		} else {
+			//throw new RuntimeException("Import cannot be null");
+		}
 	}
 	
 	public void addTaggedValue(String key, Object value) {

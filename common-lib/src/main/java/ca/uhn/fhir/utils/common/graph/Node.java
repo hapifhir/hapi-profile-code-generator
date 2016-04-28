@@ -258,4 +258,14 @@ public class Node<T> {
 			child.executeCommandBreadthFirst(command);
 		}
 	}
+
+	public Node<T> shallowClone() {
+		Node<T> node = new Node<T>();
+		node.setParent(this.getParent());
+		node.setName(this.getName());
+		node.setChildren(this.getChildren());
+		node.setOriginalName(this.getOriginalName());
+		node.setPayload(this.getPayload());
+		return node;
+	}
 }

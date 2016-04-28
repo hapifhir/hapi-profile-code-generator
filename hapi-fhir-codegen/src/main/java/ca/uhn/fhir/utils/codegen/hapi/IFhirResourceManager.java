@@ -11,4 +11,8 @@ public interface IFhirResourceManager<T> {
 	
 	public FhirExtensionDefinition getFhirExtension(String uri);
 
+	public void addGeneratedType(String classPath);
+
+	public boolean generatedTypeExists(String generatedType);
+
 }

@@ -36,14 +36,15 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 	
 	protected void processElement(ElementDefinition elt) {
 		if(elt != null && elt.getType() != null && elt.getType().size() > 0) {
-			if(elt.getType().size() > 1) {
-				setMultiType(true);
-			}
 			if(PathUtils.isMultivaluedAttribute(elt.getPath())) {
+				setMultiType(true);
 				Class<? extends IBaseResource> resourceClass = HapiFhirUtils.getResourceClass(getFhirContext(), getRoot());
 				List<HapiType> hapiTypes = HapiFhirUtils.getChoiceTypes(getFhirContext(), resourceClass, getRelativePath());
 				getHapiTypes().addAll(hapiTypes);
-			} else {
+			} if(hasOnlyReferenceTypes(elt)) {
+				setReferenceMultiType(true);
+			}else
+			{
 				for(TypeRefComponent type : elt.getType()) {
 					UriType uri = null;
 					if(type.getProfile() != null && type.getProfile().size() > 0) {
@@ -53,6 +54,14 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 				}
 			}
 		}
+	}
+
+	protected boolean hasOnlyReferenceTypes(ElementDefinition elt) {
+		boolean onlyReferences = true;
+		for(ElementDefinition.TypeRefComponent type : elt.getType()) {
+			onlyReferences = type.getCode() != null && type.getCode().equalsIgnoreCase("Reference");
+		}
+		return onlyReferences;
 	}
 	
 	protected void processReference(String code, String profileUri) {
@@ -65,8 +74,8 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 				//It is a base resource profile
 				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), profile.getName()));
 			} else {
-				System.out.println("ERROR: " + profile.getBaseType() + " has not been implemented yet - " + profileUri);
-				//throw new RuntimeException("Not implemented yet");
+				//TODO For short term, just get the base resource of the profile. In future, get the generated wrapper
+				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), profile.getName()));
 			}
 			getHapiTypes().add(hapiType);
 		} else {
@@ -78,6 +87,9 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 		setExtensionUri(extensionUri);
 		FhirExtensionDefinition extensionDef = getFhirResourceManager().getFhirExtension(PathUtils.getExtensionRootPath(extensionUri));
 		String extensionName = PathUtils.getExtensionName(extensionUri);
+		if(extensionDef == null) {
+			System.out.println("ExtensionDef is null for " + extensionUri);
+		}
 		ElementDefinitionDt extendedElement = extensionDef.getExtensionByName(extensionName);
 		processElementDt(extendedElement);
 	}

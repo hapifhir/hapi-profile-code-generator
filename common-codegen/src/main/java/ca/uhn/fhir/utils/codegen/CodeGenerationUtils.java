@@ -124,8 +124,13 @@ public class CodeGenerationUtils {
 	 *            - The definition of the field to add to the JavaClassSource
 	 */
 	public static void addFieldToJavaClass(JavaClassSource classSource, ClassField field) {
-		FieldSource<?> fieldSource = classSource.addField().setName(field.getName()).setType(field.getType())
-					.setLiteralInitializer(field.getInitializer());
+		FieldSource<?> fieldSource = classSource.addField().setName(field.getName());
+		if(field.getType() != null) {
+			fieldSource.setType(field.getType());
+		}
+		if(field.getInitializer() != null) {
+			fieldSource.setLiteralInitializer(field.getInitializer());
+		}
 		for (ModifierEnum modifier : field.getModifiers()) {
 			setFieldSourceModifier(fieldSource, modifier);
 		}
@@ -188,7 +193,15 @@ public class CodeGenerationUtils {
 				methodSource.addParameter(argument.getValue(), argument.getName());
 			}
 			for (String importString : interfaceModel.getImports()) {
-				javaInterface.addImport(importString);
+				try {
+					if(importString != null) {
+						javaInterface.addImport(importString);
+					}
+				} catch(Exception e) {
+					LOGGER.error("Error importing " + importString, e);
+					e.printStackTrace();
+
+				}
 			}
 		}
 		return javaInterface;
@@ -246,7 +259,9 @@ public class CodeGenerationUtils {
 		}
 		for (String importString : classModel.getImports()) {
 			try {
-				javaClass.addImport(importString);
+				if(importString != null) {
+					javaClass.addImport(importString);
+				}
 			} catch(Exception e) {
 				LOGGER.error("Error importing " + importString, e);
 				throw new RuntimeException("Error importing " + importString, e);
