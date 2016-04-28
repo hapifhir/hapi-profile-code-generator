@@ -14,6 +14,7 @@ import ca.uhn.fhir.utils.fhir.dstu3.ProfileTreeBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
+import org.hl7.fhir.dstu3.model.UriType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     public static final Logger LOGGER = LoggerFactory.getLogger(FhirResourceManagerDstu2.class);
 
     public static final String EXTENDED_TYPE = "extended_type";
+    public static final String EXTENSION_ADAPTER_ATTRIBUTE_NAME = "rootObjectExtension";
 
     private FhirResourceManagerDstu3 fhirResourceManager;
     private MethodBodyGenerator templateUtils;
@@ -102,7 +104,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     public void execute(Node<ElementDefinition> node) {
         boolean found = false;
         if (node.getPayload() != null) {
-            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("patient"));
+            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("clinicalTrial"));
         }
         if (found) {// && profile.getName().equals("Immunization")) {
             LOGGER.debug("Found!");
@@ -188,7 +190,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
 
     public void handleInnerNonRootNode(Node<ElementDefinition> node) {
         if (isExtensionNode(node)) {
-            //handleInnerNonRootExtensionNode(node);
+            handleInnerNonRootExtensionNode(node);
         } else {
             handleInnerNonRootNonExtensionNode(node);
         }
@@ -205,19 +207,26 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     public void handleInnerNonRootExtensionNode(Node<ElementDefinition> node) {
         // 1. Clone the node as we are going to override its type (currently set
         // to 'Extension' with a profile URI) with the new generated type
-        ElementDefinition clone = FhirResourceManagerDstu3.shallowCloneElement(node.getPayload());
+        ElementDefinition clonedElement = FhirResourceManagerDstu3.shallowCloneElement(node.getPayload());
         // 2. Build the canonical class path for this to-be-generated type
         String generatedType = CodeGenerationUtils.buildGeneratedClassName(generatedCodePackage, profile.getName(),
-                node.getName());
+                node.getName() + "Adapter");
         // 3. Keep track of user-defined types
         fhirResourceManager.addGeneratedType(generatedType);
         // 4. Set the type of this node to the new class name
-        clone.addType().setCode(generatedType);
+        clonedElement.getType().clear();
+        clonedElement.addType().setCode(generatedType);
+        Node<ElementDefinition> clonedNode = node.shallowClone();
+        clonedNode.setPayload(clonedElement);
         // 5. Generate the accessor methods for this new type
-        List<Method> methods = handleUserDefinedExtensionType(clone, false);
+        MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, clonedNode);
+        handler.setParentType(generatedCodePackage + "." + getInterfaceName());
+        handler.setAddUserDefinedStructureToParent(true);
+        handler.setUserDefinedStructureExtensionURL(node.getPayload().getType().get(0).getProfile().get(0).getValueAsString());//Yuck
+        List<Method> accessors = handler.generateMethods();
         // 6. Add method definitions to parent class
         ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-        rootClass.addMethods(methods);
+        rootClass.addMethods(accessors);
     }
 
     /**
@@ -261,20 +270,19 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
      */
     public void handleExtensionLeafNode(Node<ElementDefinition> node) {
 		if (ifParentIsExtension(node)) { // A leaf extension on an extension ...
-//			// 1. Determine profile URI if none is given (generally relative to
-//			// parent extension)
-//			determineProfileUri(node);
-//			// 2. Fetch the parent class definition
-//			ClassModel parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-//			// 3. Initialize method handlers and generate accessors
-//			ExtendedStructureAttributeHandler handler = new ExtendedStructureAttributeHandler(fhirResourceManager,
-//					templateUtils, profile, node.getPayload());
-//			handler.initialize();
-//			// 3a. Sets the parent name for the construction of fluent setters
-//			handler.setExtendedStructureName(parentClass.getName());
-//			List<Method> methods = handler.buildCorrespondingMethods();
-//			// 4. Add accessors for this field to parent
-//			parentClass.addMethods(methods);
+			// 1. Determine profile URI if none is given (generally relative to
+			// parent extension)
+			determineProfileUri(node);
+			// 2. Fetch the parent class definition
+			ClassModel parentClass = retrieveClassModel(node.getParent(), buildAdaptedTypeName(node.getParent().getName()));
+			// 3. Initialize method handlers and generate accessors
+            MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, node);
+            handler.setExtensionStructure(true);//Flag to indicate that root is an extension and not a FHIR core element
+            handler.setExtensionStructureAttributeName(EXTENSION_ADAPTER_ATTRIBUTE_NAME);
+            handler.setParentType(generatedCodePackage + "." + buildAdaptedTypeName(node.getParent().getName()));
+            List<Method> methods = handler.generateMethods();
+			// 4. Add accessors for this field to parent
+			parentClass.addMethods(methods);
 		} else {
 			if (node.getParent().isRoot()) {
 				// A leaf extension on root
@@ -285,8 +293,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
                         getAdapterName());
                 rootClass.addMethods(methods);
 			} else {
-//				// Leaf extension on a type or backbone element
-                FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(fhirResourceManager, node.getParent().getPayload());
+				// Leaf extension on a type or backbone element
 				ClassModel parentClass = retrieveClassModel(node.getParent(), buildAdaptedTypeName(node.getParent().getName()));
 
 				// 1. Flag the parent FHIR Core datatype as containing
@@ -655,13 +662,13 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
         ClassField fieldUri = buildUriField("uri", extensionDefUri);
         classDefinition.addField(fieldUri);
         // 4. Create class field and accessors for the wrapped ExtensionDt field
-        Method.addGetterSetterFieldToClass(classDefinition, "rootObjectExtension", "ca.uhn.fhir.model.api.ExtensionDt");
+        Method.addGetterSetterFieldToClass(classDefinition, EXTENSION_ADAPTER_ATTRIBUTE_NAME, "org.hl7.fhir.dstu3.model.Extension");
         // 5. Bind wrapped extension to parent class
         Method bindMethod = new Method();
         bindMethod.setName("bindTemplateToParent");
-        bindMethod.addParameter("containingResource", "ca.uhn.fhir.model.dstu2.resource.BaseResource");
-        bindMethod.setBody(templateUtils.getBindExtensionToParent());
-        bindMethod.setReturnType("ca.uhn.fhir.model.api.ExtensionDt");
+        bindMethod.addParameter("containingResource", "org.hl7.fhir.dstu3.model.DomainResource");
+        bindMethod.setBody(templateUtils.getBindExtensionToParent_dstu3());
+        bindMethod.setReturnType("org.hl7.fhir.dstu3.model.Extension");
         classDefinition.addMethod(bindMethod);
     }
 
@@ -693,10 +700,15 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
      * @param node
      */
     private void determineProfileUri(Node<ElementDefinition> node) {
-        if (node.getPayload().getType().get(0).getProfile().get(0).getValueAsString() == null) {
-            node.getPayload().getType().get(0).getProfile().get(0)
-                    .setValue(node.getParent().getPayload().getType().get(0).getProfile().get(0).getValueAsString()
-                            + "#" + PathUtils.getLastPathComponent(node.getPayload().getName()));
+        ElementDefinition.TypeRefComponent type = node.getPayload().getType().get(0);
+        if(type.getProfile().size() == 0) {
+            try {
+                String uri = node.getParent().getPayload().getType().get(0).getProfile().get(0).getValueAsString()
+                        + "#" + PathUtils.getLastPathComponent(node.getPayload().getName());
+                type.getProfile().add(new UriType(uri));
+            } catch(Exception e) {
+                throw new RuntimeException("Unable to determine profile URI", e);
+            }
         }
     }
 

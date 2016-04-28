@@ -848,7 +848,7 @@ public abstract class BaseMethodGenerator implements IMethodHandler {
 	public String buildExtendedTypeSetterBody(String fieldUri) {
 		return template.getExtendedTypeSetterBody(fieldUri);
 	}
-	
+
 	public String buildExtendedStructureListGetterBody(String callee, String type, String uri) {
 		return template.getExtendedStructureListGetterBody(callee, type, uri);
 	}

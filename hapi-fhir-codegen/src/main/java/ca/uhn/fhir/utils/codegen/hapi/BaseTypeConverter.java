@@ -238,8 +238,12 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 					}
 					hapiType.setDatatypeClass(HapiFhirUtils.getPrimitiveTypeClass(ctx, code));
 				} else if(isGeneratedType(code)) {
-					getHapiType().setGeneratedType(code);
-					skip = true;//We are modifying the first type rather than adding a new type for the generated type
+					if(getHapiTypes().size() > 0) {
+						getHapiType().setGeneratedType(code);
+						skip = true;//We are modifying the first type rather than adding a new type for the generated type
+					} else {//We are dealing with an extension
+						hapiType.setGeneratedType(code);
+					}
 				} else if(isResource(code)){
 					if(code.equalsIgnoreCase("DomainResource")) {
 						hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(ctx, getRoot()));

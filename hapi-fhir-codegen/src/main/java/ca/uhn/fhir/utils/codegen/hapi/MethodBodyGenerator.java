@@ -194,6 +194,19 @@ public class MethodBodyGenerator extends TemplateUtils {
 		return st.render();
 	}
 
+	/**
+	 * Method delegating to the adapter's class setter.
+	 *
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getUserDefinedExtensionTypeGetterBody_dstu3(String type, String fieldUri) {
+		ST st = getGroupMain().getInstanceOf("userDefinedExtensionTypeGetterBody_dstu3");
+		st.add("type", type);
+		st.add("fieldUri", fieldUri);
+		return st.render();
+	}
+
 	public String castTypeToReferenceAndReturnTarget(String propertyName, String propertyType) {
 		propertyName = StringUtils.capitalize(propertyName);
 		ST st = getGroupMain().getInstanceOf("castTypeToReferenceAndReturnTarget");
@@ -217,6 +230,18 @@ public class MethodBodyGenerator extends TemplateUtils {
 	 */
 	public String getUserDefinedExtensionTypeSetterBody(String type) {
 		ST st = getGroupMain().getInstanceOf("userDefinedExtensionTypeSetterBody");
+		st.add("type", type);
+		return st.render();
+	}
+
+	/**
+	 * Method delegating to the adapter's class setter.
+	 *
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getUserDefinedExtensionTypeSetterBody_dstu3(String type) {
+		ST st = getGroupMain().getInstanceOf("userDefinedExtensionTypeSetterBody_dstu3");
 		st.add("type", type);
 		return st.render();
 	}
@@ -677,6 +702,11 @@ public class MethodBodyGenerator extends TemplateUtils {
 	
 	public String getBindExtensionToParent() {
 		ST st = getGroupMain().getInstanceOf("bindExtensionToParent");
+		return st.render();
+	}
+
+	public String getBindExtensionToParent_dstu3() {
+		ST st = getGroupMain().getInstanceOf("bindExtensionToParent_dstu3");
 		return st.render();
 	}
 	

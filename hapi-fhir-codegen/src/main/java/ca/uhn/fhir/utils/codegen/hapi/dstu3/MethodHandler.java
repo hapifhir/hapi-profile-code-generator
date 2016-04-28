@@ -3,7 +3,6 @@ package ca.uhn.fhir.utils.codegen.hapi.dstu3;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.uhn.fhir.utils.codegen.CodeGenerationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 
@@ -15,8 +14,6 @@ import ca.uhn.fhir.utils.common.metamodel.Cardinality;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.model.datatype.dstu2.FhirDatatypeEnum;
-import org.hl7.fhir.dstu3.model.Extension;
-import org.hl7.fhir.dstu3.model.Patient;
 
 public class MethodHandler extends BaseMethodHandler {
 
@@ -33,7 +30,9 @@ public class MethodHandler extends BaseMethodHandler {
         List<Method> methods = new ArrayList<Method>();
         try {
             FhirToHapiTypeConverter converter = createConverter();
-            if (converter.isExtension()) {
+            if (addUserDefinedStructureToParent()) {
+                generateAccessorsForLogicalDatatypes(converter, methods);
+            } else if(converter.isExtension()) {
                 generateLogicalAccessors(converter, methods);
             } else {
                 generateMethods(converter, methods);
@@ -346,41 +345,17 @@ public class MethodHandler extends BaseMethodHandler {
             return;
         } else {
             boolean isMultitype = converter.isMultiType();
+            String adaptedClass = "adaptedClass";
+            if(isExtensionStructure()) {
+                adaptedClass = getExtensionStructureAttributeName();
+            }
             for (HapiType type : types) {
                 //Some prep for multi-type field to disambiguate getter signatures
                 String disambiguatingSuffix = "";
                 if (isMultitype) {
                     disambiguatingSuffix = StringUtils.capitalize(type.getDatatypeClass().getSimpleName());
                 }
-                if (!converter.isMultipleCardinality()) {//No setters on lists in HAPI at this time
-                    //Getter
-                    Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguatingSuffix), type.getDatatypeOrList());
-                    if (type.isResource()) {
-                        method.setBody(getTemplate().getExtensionGetterBodyResourceDstu3("adaptedClass", type.getDatatype(), converter.getExtensionUri(), attributeName));
-                    } else {
-                        method.setBody(getTemplate().getExtensionGetterBodyDstu3("adaptedClass", type.getDatatype(), converter.getExtensionUri(), attributeName));
-                    }
-                    if (type.getDatatype() == null) {
-                        System.out.println("STOP HERE");
-                    } else {
-                        method.addImport(type.getDatatype());
-                        addMethod(methods, method);
-                    }
-
-                    //Setter
-                    method = constructSetMethodFromField(attributeName, type.getDatatypeOrList(), getParentType());
-                    if (type.isResource()) {
-                        method.setBody(getTemplate().getExtensionSetterBodyResourceDstu3("adaptedClass", converter.getExtensionUri()));
-                    } else {
-                        method.setBody(getTemplate().getExtensionSetterBodyDstu3("adaptedClass", converter.getExtensionUri()));
-                    }
-                    if (type.getDatatype() == null) {
-                        System.out.println("STOP HERE");
-                    } else {
-                        method.addImport(type.getDatatype());
-                        addMethod(methods, method);
-                    }
-                } else {
+                if (converter.isMultipleCardinality()) {//No setters on lists in HAPI at this time
                     //Getter
                     Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguatingSuffix), type.getDatatypeOrList());
                     if (type.isResource()) {
@@ -392,6 +367,7 @@ public class MethodHandler extends BaseMethodHandler {
                         System.out.println("STOP HERE");
                     } else {
                         method.addImport(type.getDatatype());
+                        method.addImport("java.util.List");
                         addMethod(methods, method);
                     }
 
@@ -406,10 +382,65 @@ public class MethodHandler extends BaseMethodHandler {
                         System.out.println("STOP HERE");
                     } else {
                         method.addImport(type.getDatatype());
+                        method.addImport("java.util.List");
+                        addMethod(methods, method);
+                    }
+                } else {
+                    //Getter
+                    Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguatingSuffix), type.getDatatypeOrList());
+                    if (type.isResource()) {
+                        method.setBody(getTemplate().getExtensionGetterBodyResourceDstu3(adaptedClass, type.getDatatype(), converter.getExtensionUri(), attributeName));
+                    } else {
+                        method.setBody(getTemplate().getExtensionGetterBodyDstu3(adaptedClass, type.getDatatype(), converter.getExtensionUri(), attributeName));
+                    }
+                    if (type.getDatatype() == null) {
+                        System.out.println("STOP HERE");
+                    } else {
+                        method.addImport(type.getDatatype());
+                        method.addImport("java.util.List");
+                        addMethod(methods, method);
+                    }
+
+                    //Setter
+                    method = constructSetMethodFromField(attributeName, type.getDatatypeOrList(), getParentType());
+                    if (type.isResource()) {
+                        method.setBody(getTemplate().getExtensionSetterBodyResourceDstu3(adaptedClass, converter.getExtensionUri()));
+                    } else {
+                        method.setBody(getTemplate().getExtensionSetterBodyDstu3(adaptedClass, converter.getExtensionUri()));
+                    }
+                    if (type.getDatatype() == null) {
+                        System.out.println("STOP HERE");
+                    } else {
+                        method.addImport(type.getDatatype());
+                        method.addImport("java.util.List");
                         addMethod(methods, method);
                     }
                 }
             }
+        }
+    }
+
+    public void generateAccessorsForLogicalDatatypes(FhirToHapiTypeConverter converter, List<Method> methods) {
+        HapiType type = converter.getHapiType();
+        String attributeName = converter.parseAttributeName();
+        if (type.getGeneratedType() == null || converter.getCardinality() == Cardinality.CONSTRAINED_OUT) {
+            return;
+        } if (converter.isMultipleCardinality()) {
+            //Getter
+            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), "java.util.List<" + type.getGeneratedType() + ">");
+            method.setBody(getTemplate().getUserDefinedExtensionTypeGetterBody_dstu3(type.getGeneratedType(), getUserDefinedStructureExtensionURL()));
+            method.addImport(type.getDatatype());
+            method.addImport("java.util.List");
+            addMethod(methods, method);
+
+            //Setter
+            method = constructSetMethodFromField(attributeName, "java.util.List<" + type.getGeneratedType() + ">", getParentType());
+            method.setBody(getTemplate().getUserDefinedExtensionTypeSetterBody_dstu3(type.getGeneratedType()));
+            method.addImport(type.getDatatype());
+            method.addImport("java.util.List");
+            addMethod(methods, method);
+        } else {
+            throw new RuntimeException("Single cardinality user defined structures are not supported yet");
         }
     }
 

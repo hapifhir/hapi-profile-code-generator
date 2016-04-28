@@ -204,7 +204,7 @@ public class Method {
 		classModel.addMethod(setter);
 		List<ModifierEnum> modifiers = new ArrayList<ModifierEnum>();
 		modifiers.add(ModifierEnum.PRIVATE);
-		ClassField field = new ClassField(StringUtils.uncapitalize(attributeName), attributeType , modifiers, "new ExtensionDt(false, uri);");//TODO Move to constructor body
+		ClassField field = new ClassField(StringUtils.uncapitalize(attributeName), attributeType , modifiers, "new Extension(uri);");//TODO Move to constructor body
 		classModel.addField(field);
 		
 	}

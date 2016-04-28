@@ -1,7 +1,6 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
 import ca.uhn.fhir.utils.common.metamodel.Method;
-import ca.uhn.fhir.utils.fhir.PathUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -13,6 +12,10 @@ public abstract class BaseMethodHandler {
 	
 	private MethodBodyGenerator template;
 	private String parentType;
+	private boolean isExtensionStructure;
+	private String extensionStructureAttributeName;
+	private boolean addUserDefinedStructureToParent;
+	private String userDefinedStructureExtensionURL;
 
 	public BaseMethodHandler(MethodBodyGenerator template) {
 		this.template = template;
@@ -34,7 +37,39 @@ public abstract class BaseMethodHandler {
 		this.parentType = parentType;
 	}
 
-	/****************************************************************
+	public boolean isExtensionStructure() {
+		return isExtensionStructure;
+	}
+
+	public void setExtensionStructure(boolean extensionStructure) {
+		isExtensionStructure = extensionStructure;
+	}
+
+	public String getExtensionStructureAttributeName() {
+		return extensionStructureAttributeName;
+	}
+
+	public void setExtensionStructureAttributeName(String extensionStructureAttributeName) {
+		this.extensionStructureAttributeName = extensionStructureAttributeName;
+	}
+
+	public boolean addUserDefinedStructureToParent() {
+		return addUserDefinedStructureToParent;
+	}
+
+	public void setAddUserDefinedStructureToParent(boolean addExtensionStructureToParent) {
+		this.addUserDefinedStructureToParent = addExtensionStructureToParent;
+	}
+
+	public String getUserDefinedStructureExtensionURL() {
+		return userDefinedStructureExtensionURL;
+	}
+
+	public void setUserDefinedStructureExtensionURL(String userDefinedStructureExtensionURL) {
+		this.userDefinedStructureExtensionURL = userDefinedStructureExtensionURL;
+	}
+
+/****************************************************************
 	 * HELPER METHODS
 	 */
 
