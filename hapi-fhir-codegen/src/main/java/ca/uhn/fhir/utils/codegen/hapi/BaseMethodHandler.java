@@ -96,4 +96,51 @@ public abstract class BaseMethodHandler {
 	public String buildSetterName(String fieldName) {
 		return "set" + StringUtils.capitalize(fieldName);
 	}
+
+	/**
+	 * Constructs add method for a field of multiple cardinality.
+	 * <pre>
+	 * <code>
+	 * public &lt;adapterType&gt; addFieldName(&lt;fieldType&gt; param)
+	 * </code>
+	 * </pre>
+	 * @param fieldName
+	 * @param type
+	 * @return
+	 */
+	public Method constructAddMethod(String fieldName, String parameterType, String returnType) {
+		Method method = new Method();
+		method.setName(buildAddMethodName(fieldName));
+		method.addParameter(parameterType);
+		method.setReturnType(returnType);
+		return method;
+	}
+
+	/**
+	 * Constructs add method for a field of multiple cardinality.
+	 * <pre>
+	 * <code>
+	 * public &lt;fieldType&gt; addFieldName()
+	 * </code>
+	 * </pre>
+	 * @param fieldName
+	 * @param type
+	 * @return
+	 */
+	public Method buildAddMethodDelegated(String fieldName, String returnType) {
+		Method method = new Method();
+		method.setName(buildAddMethodName(fieldName));
+		method.setReturnType(returnType);
+		return method;
+	}
+
+	/**
+	 * Builds a method signature that adds an element to a List type
+	 *
+	 * @param fieldName
+	 * @return
+	 */
+	public String buildAddMethodName(String fieldName) {
+		return "add" + StringUtils.capitalize(fieldName);
+	}
 }

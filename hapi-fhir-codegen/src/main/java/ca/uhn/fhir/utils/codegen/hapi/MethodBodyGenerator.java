@@ -136,6 +136,22 @@ public class MethodBodyGenerator extends TemplateUtils {
 		st.add("propertyType", propertyType);
 		return st.render();
 	}
+
+	/**
+	 * Method returning method body for adding item to a list.
+	 *
+	 * @param className - The class name
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getAddToListMethodDelegatedBody_dstu3(String className, String propertyName, String propertyType) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("addToListMethodDelegatedBody_dstu3");
+		st.add("fieldName", className);
+		st.add("propertyName", propertyName);
+		st.add("propertyType", propertyType);
+		return st.render();
+	}
 	
 	/**
 	 * Method delegating to the adapter's class setter.

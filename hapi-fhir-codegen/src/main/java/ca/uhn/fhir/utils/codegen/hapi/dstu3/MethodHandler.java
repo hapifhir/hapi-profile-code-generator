@@ -127,6 +127,15 @@ public class MethodHandler extends BaseMethodHandler {
                     addMethod(methods, method);
                 }
             }
+
+            if(converter.isMultipleCardinality()) {
+                method = constructAddMethod(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype(), getParentType());
+                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX));
+                method.addImport(type.getDatatype());
+                if (!methods.contains(method)) {
+                    addMethod(methods, method);
+                }
+            }
         }
     }
 
@@ -175,6 +184,25 @@ public class MethodHandler extends BaseMethodHandler {
                 } else {
                     method.addImport(type.getDatatype());
                     addMethod(methods, method);
+                }
+            }
+
+            if(converter.isMultipleCardinality()) {
+                method = constructAddMethod(attributeName, type.getDatatype(), getParentType());
+                method.setBody(getTemplate().getAddToListMethodBody("adaptedClass", attributeName));
+                method.addImport(type.getDatatype());
+                if (!methods.contains(method)) {
+                    addMethod(methods, method);
+                }
+                if(attributeName.equalsIgnoreCase("contained")) {
+                    //Do nothing since the method would have no idea what resource to return
+                } else {
+                    method = buildAddMethodDelegated(attributeName, type.getDatatype());
+                    method.setBody(getTemplate().getAddToListMethodDelegatedBody_dstu3("adaptedClass", attributeName, type.getDatatype()));
+                    method.addImport(type.getDatatype());
+                    if (!methods.contains(method)) {
+                        addMethod(methods, method);
+                    }
                 }
             }
         }
@@ -255,6 +283,28 @@ public class MethodHandler extends BaseMethodHandler {
             if (!methods.contains(method)) {
                 addMethod(methods, method);
             }
+
+            if(converter.isMultipleCardinality()) {
+                method = constructAddMethod("Wrapped" + StringUtils.capitalize(attributeName), type.getGeneratedType(), getParentType());
+                method.setBody(getTemplate().addWrappedTypeToListMethodDelegatedBody(attributeName));
+                method.addImport(type.getDatatype());
+                if (!methods.contains(method)) {
+                    addMethod(methods, method);
+                }
+                if(attributeName.equalsIgnoreCase("contained")) {
+                    //Do nothing since the method would have no idea what resource to return
+                } else {
+                    method = buildAddMethodDelegated("Wrapped" + StringUtils.capitalize(attributeName), type.getGeneratedType());
+                    method.setBody(getTemplate().addWrappedTypeToListMethodBody(type.getGeneratedType(), type.getDatatype(), attributeName));
+                    method.addImport(type.getDatatype());
+                    if (!methods.contains(method)) {
+                        addMethod(methods, method);
+                    }
+                }
+            }
+
+            //Now generate the standard datatype methods
+            handleDatatypeMethods(converter, type, methods);
         }
     }
 
