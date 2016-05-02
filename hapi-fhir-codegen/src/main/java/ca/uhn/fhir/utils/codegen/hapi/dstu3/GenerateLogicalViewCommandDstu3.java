@@ -104,7 +104,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     public void execute(Node<ElementDefinition> node) {
         boolean found = false;
         if (node.getPayload() != null) {
-            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("clinicalTrial"));
+            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("dosageInstruction"));
         }
         if (found) {// && profile.getName().equals("Immunization")) {
             LOGGER.debug("Found!");
@@ -225,8 +225,13 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
         handler.setUserDefinedStructureExtensionURL(node.getPayload().getType().get(0).getProfile().get(0).getValueAsString());//Yuck
         List<Method> accessors = handler.generateMethods();
         // 6. Add method definitions to parent class
-        ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-        rootClass.addMethods(accessors);
+        ClassModel parentClass = null;
+        if(node.getParent().isRoot()) {
+            parentClass = retrieveRootClassModel(node.getParent(), getAdapterName());
+        } else {
+            parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+        }
+        parentClass.addMethods(accessors);
     }
 
     /**
@@ -408,8 +413,13 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
             MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, node);
             handler.setParentType(generatedCodePackage + "." + getInterfaceName());
             List<Method> updatedAccessors = handler.generateMethods();
-            ClassModel rootClass = retrieveClassModel(node.getParent(), node.getParent().getName());
-            rootClass.addMethods(updatedAccessors);
+            ClassModel parentClass = null;
+            if(node.getParent().isRoot()) {
+                parentClass = retrieveRootClassModel(node.getParent(), getAdapterName());
+            } else {
+                parentClass = retrieveClassModel(node.getParent(), node.getParent().getName());
+            }
+            parentClass.addMethods(updatedAccessors);
 		}
 
         //TODO This may not be needed any longer. Should lead to duplicate method signatures
