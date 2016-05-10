@@ -1,8 +1,6 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
-import org.hl7.fhir.dstu3.model.DomainResource;
-import org.hl7.fhir.dstu3.model.PrimitiveType;
-import org.hl7.fhir.dstu3.model.Type;
+import org.hl7.fhir.dstu3.model.*;
 import org.hl7.fhir.instance.model.api.IBase;
 
 /**
@@ -142,6 +140,46 @@ public class HapiType {
 	}
 	public boolean isType() {
 		return this.datatype != null && Type.class.isAssignableFrom(this.datatype);
+	}
+
+	/**
+	 * FHIR supports extensible types. For each extensible type, there is a
+	 * primitive Java type equivalent. Method returns the primitive java type
+	 * corresponding to this FHIR extensible type.
+	 *
+	 * @param type
+	 * @return
+	 */
+	public String getPrimitiveEquivalent() {
+		if(datatype == null) {
+			return null;
+		} else if(getDatatype().equals(DateTimeType.class.getCanonicalName())) {
+			return java.util.Date.class.getName();
+		} else if(getDatatype().equals(DateType.class.getCanonicalName())) {
+			return  java.util.Date.class.getName();
+		} else if(getDatatype().equals(BooleanType.class.getCanonicalName())) {
+			return java.lang.Boolean.class.getName();
+		} else if(getDatatype().equals(IntegerType.class.getName())) {
+			return java.lang.Integer.class.getName();
+		} else if(getDatatype().equals(StringType.class.getCanonicalName())) {
+			return java.lang.String.class.getName();
+		} else if(getDatatype().equals(CodeType.class.getCanonicalName())) {
+			return java.lang.String.class.getName();
+		} else if(getDatatype().equals(TimeType.class.getCanonicalName())) {
+			return java.lang.String.class.getName();
+		} else if(getDatatype().equals(InstantType.class.getName())) {
+			return java.util.Date.class.getName();
+		} else if(getDatatype().equals(PositiveIntType.class.getCanonicalName())) {
+			return java.lang.Integer.class.getName();
+		} else if(getDatatype().equals(UriType.class.getCanonicalName())) {
+			return java.lang.String.class.getName();
+		} else if(getDatatype().equals(IdType.class.getCanonicalName())) {
+			return java.lang.String.class.getName();
+		} else if(getDatatype().equals(CodeType.class.getCanonicalName())) {
+			return java.lang.String.class.getName();
+		} else {
+			return null;
+		}
 	}
 
 	public String toString() {

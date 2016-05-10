@@ -171,6 +171,16 @@ public class Method {
 	public static String buildGetterName(String fieldName) {
 		return "get" + StringUtils.capitalize(fieldName);
 	}
+
+	/**
+	 * Builds getter signature name using the JavaBean convention
+	 *
+	 * @param fieldName
+	 * @return
+	 */
+	public static String buildHasMethodName(String fieldName) {
+		return "has" + StringUtils.capitalize(fieldName);
+	}
 	
 	/**
 	 * Returns a setter following the JavaBean convention.

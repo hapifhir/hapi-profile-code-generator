@@ -1,0 +1,1 @@
+hasMethodInvocation(className, propertyName) ::= "return <className>.has<propertyName>();"

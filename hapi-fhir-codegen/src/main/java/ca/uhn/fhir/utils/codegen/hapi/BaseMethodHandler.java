@@ -143,4 +143,23 @@ public abstract class BaseMethodHandler {
 	public String buildAddMethodName(String fieldName) {
 		return "add" + StringUtils.capitalize(fieldName);
 	}
+
+
+	protected void buildHasMethod(List<Method> methods, String attributeName) {
+		buildHasMethod(methods, attributeName, "");
+	}
+
+	protected void buildHasMethod(List<Method> methods, String attributeName, String nameSuffix) {
+		Method method;
+		method = Method.constructNoArgMethod(Method.buildHasMethodName(attributeName + nameSuffix), "boolean");
+		method.setBody(getTemplate().getAdapterHasMethodDelegationBody(attributeName + nameSuffix));
+		addMethod(methods, method);
+	}
+
+
+	public void addMethod(List<Method> methods, Method method) {
+		if(method != null && !methods.contains(method)) { //Check is needed for multi-type method
+			methods.add(method);
+		}
+	}
 }

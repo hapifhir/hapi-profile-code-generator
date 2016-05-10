@@ -21,7 +21,13 @@ public abstract class TemplateUtils {
 	public static final Logger LOGGER = LoggerFactory.getLogger(TemplateUtils.class);
 	
 	private String templateFolderPath = "src/main/resources/templates";
+	private String templateFolderPathCommon = "src/main/resources/templates/common";
+	private String templateFolderPathDstu2 = "src/main/resources/templates/dstu2";
+	private String templateFolderPathDstu3 = "src/main/resources/templates/dstu3";
 	private STGroup groupMain;
+	private STGroup groupCommon;
+	private STGroup groupDstu2;
+	private STGroup groupDstu3;
 
 	public TemplateUtils() {}
 	
@@ -33,7 +39,16 @@ public abstract class TemplateUtils {
 	public TemplateUtils initialize() {
 		try {
 			File rootMain = new File(templateFolderPath);
+			File rootCommon = new File(templateFolderPathCommon);
+			File rootDstu2 = new File(templateFolderPathDstu2);
+			File rootDstu3 = new File(templateFolderPathDstu3);
 			groupMain = new STGroupDir(rootMain.getCanonicalPath());
+			groupCommon = new STGroupDir(rootCommon.getCanonicalPath());
+			groupDstu2 = new STGroupDir(rootDstu2.getCanonicalPath());
+			groupDstu3 = new STGroupDir(rootDstu3.getCanonicalPath());
+			groupMain.importTemplates(groupCommon);
+			groupMain.importTemplates(groupDstu2);
+			groupMain.importTemplates(groupDstu3);
 			return this;
 		} catch(Exception e) {
 			LOGGER.error("Error initializing StringTemplate. Validate template path: " + templateFolderPath, e);

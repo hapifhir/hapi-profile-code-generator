@@ -2,8 +2,10 @@ package ca.uhn.fhir.utils.codegen.hapi.dstu3;
 
 import java.util.List;
 
+import ca.uhn.fhir.utils.codegen.hapi.GenerateLogicalViewCommandBase;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
 import org.hl7.fhir.dstu3.model.ElementDefinition.TypeRefComponent;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.hl7.fhir.dstu3.model.StructureDefinition;
 import org.hl7.fhir.dstu3.model.UriType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -41,25 +43,33 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 				Class<? extends IBaseResource> resourceClass = HapiFhirUtils.getResourceClass(getFhirContext(), getRoot());
 				List<HapiType> hapiTypes = HapiFhirUtils.getChoiceTypes(getFhirContext(), resourceClass, getRelativePath());
 				getHapiTypes().addAll(hapiTypes);
-			} if(hasOnlyReferenceTypes(elt)) {
+			} if(elt.getType().size() > 1 && hasOnlyReferenceTypes(elt)) {
 				setReferenceMultiType(true);
+				handleElementTypes(elt);
 			}else
 			{
-				for(TypeRefComponent type : elt.getType()) {
-					UriType uri = null;
-					if(type.getProfile() != null && type.getProfile().size() > 0) {
-						uri = type.getProfile().get(0);
-					}
-					processType(type.getCode(), (uri != null)? uri.getValueAsString():null);
-				}
+				handleElementTypes(elt);
 			}
 		}
+	}
+
+	private void handleElementTypes(ElementDefinition elt) {
+		for(TypeRefComponent type : elt.getType()) {
+            UriType uri = null;
+            if(type.getProfile() != null && type.getProfile().size() > 0) {
+                uri = type.getProfile().get(0);
+            }
+            processType(type.getCode(), (uri != null)? uri.getValueAsString():null);
+        }
 	}
 
 	protected boolean hasOnlyReferenceTypes(ElementDefinition elt) {
 		boolean onlyReferences = true;
 		for(ElementDefinition.TypeRefComponent type : elt.getType()) {
 			onlyReferences = type.getCode() != null && type.getCode().equalsIgnoreCase("Reference");
+			if (!onlyReferences){
+				break;
+			}
 		}
 		return onlyReferences;
 	}
@@ -73,9 +83,15 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 			if(baseType != null && baseType.equalsIgnoreCase("DomainResource")) {
 				//It is a base resource profile
 				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), profile.getName()));
+			} else if(profileUri != null && profileUri.equals("http://hl7.org/fhir/StructureDefinition/Resource")) {
+				hapiType.setDatatypeClass(Resource.class);
 			} else {
-				//TODO For short term, just get the base resource of the profile. In future, get the generated wrapper
-				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), profile.getName()));
+				//TODO Fix to return generated type rather than profile.
+				String generatedType = GenerateLogicalViewCommandDstu3.generateAdapterName(profile);
+				if(generatedType != null) {
+					hapiType.setGeneratedType("org.socraticgrid.fhir.dstu3.generated." + generatedType);
+				}
+				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), profile.getBaseType()));
 			}
 			getHapiTypes().add(hapiType);
 		} else {

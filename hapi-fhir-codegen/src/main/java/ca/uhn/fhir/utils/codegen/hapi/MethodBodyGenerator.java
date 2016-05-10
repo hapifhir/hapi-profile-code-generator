@@ -277,6 +277,20 @@ public class MethodBodyGenerator extends TemplateUtils {
 	}
 
 	/**
+	 * Method delegating to the adapter's class has-method.
+	 *
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getAdapterHasMethodDelegationBody(String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("hasMethodInvocation");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+
+	/**
 	 * Method delegating to the adapter's class getter.
 	 *
 	 * @param propertyName - The name of the property
@@ -399,6 +413,20 @@ public class MethodBodyGenerator extends TemplateUtils {
 	public String getProfiledReferenceSetterBody(String propertyName) {
 		propertyName = StringUtils.capitalize(propertyName);
 		ST st = getGroupMain().getInstanceOf("profiledReferenceSetterBody");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		return st.render();
+	}
+
+	/**
+	 * Sets a reference type in HAPI FHIR.
+	 *
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getProfiledReferenceSetterBody_dstu3(String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("profiledReferenceSetterBody_dstu3");
 		st.add("className", "adaptedClass");
 		st.add("propertyName", propertyName);
 		return st.render();
