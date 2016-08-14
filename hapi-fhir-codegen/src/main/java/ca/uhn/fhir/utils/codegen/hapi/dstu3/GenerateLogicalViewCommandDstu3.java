@@ -77,10 +77,11 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
 
     public void buildAdapterInterfaceNames() {
         if (profile != null) {
-            String base = profile.getBaseType();
+            String base = profile.getType();
             if (base != null && base.equalsIgnoreCase("DomainResource")) {
-                interfaceName = "I" + profile.getName();
-                adapterName = profile.getName() + "Adapter";
+                String profileName = FhirResourceManagerDstu3.getProfileName(profile);
+                interfaceName = "I" + profileName;
+                adapterName = profileName + "Adapter";
             } else {
                 interfaceName = generateInterfaceName(profile);
                 adapterName = generateAdapterName(profile);
@@ -93,7 +94,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     public String buildAdaptedTypeName(String adaptedType) {
         String adaptedName = null;
         if (profile != null) {
-            adaptedName = CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + StringUtils.capitalize(adaptedType) + "Adapter";
+            adaptedName = CodeGenerationUtils.makeIdentifierJavaSafe(FhirResourceManagerDstu3.getProfileName(profile)) + StringUtils.capitalize(adaptedType) + "Adapter";
         } else {
             //Log error
         }
@@ -104,7 +105,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     public void execute(Node<ElementDefinition> node) {
         boolean found = false;
         if (node.getPayload() != null) {
-            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("abatement"));
+            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("relatedCondition.condition"));
         }
         if (found) {// && profile.getName().equals("Immunization")) {
             LOGGER.debug("Found!");
@@ -209,7 +210,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
         // to 'Extension' with a profile URI) with the new generated type
         ElementDefinition clonedElement = FhirResourceManagerDstu3.shallowCloneElement(node.getPayload());
         // 2. Build the canonical class path for this to-be-generated type
-        String generatedType = CodeGenerationUtils.buildGeneratedClassName(generatedCodePackage, profile.getName(),
+        String generatedType = CodeGenerationUtils.buildGeneratedClassName(generatedCodePackage, FhirResourceManagerDstu3.getProfileName(profile),
                 node.getName() + "Adapter");
         // 3. Keep track of user-defined types
         fhirResourceManager.addGeneratedType(generatedType);
@@ -222,7 +223,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
         MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, clonedNode);
         handler.setParentType(generatedCodePackage + "." + getInterfaceName());
         handler.setAddUserDefinedStructureToParent(true);
-        handler.setUserDefinedStructureExtensionURL(node.getPayload().getType().get(0).getProfile().get(0).getValueAsString());//Yuck
+        handler.setUserDefinedStructureExtensionURL(node.getPayload().getType().get(0).getProfile());//Yuck
         List<Method> accessors = handler.generateMethods();
         // 6. Add method definitions to parent class
         ClassModel parentClass = null;
@@ -406,9 +407,9 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
 //            clonedElement.addType().setCode(generatedCodePackage + "."
 //					+ CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName());
             node.getPayload().addType().setCode(generatedCodePackage + "."
-                    + CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName() + "Adapter");
+                    + CodeGenerationUtils.makeIdentifierJavaSafe(FhirResourceManagerDstu3.getProfileName(profile)) + node.getName() + "Adapter");
             fhirResourceManager.addGeneratedType(generatedCodePackage + "."
-                    + CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName()) + node.getName() + "Adapter");
+                    + CodeGenerationUtils.makeIdentifierJavaSafe(FhirResourceManagerDstu3.getProfileName(profile)) + node.getName() + "Adapter");
 
             MethodHandler handler = new MethodHandler(fhirResourceManager, templateUtils, node);
             handler.setParentType(generatedCodePackage + "." + getInterfaceName());
@@ -624,6 +625,15 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
      * @param model
      */
     private void initializeAdaptedModel(Node<ElementDefinition> node, ClassModel model) {
+        //Need to add a type of DomainResource when element is root node and type is null. This type existed in earlier profiles but was removed in latest STU3 profiles.
+        //It led to a bug downstream when no type was found but one was expected for the element definition.
+        if(node.isRoot() && (node.getPayload().getType() == null || node.getPayload().getType().size() == 0)) {
+            if(profile.getBaseDefinition().endsWith("DomainResource")) {
+                node.getPayload().addType().setCode("DomainResource");
+            } else {
+                node.getPayload().addType().setCode(PathUtils.getLastResourcePathComponent(profile.getBaseDefinition()));
+            }
+        }
         FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(fhirResourceManager, node.getPayload());
         if (converter.isExtension()) {// TODO Following code couples FHIR
             buildExtendedParentClass(model, node);
@@ -663,7 +673,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     public void buildExtendedParentClass(ClassModel classDefinition, Node<ElementDefinition> node) {
         // 1. Get the extension URI (we are only considering single extensions
         // in this implementation)
-        String extensionDefUri = node.getPayload().getType().get(0).getProfile().get(0).getValueAsString();
+        String extensionDefUri = node.getPayload().getType().get(0).getProfile();
         // 2. Sets the package for this new type.
         classDefinition.setNamespace(generatedCodePackage);
         // 3. Build a field for this extension URI. E.g.,
@@ -711,11 +721,11 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
      */
     private void determineProfileUri(Node<ElementDefinition> node) {
         ElementDefinition.TypeRefComponent type = node.getPayload().getType().get(0);
-        if (type.getProfile().size() == 0) {
+        if (type.getProfile() == null) {
             try {
-                String uri = node.getParent().getPayload().getType().get(0).getProfile().get(0).getValueAsString()
+                String uri = node.getParent().getPayload().getType().get(0).getProfile()
                         + "#" + PathUtils.getLastPathComponent(node.getPayload().getName());
-                type.getProfile().add(new UriType(uri));
+                type.setProfile(new UriType(uri).getValue());//TODO Revisit
             } catch (Exception e) {
                 throw new RuntimeException("Unable to determine profile URI", e);
             }
@@ -733,12 +743,12 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     }
 
     public static String generateAdapterName(StructureDefinition profile) {
-        String javaSafeProfileName = CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName());
+        String javaSafeProfileName = CodeGenerationUtils.makeIdentifierJavaSafe(FhirResourceManagerDstu3.getProfileName(profile));
         return generateAdapterName(javaSafeProfileName);
     }
 
     public static String generateInterfaceName(StructureDefinition profile) {
-        String javaSafeProfileName = CodeGenerationUtils.makeIdentifierJavaSafe(profile.getName());
+        String javaSafeProfileName = CodeGenerationUtils.makeIdentifierJavaSafe(FhirResourceManagerDstu3.getProfileName(profile));
         return generateInterfaceName(javaSafeProfileName);
     }
 }

@@ -28,9 +28,9 @@ public class InterfaceAdapterGeneratorTest {
 	@Before
 	public void setUp() throws Exception {
 		loader = new FhirResourceManagerDstu2();
-		loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("profiles-resources.xml"));
+		//loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("profiles-resources.xml"));
 		loaderDstu3 = new FhirResourceManagerDstu3();
-		loaderDstu3.loadResourceProfiles(ResourceLoadingUtils.getReaderFromFilePath("/Users/cnanjo/repository/fhir_dstu3/fhir/trunk/build/publish/profiles-resources.xml"));
+		//loaderDstu3.loadResourceProfiles(ResourceLoadingUtils.getReaderFromFilePath("/Users/cnanjo/repository/fhir_dstu3/fhir/trunk/build/publish/profiles-resources.xml"));
 	}
 
 	@After

@@ -291,6 +291,21 @@ public class MethodBodyGenerator extends TemplateUtils {
 	}
 
 	/**
+	 * Method delegating to the adapter's class has-method.
+	 *
+	 * @param propertyName - The name of the property
+	 * @return
+	 */
+	public String getAdapterHasMethodDelegationBody(String propertyName, String argumentType) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("hasMethodWithArgumentInvocation");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		st.add("argumentType", argumentType);
+		return st.render();
+	}
+
+	/**
 	 * Method delegating to the adapter's class getter.
 	 *
 	 * @param propertyName - The name of the property
@@ -648,10 +663,10 @@ public class MethodBodyGenerator extends TemplateUtils {
 	 */
 	public String getExtensionGetterBodyResourceDstu3(String rootClassName, String type, String uri, String fieldName) {
 		ST st = getGroupMain().getInstanceOf("extensionGetterBodyResourceDstu3");
-		st.add("rootClassName", rootClassName);
+		//st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		st.add("type", type);
-		st.add("fieldName", fieldName);
+		//st.add("fieldName", fieldName);
 		return st.render();
 	}
 	

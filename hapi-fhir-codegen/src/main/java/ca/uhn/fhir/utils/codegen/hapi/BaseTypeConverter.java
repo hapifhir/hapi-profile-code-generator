@@ -190,9 +190,9 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 			if(elt.getType().size() > 1) {
 				setMultiType(true);
 			}
-			for(Type type : elt.getType()) {
+			for (Type type : elt.getType()) {
 				UriDt uri = type.getProfileFirstRep();
-				processType(type.getCode(), (uri != null)? uri.getValueAsString():null);
+				processType(type.getCode(), (uri != null) ? uri.getValueAsString() : null);
 			}
 		}
 	}

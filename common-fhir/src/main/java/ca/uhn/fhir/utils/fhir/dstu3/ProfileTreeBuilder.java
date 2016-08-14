@@ -75,7 +75,7 @@ public class ProfileTreeBuilder {
 		for(ElementDefinition element : elementIndex.values()) {
 			String path = PathUtils.generateExtensionPath(element.getPath(), element.getName());
 			LOGGER.debug(path);
-			if(path.contains("Patient.clinicalTrial")) {
+			if(path.contains("Encounter.relatedCondition")) {
 				System.out.println("Stop here");
 			}
 			root.addToPath(path, element);

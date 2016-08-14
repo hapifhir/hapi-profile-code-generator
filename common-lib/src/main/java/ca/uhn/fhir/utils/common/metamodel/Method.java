@@ -99,18 +99,18 @@ public class Method {
 	 * @param imports
 	 * @return
 	 */
-	public static Method constructNoArgMethod(String methodName, String type, List<String> imports) {
+	public static Method constructNoArgMethod(String methodName, String returnType, List<String> imports) {
 		Method method = new Method();
 		method.setName(methodName);
 		if(imports != null) {
 			method.getImports().addAll(imports);
 		}
-		method.setReturnType(type);
+		method.setReturnType(returnType);
 		return method;
 	}
 	
-	public static Method constructNoArgMethod(String methodName, String type) {
-		return constructNoArgMethod(methodName, type, null);
+	public static Method constructNoArgMethod(String methodName, String returnType) {
+		return constructNoArgMethod(methodName, returnType, null);
 	}
 	
 	/**

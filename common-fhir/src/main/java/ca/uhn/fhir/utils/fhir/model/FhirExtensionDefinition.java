@@ -113,6 +113,9 @@ public class FhirExtensionDefinition {
 	public static FhirExtensionDefinition populateFromStructureDefinition(StructureDefinition definition) {
 		FhirExtensionDefinition extensionDefinition = new FhirExtensionDefinition();
 		extensionDefinition.setProfileUrl(definition.getUrl());
+		if(definition.getUrl().contains("relatedCondition")) {
+			System.out.println("STOP HERE");
+		}
 		List<ElementDefinitionDt> elements = definition.getSnapshot().getElement();
 		int currentLevel = 0;
 		for(ElementDefinitionDt element : elements) {
@@ -155,7 +158,7 @@ public class FhirExtensionDefinition {
 		} else if(original.getPath().equals("Extension.url")) {
 			processExtensionUrlElement(original, consolidated);
 		} else if(original.getPath().equals("Extension.value[x]")) {
-			processExtensionValueElement(original, consolidated);
+			processExtensionMultiValueElement(original, consolidated);
 		} else if(original.getPath().equals("Extension.id")) {
 			//Do nothing
 		}
@@ -189,6 +192,16 @@ public class FhirExtensionDefinition {
 	
 	protected static void processExtensionValueElement(ElementDefinitionDt element, ElementDefinitionDt consolidated) {
 		consolidated.setType(element.getType());
+	}
+
+	protected static void processExtensionMultiValueElement(ElementDefinitionDt element, ElementDefinitionDt consolidated) {
+		if(element.getType() != null && element.getType().size() == 38) {
+			consolidated.getType().clear(); //TODO This is a hack. Currently, structures simply specify a value[x] even if they have no value.
+			//Clearing the type or else downstream logic will be assume that this extension has 38 value types.
+			//Need to find out from Grahame if multi-valued extension also use the value[x] syntax. This will break if values are no longer 38 in the future.
+		} else {
+			consolidated.setType(element.getType());
+		}
 	}
 	
 	public static FhirExtensionDefinition loadExtension(String extensionFilePath) {

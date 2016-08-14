@@ -43,23 +43,24 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 				Class<? extends IBaseResource> resourceClass = HapiFhirUtils.getResourceClass(getFhirContext(), getRoot());
 				List<HapiType> hapiTypes = HapiFhirUtils.getChoiceTypes(getFhirContext(), resourceClass, getRelativePath());
 				getHapiTypes().addAll(hapiTypes);
-			} if(elt.getType().size() > 1 && hasOnlyReferenceTypes(elt)) {
+			} else if(elt.getType().size() > 1 && hasOnlyReferenceTypes(elt)) {
 				setReferenceMultiType(true);
 				handleElementTypes(elt);
-			}else
-			{
+			} else {
 				handleElementTypes(elt);
 			}
+		} else {
+			System.out.println(elt.getPath() + " does not appear to have a code assigned");//TODO Change to DEBUG later on
 		}
 	}
 
 	private void handleElementTypes(ElementDefinition elt) {
 		for(TypeRefComponent type : elt.getType()) {
-            UriType uri = null;
-            if(type.getProfile() != null && type.getProfile().size() > 0) {
-                uri = type.getProfile().get(0);
+			String typeProfile = null;
+			if(type.getProfile() != null) {
+                typeProfile = type.getProfile();
             }
-            processType(type.getCode(), (uri != null)? uri.getValueAsString():null);
+			processType(type.getCode(), typeProfile);
         }
 	}
 
@@ -79,8 +80,8 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 		hapiType.setReference(true);
 		StructureDefinition profile = getFhirResourceManager().getProfileFromProfileUri(profileUri);
 		if(profile != null) {
-			String baseType = profile.getBaseType();
-			if(baseType != null && baseType.equalsIgnoreCase("DomainResource")) {
+			String baseType = profile.getBaseDefinition();
+			if(baseType != null && baseType.endsWith("DomainResource")) {
 				//It is a base resource profile
 				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), profile.getName()));
 			} else if(profileUri != null && profileUri.equals("http://hl7.org/fhir/StructureDefinition/Resource")) {
@@ -91,7 +92,7 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 				if(generatedType != null) {
 					hapiType.setGeneratedType("org.socraticgrid.fhir.dstu3.generated." + generatedType);
 				}
-				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), profile.getBaseType()));
+				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), PathUtils.getLastResourcePathComponent(profile.getBaseDefinition())));
 			}
 			getHapiTypes().add(hapiType);
 		} else {
@@ -105,6 +106,9 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 		String extensionName = PathUtils.getExtensionName(extensionUri);
 		if(extensionDef == null) {
 			System.out.println("ExtensionDef is null for " + extensionUri);
+		}
+		if(extensionUri == null) {
+			System.out.println("Extension URI is null");
 		}
 		ElementDefinitionDt extendedElement = extensionDef.getExtensionByName(extensionName);
 		processElementDt(extendedElement);

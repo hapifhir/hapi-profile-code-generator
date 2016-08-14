@@ -1,15 +1,15 @@
 <executionPlan>
 	<profileSourceFilePaths>
-		<profileSourceFilePath>/Users/cnanjo/repository/fhir_2016may/fhir-spec/site/profiles-resources.xml</profileSourceFilePath>
+		<profileSourceFilePath>/Users/cnanjo/repository/fhir_dstu3/fhir/trunk/build/publish/profiles-resources.xml</profileSourceFilePath>
 	</profileSourceFilePaths>
 	<profileDirectoryPaths>
-		<profileDirectoryPath>/Users/cnanjo/work/qicore/profiles_dstu3</profileDirectoryPath>
+		<profileDirectoryPath>/Users/cnanjo/work/qicore/profiles_stu3</profileDirectoryPath>
 	</profileDirectoryPaths>
 	<generatedCodePackage>org.socraticgrid.fhir.generated</generatedCodePackage>
 	<targetCodeGenerationDirectory>generated-source/java/</targetCodeGenerationDirectory>
 	<extensionRepositories>
-		<extensionRepository>/Users/cnanjo/repository/fhir_2016may/fhir-spec/site/</extensionRepository>
-		<extensionRepository>/Users/cnanjo/repository/fhir_2016may/fhir-spec/site/qicore</extensionRepository>
+		<extensionRepository>/Users/cnanjo/repository/fhir_dstu3/fhir/trunk/build/publish/</extensionRepository>
+		<extensionRepository>/Users/cnanjo/work/qicore/profiles_stu3</extensionRepository>
 	</extensionRepositories>
 	<!--
 	<profileNames>
@@ -29,56 +29,56 @@
 	</profileNames>
 	-->
 	<profileNames>
-		<profileName>Condition</profileName>
-		<profileName>Patient</profileName>
-		<profileName>Observation</profileName>
-		<profileName>Organization</profileName>
-		<profileName>AllergyIntolerance</profileName>
-		<profileName>Communication</profileName>
-		<profileName>CommunicationRequest</profileName>
-		<profileName>DiagnosticOrder</profileName>
-		<profileName>DiagnosticReport</profileName>
-		<profileName>Encounter</profileName>
-		<profileName>Goal</profileName>
-		<profileName>Immunization</profileName>
-		<profileName>Medication</profileName>
-		<profileName>MedicationAdministration</profileName>
-		<profileName>MedicationDispense</profileName>
-		<profileName>MedicationOrder</profileName>
-		<profileName>MedicationStatement</profileName>
-		<profileName>Practitioner</profileName>
-		<profileName>Procedure</profileName>
-		<profileName>ProcedureRequest</profileName>
-		<profileName>ReferralRequest</profileName>
-		<profileName>Specimen</profileName>
-		<profileName>Substance</profileName>
-		<profileName>QICore-Patient</profileName>
-		<profileName>QICore-Organization</profileName>
-		<profileName>QICore-Observation</profileName>
-		<profileName>QICore-Condition</profileName>
-		<profileName>QICore-Device</profileName>
-		<profileName>QICore-RelatedPerson</profileName>
-		<profileName>QICore-AdverseEvent</profileName>
-		<profileName>QICore-AllergyIntolerance</profileName>
-		<profileName>QICore-Communication</profileName>
-		<profileName>QICore-CommunicationRequest</profileName>
-		<profileName>QICore-DiagnosticOrder</profileName>
-		<profileName>QICore-DiagnosticReport</profileName>
-		<profileName>QICore-Encounter</profileName>
-		<profileName>QICore-Goal</profileName>
-		<profileName>QICore-Immunization</profileName>
-		<profileName>QICore-ImagingStudy</profileName>
-		<profileName>QICore-Location</profileName>
-		<profileName>QICore-Medication</profileName>
-		<profileName>QICore-MedicationAdministration</profileName>
-		<profileName>QICore-MedicationDispense</profileName>
-		<profileName>QICore-MedicationOrder</profileName>
-		<profileName>QICore-MedicationStatement</profileName>
-		<profileName>QICore-Practitioner</profileName>
-		<profileName>QICore-Procedure</profileName>
-		<profileName>QICore-ProcedureRequest</profileName>
-		<profileName>QICore-ReferralRequest</profileName>
-		<profileName>QICore-Specimen</profileName>
-		<profileName>QICore-Substance</profileName>
+		<!--<profileName>Condition</profileName>-->
+		<!--<profileName>Patient</profileName>-->
+		<!--<profileName>Observation</profileName>-->
+		<!--<profileName>Organization</profileName>-->
+		<!--<profileName>AllergyIntolerance</profileName>-->
+		<!--<profileName>Communication</profileName>-->
+		<!--<profileName>CommunicationRequest</profileName>-->
+		<!--<profileName>DiagnosticRequest</profileName>-->
+		<!--<profileName>DiagnosticReport</profileName>-->
+		<!--<profileName>Encounter</profileName>-->
+		<!--<profileName>Goal</profileName>-->
+		<!--<profileName>Immunization</profileName>-->
+		<!--<profileName>Medication</profileName>-->
+		<!--<profileName>MedicationAdministration</profileName>-->
+		<!--<profileName>MedicationDispense</profileName>-->
+		<!--<profileName>MedicationOrder</profileName>-->
+		<!--<profileName>MedicationStatement</profileName>-->
+		<!--<profileName>Practitioner</profileName>-->
+		<!--<profileName>Procedure</profileName>-->
+		<!--<profileName>ProcedureRequest</profileName>-->
+		<!--<profileName>ReferralRequest</profileName>-->
+		<!--<profileName>Specimen</profileName>-->
+		<!--<profileName>Substance</profileName>-->
+		<profileName>qicore-patient</profileName>
+		<profileName>qicore-organization</profileName>
+		<profileName>qicore-observation</profileName>
+		<profileName>qicore-condition</profileName>
+		<profileName>qicore-device</profileName>
+		<profileName>qicore-relatedperson</profileName>
+		<profileName>qicore-adverseevent</profileName>
+		<profileName>qicore-allergyintolerance</profileName>
+		<profileName>qicore-communication</profileName>
+		<profileName>qicore-communicationrequest</profileName>
+		<profileName>qicore-diagnosticrequest</profileName>
+		<profileName>qicore-diagnosticreport</profileName>
+		<profileName>qicore-encounter</profileName>
+		<profileName>qicore-goal</profileName>
+		<profileName>qicore-immunization</profileName>
+		<profileName>qicore-imagingstudy</profileName>
+		<profileName>qicore-location</profileName>
+		<profileName>qicore-medication</profileName>
+		<profileName>qicore-medicationadministration</profileName>
+		<profileName>qicore-medicationdispense</profileName>
+		<profileName>qicore-medicationorder</profileName>
+		<profileName>qicore-medicationstatement</profileName>
+		<profileName>qicore-practitioner</profileName>
+		<profileName>qicore-procedure</profileName>
+		<profileName>qicore-procedurerequest</profileName>
+		<profileName>qicore-referralrequest</profileName>
+		<profileName>qicore-specimen</profileName>
+		<profileName>qicore-substance</profileName>
 	</profileNames>
 </executionPlan>

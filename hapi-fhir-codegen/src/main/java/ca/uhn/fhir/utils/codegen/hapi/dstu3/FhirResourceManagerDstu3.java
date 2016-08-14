@@ -101,6 +101,12 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 		return this.generatedType.contains(generatedType);
 	}
 
+	public static String getProfileName(StructureDefinition profile) {
+		String id = profile.getId();
+		String name = PathUtils.getLastResourcePathComponent(id);
+		return name;
+	}
+
 	/**
 	 * Returns a profile-name-to-profile index
 	 * 
@@ -189,7 +195,8 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 			} else if(resource instanceof StructureDefinition) {
 				populateProfileMaps((StructureDefinition)resource);
 			} else {
-				throw new RuntimeException("Unknown resource " + resource.getClass().getCanonicalName());
+				LOGGER.info("Unknown resource " + resource.getClass().getCanonicalName());
+				System.out.println("This resource is neither a profile nor a bundle of profiles " + resource.getClass().getCanonicalName());
 			}
 			populateResourceNameToClassMap();
 		} catch(Exception e) {
@@ -200,20 +207,20 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	}
 
 	protected void populateProfileMaps(StructureDefinition profile) {
-		profileNameToProfileMap.put(profile.getName(),profile);
+		profileNameToProfileMap.put(getProfileName(profile),profile);
 		profileUriToProfileMap.put(profile.getUrl(), profile);
 		populateProfileToBaseResourceMap(profile);
 	}
 
 	protected void populateProfileToBaseResourceMap(StructureDefinition profile) {
-		String profileBase = profile.getBaseType();
+		String profileBase = profile.getBaseDefinition();
 		if(profileBase != null) {
 			String baseResource = getBaseResourceFromProfileName(profileBase);
 			if(baseResource != null) {
-				profileNameToBaseResourceNameMap.put(profile.getName(), baseResource);
-				if(profile.getId() != null && !profile.getName().equalsIgnoreCase(profile.getId()) && !profile.getId().equals("http://hl7.org/fhir/StructureDefinition/Resource")) {
-					profileNameToBaseResourceNameMap.put(profile.getId(), baseResource);
-				}
+				profileNameToBaseResourceNameMap.put(getProfileName(profile), baseResource);
+//				if(profile.getId() != null && !profile.getName().equalsIgnoreCase(profile.getId()) && !profile.getId().equals("http://hl7.org/fhir/StructureDefinition/Resource")) { //TODO Check to see if this path is ever taken
+//					profileNameToBaseResourceNameMap.put(profile.getId(), baseResource);
+//				}
 			}
 		}
 	}
@@ -226,7 +233,7 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	 */
 	private void populateResourceNameToClassMap() {
 		for(StructureDefinition profile : profileNameToProfileMap.values()) {
-	    	String profileName = profile.getName();
+	    	String profileName = getProfileName(profile);
 	    	try {
 	    		Class<?> clazz = ctx.getResourceDefinition(profileName).getImplementingClass();
 	    		resourceNameToClassMap.put(profileName, clazz);
@@ -237,13 +244,13 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	}
 	
 	public Class<?> addResourceToIndex(StructureDefinition profile) {
-		String profileName = profile.getName();
+		String profileName = getProfileName(profile);
 		Class<?> clazz = null;
 		try {
 			clazz = addResourceToIndex(profileName);
 		} catch(DataFormatException dfe) {
-			LOGGER.info(profileName + " not found. Next trying base structure: " + profile.getBaseType());
-			clazz = addResourceToIndex(getBaseResourceFromProfileName(profile.getBaseType()));
+			LOGGER.info(profileName + " not found. Next trying base structure: " + profile.getBaseDefinition());
+			clazz = addResourceToIndex(getBaseResourceFromProfileName(profile.getBaseDefinition()));
 		}
 		return clazz;
 	}
@@ -384,7 +391,7 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 		String referenceType = typeCode;
 		if(typeCode != null && typeCode.equals("Reference")) {
 			StructureDefinition profile = getProfileFromProfileUri(typeProfile);//We first get the profile associated with the type
-			String profileUri = profile.getBaseType();
+			String profileUri = profile.getBaseDefinition();
 			if(profileUri == null) {
 				profileUri = typeProfile;
 			}
@@ -435,10 +442,10 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 			if(hapiTypeClass != null) {
 				hapiTypeName = hapiTypeClass.getName();
 			} else {
-				String baseResourcePath = profile.getBaseType();
+				String baseResourcePath = profile.getBaseDefinition();
 				String baseResourceName = PathUtils.getLastResourcePathComponent(baseResourcePath);
 				if(baseResourceName.equals("DomainResource")) {
-					baseResourceName = profile.getName();
+					baseResourceName = getProfileName(profile);
 				}
 				try {
 					Class<?> typeClass = HapiFhirUtils.getStructureTypeClass(getFhirContext(), baseResourceName, fhirType);
@@ -816,7 +823,7 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	public static String buildMultiAttributePath(String path, ElementDefinition.TypeRefComponent type) {
 		String modifiedPath = path.replaceAll("\\[x\\]", "");
 		if(type.getCode().equalsIgnoreCase("Reference")) {
-			modifiedPath += getProfileSuffix(type.getProfile().get(0).getValueAsString());
+			modifiedPath += getProfileSuffix(type.getProfile());
 		} else {
 			modifiedPath += StringUtils.capitalize(type.getCode());
 		}

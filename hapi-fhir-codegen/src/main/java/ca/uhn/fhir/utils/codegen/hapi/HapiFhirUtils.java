@@ -254,6 +254,9 @@ public class HapiFhirUtils {
 				} else if (child instanceof ca.uhn.fhir.context.RuntimeChildPrimitiveDatatypeDefinition) {
 					enumerationType = ((BaseRuntimeChildDatatypeDefinition) child).getBoundEnumType();
 					datatype = ((BaseRuntimeChildDatatypeDefinition) child).getDatatype();
+				} else if(child instanceof ca.uhn.fhir.context.RuntimeChildChoiceDefinition) {
+					((RuntimeChildChoiceDefinition)child).getChoices();
+					System.out.println("RuntimeChildChoiceDefinition found!!");
 				} else {
 					throw new RuntimeException("Unknown type " + child.getClass().getName() + " - " + structurePath);
 				}
