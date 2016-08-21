@@ -105,7 +105,7 @@ public class GenerateLogicalViewCommandDstu3 extends GenerateLogicalViewCommandB
     public void execute(Node<ElementDefinition> node) {
         boolean found = false;
         if (node.getPayload() != null) {
-            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("relatedCondition.condition"));
+            found = node.getPayload().getPath() != null && (node.getPayload().getPath().contains("locationPerformed"));
         }
         if (found) {// && profile.getName().equals("Immunization")) {
             LOGGER.debug("Found!");

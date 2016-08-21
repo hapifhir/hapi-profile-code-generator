@@ -20,7 +20,7 @@ public class HapiFhirUtilsTest {
 	
 	@Before
 	public void initialize() {
-		ctx = FhirContext.forDstu2();
+		ctx = FhirContext.forDstu3();
 	}
 
 	@Test
@@ -48,6 +48,12 @@ public class HapiFhirUtilsTest {
 	@Test
 	public void testGetPrimitiveTypeClassName() {
 		String primitiveType = HapiFhirUtils.getPrimitiveTypeClassName(ctx, "boolean");
+		assertEquals("ca.uhn.fhir.model.primitive.BooleanDt", primitiveType);
+	}
+
+	@Test
+	public void testGetPrimitiveTypeClassName2() {
+		String primitiveType = HapiFhirUtils.getPrimitiveTypeClassName(ctx, "dateTime");
 		assertEquals("ca.uhn.fhir.model.primitive.BooleanDt", primitiveType);
 	}
 

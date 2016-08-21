@@ -42,6 +42,7 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 				setMultiType(true);
 				Class<? extends IBaseResource> resourceClass = HapiFhirUtils.getResourceClass(getFhirContext(), getRoot());
 				List<HapiType> hapiTypes = HapiFhirUtils.getChoiceTypes(getFhirContext(), resourceClass, getRelativePath());
+				updateHapiReferenceTypes(hapiTypes, elt);
 				getHapiTypes().addAll(hapiTypes);
 			} else if(elt.getType().size() > 1 && hasOnlyReferenceTypes(elt)) {
 				setReferenceMultiType(true);
@@ -73,6 +74,37 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 			}
 		}
 		return onlyReferences;
+	}
+
+	protected boolean hasMultipleReferenceTypes(ElementDefinition elt) {
+		boolean moreThanOneReference = false;
+		int count = 0;
+		for(ElementDefinition.TypeRefComponent type : elt.getType()) {
+			if(type.getCode() != null && type.getCode().equalsIgnoreCase("Reference")) {
+				++count;
+			}
+			if (count > 1){
+				moreThanOneReference = true;
+				break;
+			}
+		}
+		return moreThanOneReference;
+	}
+
+	/**
+	 * HAPI types looked up using FHIR utils do not have profile URIs associated with reference types.
+	 * This method fills in the gaps so downstream processing can handle references appropriately.
+	 *
+	 * TODO: Implementation of this method is still incomplete and does not handle profiled references.
+	 *
+	 * @param hapiTypes
+	 * @param elt
+	 */
+	protected void updateHapiReferenceTypes(List<HapiType> hapiTypes, ElementDefinition elt) {
+		if(hasMultipleReferenceTypes(elt)) {
+			setReferenceMultiType(true);
+		}
+
 	}
 	
 	protected void processReference(String code, String profileUri) {
@@ -119,5 +151,6 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 		String max = (element.getMax()!= null)?element.getMax():"";
 		assignCardinality(min, max);
 	}
-	
+
+
 }

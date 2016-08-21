@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hl7.fhir.dstu3.model.DateTimeType;
+import org.hl7.fhir.dstu3.model.PositiveIntType;
+import org.hl7.fhir.dstu3.model.UnsignedIntType;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
@@ -138,12 +141,25 @@ public class HapiFhirUtils {
 	 */
 	public static Class<? extends IBase> getPrimitiveTypeClass(FhirContext ctx, String fhirPrimitiveType) {
 		BaseRuntimeElementDefinition<?> elementDefinition = ctx.getElementDefinition(fhirPrimitiveType);
+		/************* Workaround for bug in HAPI FHIR library: Remove when fixed *****************/
+		if(fhirPrimitiveType.equals("dateTime") && elementDefinition == null) {
+			Class<? extends IBase> primitiveClassName = DateTimeType.class;
+			return primitiveClassName;
+		} else if(fhirPrimitiveType.equals("positiveInt") && elementDefinition == null) {
+			Class<? extends IBase> primitiveClassName = PositiveIntType.class;
+			return primitiveClassName;
+		}  else if(fhirPrimitiveType.equals("unsignedInt") && elementDefinition == null) {
+			Class<? extends IBase> primitiveClassName = UnsignedIntType.class;
+			return primitiveClassName;
+		}
+		/************* End of workaround *****************/
 		if (elementDefinition != null) {
 			Class<? extends IBase> primitiveClassName = elementDefinition.getImplementingClass();
 			LOGGER.trace(primitiveClassName.getName());
 			return primitiveClassName;
 		} else {
 			LOGGER.trace("No primitive class found for " + fhirPrimitiveType);
+			System.out.println("No primitive class found for " + fhirPrimitiveType);//TODO Remove when bug is found
 			return null;
 		}
 	}

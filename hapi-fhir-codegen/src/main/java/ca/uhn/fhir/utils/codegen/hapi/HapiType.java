@@ -171,7 +171,11 @@ public class HapiType {
 			return java.util.Date.class.getName();
 		} else if(getDatatype().equals(PositiveIntType.class.getCanonicalName())) {
 			return java.lang.Integer.class.getName();
+		} else if(getDatatype().equals(UnsignedIntType.class.getCanonicalName())) {
+			return java.lang.Integer.class.getName();
 		} else if(getDatatype().equals(UriType.class.getCanonicalName())) {
+			return java.lang.String.class.getName();
+		} else if(getDatatype().equals(OidType.class.getCanonicalName())) {
 			return java.lang.String.class.getName();
 		} else if(getDatatype().equals(IdType.class.getCanonicalName())) {
 			return java.lang.String.class.getName();

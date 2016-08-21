@@ -56,23 +56,27 @@ public class MethodHandler extends BaseMethodHandler {
             return;
         } else {
             if(converter.isMultiType()) {
-                Method method = Method.constructNoArgMethod(Method.buildGetterName(converter.parseAttributeName()), "org.hl7.fhir.dstu3.model.Type");
-                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(converter.parseAttributeName()));
-                addMethod(methods, method);
+//                Method method = Method.constructNoArgMethod(Method.buildGetterName(converter.parseAttributeName()), "org.hl7.fhir.dstu3.model.Type");
+//                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(converter.parseAttributeName()));
+//                addMethod(methods, method);
+                buildGetterMethod(methods, converter.parseAttributeName(), "org.hl7.fhir.dstu3.model.Type", null, false, null);
 
-                method = constructSetMethodSignature(converter.parseAttributeName(), "org.hl7.fhir.dstu3.model.Type", getParentType());
-                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(converter.parseAttributeName()));
-                method.addImport("org.hl7.fhir.dstu3.model.Type");
-                addMethod(methods, method);
+//                method = constructSetMethodSignature(converter.parseAttributeName(), "org.hl7.fhir.dstu3.model.Type", getParentType());
+//                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(converter.parseAttributeName()));
+//                method.addImport("org.hl7.fhir.dstu3.model.Type");
+//                addMethod(methods, method);
+                buildSetterMethod(methods, converter.parseAttributeName(), "org.hl7.fhir.dstu3.model.Type", getParentType());
             }
-            if(converter.isReferenceMultiType() && !converter.isMultipleCardinality()) {
-                Method method = Method.constructNoArgMethod(Method.buildGetterName(converter.parseAttributeName()), "org.hl7.fhir.dstu3.model.Reference");
-                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(converter.parseAttributeName()));
-                addMethod(methods, method);
+            if(converter.isReferenceMultiType() && !converter.isMultipleCardinality() && !converter.isMultiType()) {
+//                Method method = Method.constructNoArgMethod(Method.buildGetterName(converter.parseAttributeName()), "org.hl7.fhir.dstu3.model.Reference");
+//                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(converter.parseAttributeName()));
+//                addMethod(methods, method);
+                buildGetterMethod(methods, converter.parseAttributeName(), "org.hl7.fhir.dstu3.model.Reference", null, false, null);
 
-                method = Method.constructNoArgMethod(Method.buildGetterName(converter.parseAttributeName() + "Target"), "org.hl7.fhir.dstu3.model.Resource");
-                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(converter.parseAttributeName() + "Target"));
-                addMethod(methods, method);
+//                method = Method.constructNoArgMethod(Method.buildGetterName(converter.parseAttributeName() + "Target"), "org.hl7.fhir.dstu3.model.Resource");
+//                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(converter.parseAttributeName() + "Target"));
+//                addMethod(methods, method);
+                buildGetterMethod(methods, converter.parseAttributeName() + "Target", "org.hl7.fhir.dstu3.model.Resource", null, false, null);
             }
             for (HapiType type : types) {
                 if (type.getDatatype() == null && type.getGeneratedType() == null) {
@@ -83,7 +87,7 @@ public class MethodHandler extends BaseMethodHandler {
                 if (type.isReference()) {
                     handleReferenceTypes(converter, type, methods);
                 } else if (!type.isResource() && type.getGeneratedType() != null) {
-                    handleGeneratedType(converter, type, methods);
+                    handleExtendedDatatypes(converter, type, methods);
                 } else if (type.isBackboneElement()) {
                     handleDatatypeMethods(converter, type, methods);
                 } else if (type.isEnumerationType()) {
@@ -177,174 +181,143 @@ public class MethodHandler extends BaseMethodHandler {
 
     public void handleDatatypeMethods(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
         String attributeName = converter.parseAttributeName();
+        if(attributeName.equalsIgnoreCase("period")) {
+            System.out.println("STOP HERE");
+        }
         if (converter.isMultiType()) {
             //Getter
-            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + PathUtils.getLastPathComponent(type.getDatatype())), type.getDatatypeOrList());
-            method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + PathUtils.getLastPathComponent(type.getDatatype())));
-            if (type.getDatatype() == null) {
-                System.out.println("STOP HERE");
-            }
-            method.addImport(type.getDatatype());
-            method.addImport("org.hl7.fhir.dstu3.model.Enumerations"); //Todo fix this as it will result in a lot of duplication
-            addMethod(methods, method);
+//            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + PathUtils.getLastPathComponent(type.getDatatype())), type.getDatatypeOrList());
+//            method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + PathUtils.getLastPathComponent(type.getDatatype())));
+//            method.addImport(type.getDatatype());
+//            method.addImport("org.hl7.fhir.dstu3.model.Enumerations"); //Todo fix this as it will result in a lot of duplication
+//            addMethod(methods, method);
+            buildGetterMethod(methods, attributeName + PathUtils.getLastPathComponent(type.getDatatype()), type.getDatatypeOrList(), type.getDatatype() , false, null);
 
             //Setter
-            method = constructSetMethodSignature(attributeName, "org.hl7.fhir.dstu3.model.Type", getParentType());
-            method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
-            if (type.getDatatype() == null) {
-                System.out.println("STOP HERE");
-            } else {
-                method.addImport("org.hl7.fhir.dstu3.model.Type");
-                if (!methods.contains(method)) {
-                    addMethod(methods, method);
-                }
-            }
+//            method = constructSetMethodSignature(attributeName, "org.hl7.fhir.dstu3.model.Type", getParentType());
+//            method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
+//            method.addImport("org.hl7.fhir.dstu3.model.Type");
+//            if (!methods.contains(method)) {
+//                addMethod(methods, method);
+//            }
+            buildSetterMethod(methods, attributeName, "org.hl7.fhir.dstu3.model.Type", getParentType());
 
             //Has
             buildHasMethod(methods, attributeName, PathUtils.getLastPathComponent(type.getDatatype()));
 
         } else {
-
-            //Getter
-            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), type.getDatatypeOrList());
-            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
-            if (type.getDatatype() == null) {
-                System.out.println("STOP HERE");
-            } else {
-                method.addImport(type.getDatatype());
-                addMethod(methods, method);
-            }
-
-            //Setter
-            if (!converter.isMultipleCardinality()) {//No setters on lists in HAPI at this time
-                method = constructSetMethodSignature(attributeName, type.getDatatypeOrList(), getParentType());
-                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
-                if (type.getDatatype() == null) {
-                    System.out.println("STOP HERE");
-                } else {
-                    method.addImport(type.getDatatype());
-                    addMethod(methods, method);
-                }
-            }
-
-            //has
-            buildHasMethod(methods, attributeName);
+            handleFhirDatatype(converter, type, methods, attributeName);
 
             if(converter.isMultipleCardinality()) {
-                method = constructAddMethodSignature(attributeName, type.getDatatype(), getParentType());
-                method.setBody(getTemplate().getAddToListMethodBody("adaptedClass", attributeName));
-                method.addImport(type.getDatatype());
-                if (!methods.contains(method)) {
-                    addMethod(methods, method);
-                }
+//                Method method = constructAddMethodSignature(attributeName, type.getDatatype(), getParentType());
+//                method.setBody(getTemplate().getAddToListMethodBody("adaptedClass", attributeName));
+//                method.addImport(type.getDatatype());
+//                if (!methods.contains(method)) {
+//                    addMethod(methods, method);
+//                }
+                buildAddMethod(methods, attributeName, type.getDatatype(), getParentType());
                 if(attributeName.equalsIgnoreCase("contained")) {
                     //Do nothing since the method would have no idea what resource to return
                 } else {
-                    method = buildAddMethodDelegated(attributeName, type.getDatatype());
-                    method.setBody(getTemplate().getAddToListMethodDelegatedBody_dstu3("adaptedClass", attributeName, type.getDatatype()));
-                    method.addImport(type.getDatatype());
-                    if (!methods.contains(method)) {
-                        addMethod(methods, method);
-                    }
+//                    method = buildAddMethodDelegated(attributeName, type.getDatatype());
+//                    method.setBody(getTemplate().getAddToListMethodDelegatedBody_dstu3("adaptedClass", attributeName, type.getDatatype()));
+//                    method.addImport(type.getDatatype());
+//                    if (!methods.contains(method)) {
+//                        addMethod(methods, method);
+//                    }
+                    buildFluentAddMethod(methods, attributeName, type.getDatatype());
                 }
             }
         }
     }
 
+    /**
+     * Method constructs the three HAPI FHIR datatype methods. If thingy is a field in ContainerAdapter, the methods have the following signature:
+     * <ol>
+     *     <li>public boolean hasThingy()</li>
+     *     <li>public Datatype getThingy()</li>
+     *     <li>public ContainerAdapter setThingy(Datatype thingy)</li>
+     * </ol>
+     * Each method delegates to the underlying HAPI FHIR type.
+     *
+     * @param converter
+     * @param type
+     * @param methods
+     * @param attributeName
+     */
+    private void handleFhirDatatype(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods, String attributeName) {
+        buildGetterMethod(methods, attributeName, type.getDatatypeOrList(), type.getDatatype(), converter.isExtension(), converter.getExtensionUri());
+        buildSetterMethod(methods, attributeName, type.getDatatypeOrList(), getParentType());
+        buildHasMethod(methods, attributeName);
+    }
+
+    /**
+     * Method constructs the six HAPI FHIR enumeration type methods. If thingy is an enumerated field in
+     * ContainerAdapter, the methods have the following signature:
+     *
+     * <ol>
+     *     <li>public boolean hasThingy()</li>
+     *     <li>public boolean hasThingy(PrimitiveType thingy)</li>
+     *     <li>public EnumeratedType getThingy()</li>
+     *     <li>public Enumeration&lt;EnumeratedType&gt; getThingyElement()</li>
+     *     <li>public ContainerAdapter setThingy(EnumeratedType thingy)</li>
+     *     <li>public ContainerAdapter setThingy(Enumeration&lt;EnumeratedType&gt; thingy)</li>
+     * </ol>
+     * Each method delegates to the underlying HAPI FHIR type.
+     * @param converter
+     * @param type
+     * @param methods
+     */
     public void handleEnumTypeMethods(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
         String attributeName = converter.parseAttributeName();
-        buildHasMethod(methods, attributeName);
-        buildHasMethod(methods, attributeName, BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX);
         if (converter.isMultiType()) {
-//			Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + PathUtils.getLastPathComponent(type.getDatatype())), type.getDatatypeOrList());
-//			method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + PathUtils.getLastPathComponent(type.getDatatype())));
-//			if(type.getDatatype() == null) {
-//				System.out.println("STOP HERE");
-//			}
-//			method.addImport(type.getDatatype());
-//			addMethod(methods, method);
             throw new RuntimeException("Multi Enum Types Not implemented yet " + converter.getFullAttributePath());
         } else {
-            //Getter style 1
-            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), type.getEnumerationType());
-            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
-            if (type.getDatatype() == null) {
-                System.out.println("Enum datatype is null!");
-            } else {
-                method.addImport(type.getEnumerationType());
-                addMethod(methods, method);
-            }
-
-            //Setter style 1
-            method = constructSetMethodSignature(attributeName, type.getEnumerationType(), getParentType());
-            method.setBody(getTemplate().getSetMethodDelegationBody(attributeName, "param"));
-            if (type.getDatatype() == null) {
-                System.out.println("Enum datatype is null!");
-            } else {
-                method.addImport(type.getEnumerationType());
-                addMethod(methods, method);
-            }
-
-            //Getter style 2
-            method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX), type.getDatatype() + "<" + type.getEnumerationType() + ">");
-            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX));
-            if (type.getDatatype() == null) {
-                System.out.println("Enum datatype is null!");
-            } else {
-                method.addImport(type.getDatatype());
-                method.addImport(type.getEnumerationType());
-                method.addImport("org.hl7.fhir.dstu3.model.Enumerations"); //Todo fix this as it will result in a lot of duplication
-                addMethod(methods, method);
-            }
-
-            //Setter style 2
-            method = constructSetMethodSignature(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", getParentType());
-            method.setBody(getTemplate().getSetMethodDelegationBody(attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, "param"));
-            if (type.getDatatype() == null) {
-                System.out.println("Enum datatype is null!");
-            } else {
-                method.addImport(type.getEnumerationType());
-                addMethod(methods, method);
-            }
+            buildHasMethod(methods, attributeName);
+            buildHasMethod(methods, attributeName, BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX);
+            buildGetterMethod(methods, attributeName, type.getEnumerationType(), type.getEnumerationType(), converter.isExtension(), converter.getExtensionUri());
+            buildGetterMethod(methods, attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", type.getDatatype(), converter.isExtension(), converter.getExtensionUri());
+            buildSetterMethod(methods, attributeName, type.getEnumerationType(), getParentType());
+            buildSetterMethod(methods, attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", getParentType());
         }
     }
 
-    public void handleGeneratedType(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
+    /**
+     * FHIR Datatypes can be extended. This results in the generation of a new wrapper class for the extended
+     * type. The wrapper class is then exposed through getters and setters allowing the caller to get
+     * a handle to the extended 'logical' type rather than the underlying FHIR datatype.
+     *
+     * Method constructs four 'wrapper-type' methods (note that two are list methods when the cardinality is
+     * greater than one. and then all the relevant datatype methods.
+     * If thingy is an enumerated field in ContainerAdapter, the methods have the following signature:
+     *
+     * <ol>
+     *     <li>public List&lt;WrappedDataType&gt; getWrappedThingy()</li>
+     *     <li>public ContainerAdapter setWrappedThingy(List&lt;WrappedType&gt; param)</li>
+     *     <li>public WrappedDataType getWrappedThingy()</li>
+     *     <li>public ContainerAdapter setWrappedThingy(WrappedType param)</li>
+     *     <li>public ContainerAdapter addWrappedThingy(WrappedDataType param)</li>
+     *     <li>public WrappedDataType addWrappedThingy()</li>
+     * </ol>
+     *
+     * @param converter
+     * @param type
+     * @param methods
+     */
+    public void handleExtendedDatatypes(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods) {
         String attributeName = converter.parseAttributeName();
         if (converter.isMultiType()) {
-            //Getter
-            throw new RuntimeException("Multi generated types should not exist. If so, this is not implemented");
+            throw new RuntimeException("Multi generated types should not exist yet. If so, this is not implemented");
         } else {
-            //Getter that return HAPI FHIR datatypes
-            Method method = Method.constructNoArgMethod(Method.buildGetterName("Wrapped" + StringUtils.capitalize(attributeName)), type.getGeneratedTypeOrList());
-            method.setBody(getTemplate().getGeneratedClassMultiCardinalityGetter(type.getGeneratedType(), type.getDatatype(), StringUtils.capitalize(attributeName)));
-            method.addImport(type.getGeneratedType());
-            addMethod(methods, method);
-
-            //Setter that take HAPI FHIR datatypes
-            method = constructSetMethodSignature("Wrapped" + StringUtils.capitalize(attributeName), type.getGeneratedTypeOrList(), getParentType());
-            method.setBody(getTemplate().getGeneratedClassMultiCardinalitySetter(type.getGeneratedType(), type.getDatatype(), StringUtils.capitalize(attributeName)));
-            method.addImport(type.getGeneratedType());
-            if (!methods.contains(method)) {
-                addMethod(methods, method);
-            }
+            buildExtendedDatatypeGetter(methods, attributeName, type.getGeneratedTypeOrList(), type.getGeneratedType(), type.getDatatype());
+            buildExtendedDatatypeSetter(methods, attributeName, type.getGeneratedTypeOrList(), type.getGeneratedType(), type.getDatatype(), getParentType());
 
             if(converter.isMultipleCardinality()) {
-                method = constructAddMethodSignature("Wrapped" + StringUtils.capitalize(attributeName), type.getGeneratedType(), getParentType());
-                method.setBody(getTemplate().addWrappedTypeToListMethodDelegatedBody(attributeName));
-                method.addImport(type.getDatatype());
-                if (!methods.contains(method)) {
-                    addMethod(methods, method);
-                }
+                buildFluentAddExtendedTypeMethod(methods, attributeName, type.getGeneratedType(), type.getDatatype(), getParentType());
                 if(attributeName.equalsIgnoreCase("contained")) {
                     //Do nothing since the method would have no idea what resource to return
                 } else {
-                    method = buildAddMethodDelegated("Wrapped" + StringUtils.capitalize(attributeName), type.getGeneratedType());
-                    method.setBody(getTemplate().addWrappedTypeToListMethodBody(type.getGeneratedType(), type.getDatatype(), attributeName));
-                    method.addImport(type.getDatatype());
-                    if (!methods.contains(method)) {
-                        addMethod(methods, method);
-                    }
+                    buildAddExtendedTypeMethod(methods, attributeName, type.getGeneratedType(), type.getDatatype(), getParentType());
                 }
             }
 
@@ -364,86 +337,68 @@ public class MethodHandler extends BaseMethodHandler {
 
             if(converter.isReferenceMultiType()) {
                 //Getter
-                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "Target", "java.util.List<" + type.getDatatype() + ">");
-                method.setBody(getTemplate().getReferenceListAsTypedList("adaptedClass", attributeName + "Target", type.getDatatype()));
-                method.addImport(type.getGeneratedType());
-                addMethod(methods, method);
+//                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "Target", "java.util.List<" + type.getDatatype() + ">");
+//                method.setBody(getTemplate().getReferenceListAsTypedList("adaptedClass", attributeName + "Target", type.getDatatype()));
+//                method.addImport(type.getGeneratedType());
+//                addMethod(methods, method);
+                buildReferenceListAsTypedListGetter(methods, attributeName, disambiguationGetterSuffix + "Target", "Target", "java.util.List<" + type.getDatatype() + ">", type.getGeneratedType(), type.getDatatype());
             } else {
-                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + "Target"), "java.util.List<" + type.getDatatype() + ">");
-                method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
-                method.addImport(type.getDatatype());
+                //TODO Investigate whether this code is necessary. Method was never added and adding it results in an error.
+//                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + "Target"), "java.util.List<" + type.getDatatype() + ">");
+//                method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
+//                method.addImport(type.getDatatype());
+//                buildGetterMethod(methods, attributeName, "Target", "", "java.util.List<" + type.getDatatype() + ">", type.getDatatype(), converter.isExtension(), converter.getExtensionUri());
             }
 
             //Getter
-            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), "java.util.List<org.hl7.fhir.dstu3.model.Reference>");
-            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
-            method.addImport("org.hl7.fhir.dstu3.model.Reference");
-            addMethod(methods, method);
+//            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), "java.util.List<org.hl7.fhir.dstu3.model.Reference>");
+//            method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
+//            method.addImport("org.hl7.fhir.dstu3.model.Reference");
+//            addMethod(methods, method);
+            buildGetterMethod(methods, attributeName, "java.util.List<org.hl7.fhir.dstu3.model.Reference>", "org.hl7.fhir.dstu3.model.Reference", converter.isExtension(), converter.getExtensionUri());
         } else {
             if(converter.isMultiType()) {
                 //Getter
-                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + "Reference"), "org.hl7.fhir.dstu3.model.Reference");
-                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName +  "Reference"));
-                method.addImport(type.getDatatype());
-                method.addImport("org.hl7.fhir.dstu3.model.Reference"); //Todo fix this as it will result in a lot of duplication
-                addMethod(methods, method);
+//                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + "Reference"), "org.hl7.fhir.dstu3.model.Reference");
+//                method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName +  "Reference"));
+//                method.addImport(type.getDatatype());
+//                method.addImport("org.hl7.fhir.dstu3.model.Reference"); //Todo fix this as it will result in a lot of duplication
+//                addMethod(methods, method);
+                buildGetterMethod(methods, attributeName, "Reference", "Reference", "org.hl7.fhir.dstu3.model.Reference", "org.hl7.fhir.dstu3.model.Reference", false, null);
 
                 //Getter
-                method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "Target", type.getDatatype());
-                method.setBody(getTemplate().castTypeToReferenceAndReturnTarget(attributeName, type.getDatatype()));
-                method.addImport(type.getDatatype());
-                addMethod(methods, method);
+//                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "Target", type.getDatatype());
+//                method.setBody(getTemplate().castTypeToReferenceAndReturnTarget(attributeName, type.getDatatype()));
+//                method.addImport(type.getDatatype());
+//                addMethod(methods, method);
+                buildCastTypeToReferenceAndReturnTargetGetter(methods, attributeName, disambiguationGetterSuffix + "Target", "", type.getDatatype());
 
                 //Setter
-                method = constructSetMethodSignature(attributeName, "org.hl7.fhir.dstu3.model.Reference", getParentType());
-                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
-                method.addImport(type.getDatatype());
-                addMethod(methods, method);
+//                method = constructSetMethodSignature(attributeName, "org.hl7.fhir.dstu3.model.Reference", getParentType());
+//                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
+//                method.addImport(type.getDatatype());
+//                addMethod(methods, method);
+                buildSetterMethod(methods, attributeName, "org.hl7.fhir.dstu3.model.Reference", getParentType());
 
                 //Setter
-                method = constructSetMethodSignature(attributeName + "Target", type.getDatatype(), getParentType());
-                method.setBody(getTemplate().wrapResourceInReferenceAndSet(attributeName));
-                method.addImport(type.getDatatype());
-                addMethod(methods, method);
+//                method = constructSetMethodSignature(attributeName + "Target", type.getDatatype(), getParentType());
+//                method.setBody(getTemplate().wrapResourceInReferenceAndSet(attributeName));
+//                method.addImport(type.getDatatype());
+//                addMethod(methods, method);
+                buildWrapResourceInReferenceSetter(methods, attributeName, "Target", "", type.getDatatype(), getParentType());
 
             } else {
-                //Getter
-                Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix), "org.hl7.fhir.dstu3.model.Reference");
-                method.setBody(getTemplate().getAdapterGetMethodDelegationBody(attributeName));
-                addMethod(methods, method);
-
-                //Setter
-                method = constructSetMethodSignature(attributeName, "org.hl7.fhir.dstu3.model.Reference", getParentType());
-                method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName));
-                addMethod(methods, method);
+                buildGetterMethod(methods, attributeName, disambiguationGetterSuffix, "", "org.hl7.fhir.dstu3.model.Reference", null, converter.isExtension(), converter.getExtensionUri());
+                buildSetterMethod(methods, attributeName, "org.hl7.fhir.dstu3.model.Reference", getParentType());
 
                 if(type.getDatatype() != null) {
-                    //Getter
-                    method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "Target", type.getDatatype());
-                    method.setBody(getTemplate().getAdapterGetWithCastMethodDelegationBody(attributeName + "Target", type.getDatatype()));
-                    method.addImport(type.getDatatype());
-                    addMethod(methods, method);
-
-                    //Setter
-                    method = constructSetMethodSignature(attributeName + "Target", type.getDatatype(), getParentType());
-                    method.setBody(getTemplate().getAdapterSetMethodDelegationBody(attributeName + "Target"));
-                    method.addImport(type.getDatatype());
-                    addMethod(methods, method);
+                    buildGetterMethodWithCast(methods, attributeName, disambiguationGetterSuffix, type.getDatatype(), type.getDatatype());
+                    buildSetterMethod(methods, attributeName + "Target", type.getDatatype(), getParentType());
                 }
 
                 if(type.getGeneratedType() != null) {
-                    //Getter
-                    method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguationGetterSuffix) + "AdapterTarget", type.getGeneratedType());
-                    method.setBody(getTemplate().getProfiledReferenceGetterBody(attributeName, type.getGeneratedType(), type.getDatatype()));
-                    method.addImport(type.getDatatype());
-                    addMethod(methods, method);
-
-                    //Setter
-                    method = constructSetMethodSignature(attributeName + "AdapterTarget", type.getGeneratedType(), getParentType());
-                    method.setBody(getTemplate().getProfiledReferenceSetterBody_dstu3(attributeName + "Target"));
-                    method.addImport(type.getDatatype());
-                    addMethod(methods, method);
-
+                    buildProfiledReferenceGetter(methods, attributeName, disambiguationGetterSuffix + "AdapterTarget", "", type.getGeneratedType(), type.getDatatype());
+                    buildProfiledReferenceSetter(methods, attributeName, type.getGeneratedType(), type.getDatatype(), getParentType());
                 }
             }
         }
@@ -468,39 +423,41 @@ public class MethodHandler extends BaseMethodHandler {
                 }
                 if (converter.isMultipleCardinality()) {//No setters on lists in HAPI at this time
                     //Getter
-                    Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguatingSuffix), type.getDatatypeOrList());
-                    if (type.isResource()) {
-                        method.setBody(getTemplate().getExtensionListGetterBodyResourceDstu3(type.getDatatype(), converter.getExtensionUri()));
-                    } else {
-                        method.setBody(getTemplate().getExtensionListGetterBodyDstu3(type.getDatatype(), converter.getExtensionUri()));
-                    }
-                    if (type.getDatatype() == null) {
-                        System.out.println("STOP HERE");
-                    } else {
-                        method.addImport(type.getDatatype());
-                        method.addImport("java.util.List");
-                        addMethod(methods, method);
-                    }
+//                    Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguatingSuffix), type.getDatatypeOrList());
+//                    if (type.isResource()) {
+//                        method.setBody(getTemplate().getExtensionListGetterBodyResourceDstu3(type.getDatatype(), converter.getExtensionUri()));
+//                    } else {
+//                        method.setBody(getTemplate().getExtensionListGetterBodyDstu3(type.getDatatype(), converter.getExtensionUri()));
+//                    }
+//                    if (type.getDatatype() == null) {
+//                        System.out.println("STOP HERE");
+//                    } else {
+//                        method.addImport(type.getDatatype());
+//                        method.addImport("java.util.List");
+//                        addMethod(methods, method);
+//                    }
+                    buildListOfReferenceValuedExtensionGetter(methods, attributeName, disambiguatingSuffix, "", type.getDatatypeOrList(), type.getDatatype(), type.isResource(), converter.getExtensionUri());
 
                     //Setter
-                    method = constructSetMethodSignature(attributeName, type.getDatatypeOrList(), getParentType());
-                    if (type.isResource()) {
-                        method.setBody(getTemplate().getExtensionListSetterBodyResourceDstu3(converter.getExtensionUri()));
-                    } else {
-                        method.setBody(getTemplate().getExtensionListSetterBodyDstu3(type.getDatatype(), converter.getExtensionUri()));
-                    }
-                    if (type.getDatatype() == null) {
-                        System.out.println("STOP HERE");
-                    } else {
-                        method.addImport(type.getDatatype());
-                        method.addImport("java.util.List");
-                        addMethod(methods, method);
-                    }
+//                    method = constructSetMethodSignature(attributeName, type.getDatatypeOrList(), getParentType());
+//                    if (type.isResource()) {
+//                        method.setBody(getTemplate().getExtensionListSetterBodyResourceDstu3(converter.getExtensionUri()));
+//                    } else {
+//                        method.setBody(getTemplate().getExtensionListSetterBodyDstu3(type.getDatatype(), converter.getExtensionUri()));
+//                    }
+//                    if (type.getDatatype() == null) {
+//                        System.out.println("STOP HERE");
+//                    } else {
+//                        method.addImport(type.getDatatype());
+//                        method.addImport("java.util.List");
+//                        addMethod(methods, method);
+//                    }
+                    buildListOfReferenceValuedExtensionSetter(methods, attributeName, type.getDatatypeOrList(), getParentType(), type.getDatatype(), type.isResource(), converter.getExtensionUri());
                 } else {
                     //Getter
                     Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + disambiguatingSuffix), type.getDatatypeOrList());
                     if (type.isResource()) {
-                        method.setBody(getTemplate().getExtensionGetterBodyResourceDstu3(adaptedClass, type.getDatatype(), converter.getExtensionUri(), attributeName));
+                        method.setBody(getTemplate().getExtensionGetterBodyResourceDstu3(adaptedClass, type.getDatatype(), converter.getExtensionUri()));
                     } else {
                         method.setBody(getTemplate().getExtensionGetterBodyDstu3(adaptedClass, type.getDatatype(), converter.getExtensionUri(), attributeName));
                     }
@@ -511,21 +468,23 @@ public class MethodHandler extends BaseMethodHandler {
                         method.addImport("java.util.List");
                         addMethod(methods, method);
                     }
+                    buildExtensionGetter(methods, attributeName, disambiguatingSuffix, adaptedClass, type.getDatatypeOrList(), type.getDatatype(), type.isResource(), converter.getExtensionUri());
 
                     //Setter
-                    method = constructSetMethodSignature(attributeName, type.getDatatypeOrList(), getParentType());
-                    if (type.isResource()) {
-                        method.setBody(getTemplate().getExtensionSetterBodyResourceDstu3(adaptedClass, converter.getExtensionUri()));
-                    } else {
-                        method.setBody(getTemplate().getExtensionSetterBodyDstu3(adaptedClass, converter.getExtensionUri()));
-                    }
-                    if (type.getDatatype() == null) {
-                        System.out.println("STOP HERE");
-                    } else {
-                        method.addImport(type.getDatatype());
-                        method.addImport("java.util.List");
-                        addMethod(methods, method);
-                    }
+//                    method = constructSetMethodSignature(attributeName, type.getDatatypeOrList(), getParentType());
+//                    if (type.isResource()) {
+//                        method.setBody(getTemplate().getExtensionSetterBodyResourceDstu3(adaptedClass, converter.getExtensionUri()));
+//                    } else {
+//                        method.setBody(getTemplate().getExtensionSetterBodyDstu3(adaptedClass, converter.getExtensionUri()));
+//                    }
+//                    if (type.getDatatype() == null) {
+//                        System.out.println("STOP HERE");
+//                    } else {
+//                        method.addImport(type.getDatatype());
+//                        method.addImport("java.util.List");
+//                        addMethod(methods, method);
+//                    }
+                    buildExtensionSetter(methods, attributeName, adaptedClass, type.getDatatypeOrList(), getParentType(), type.getDatatype(), type.isResource(), converter.getExtensionUri());
                 }
             }
         }
@@ -538,18 +497,20 @@ public class MethodHandler extends BaseMethodHandler {
             return;
         } if (converter.isMultipleCardinality()) {
             //Getter
-            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), "java.util.List<" + type.getGeneratedType() + ">");
-            method.setBody(getTemplate().getUserDefinedExtensionTypeGetterBody_dstu3(type.getGeneratedType(), getUserDefinedStructureExtensionURL()));
-            method.addImport(type.getDatatype());
-            method.addImport("java.util.List");
-            addMethod(methods, method);
+//            Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName), "java.util.List<" + type.getGeneratedType() + ">");
+//            method.setBody(getTemplate().getUserDefinedExtensionTypeGetterBody_dstu3(type.getGeneratedType(), getUserDefinedStructureExtensionURL()));
+//            method.addImport(type.getDatatype());
+//            method.addImport("java.util.List");
+//            addMethod(methods, method);
+            buildUserDefinedExtensionTypeGetter(methods, attributeName, type.getGeneratedType(), type.getGeneratedType(), type.getDatatype(), getUserDefinedStructureExtensionURL());
 
             //Setter
-            method = constructSetMethodSignature(attributeName, "java.util.List<" + type.getGeneratedType() + ">", getParentType());
-            method.setBody(getTemplate().getUserDefinedExtensionTypeSetterBody_dstu3(type.getGeneratedType()));
-            method.addImport(type.getDatatype());
-            method.addImport("java.util.List");
-            addMethod(methods, method);
+//            method = constructSetMethodSignature(attributeName, "java.util.List<" + type.getGeneratedType() + ">", getParentType());
+//            method.setBody(getTemplate().getUserDefinedExtensionTypeSetterBody_dstu3(type.getGeneratedType()));
+//            method.addImport(type.getDatatype());
+//            method.addImport("java.util.List");
+//            addMethod(methods, method);
+            buildUserDefinedExtensionTypeSetter(methods, attributeName, "java.util.List<" + type.getGeneratedType() + ">", getParentType(), type.getGeneratedType(), type.getDatatype());
         } else {
             throw new RuntimeException("Single cardinality user defined structures are not supported yet");
         }

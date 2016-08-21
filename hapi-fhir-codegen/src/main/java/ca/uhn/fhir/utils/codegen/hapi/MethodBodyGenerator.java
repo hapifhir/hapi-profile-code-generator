@@ -611,6 +611,7 @@ public class MethodBodyGenerator extends TemplateUtils {
 	 */
 	public String getExtensionSetterBodyResourceDstu3(String rootClassName, String uri) {
 		ST st = getGroupMain().getInstanceOf("extensionSetterBodyResourceDstu3");
+		st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		return st.render();
 	}
@@ -661,12 +662,11 @@ public class MethodBodyGenerator extends TemplateUtils {
 	 *
 	 * @return
 	 */
-	public String getExtensionGetterBodyResourceDstu3(String rootClassName, String type, String uri, String fieldName) {
+	public String getExtensionGetterBodyResourceDstu3(String rootClassName, String type, String uri) {
 		ST st = getGroupMain().getInstanceOf("extensionGetterBodyResourceDstu3");
-		//st.add("rootClassName", rootClassName);
+		st.add("rootClassName", rootClassName);
 		st.add("uri", uri);
 		st.add("type", type);
-		//st.add("fieldName", fieldName);
 		return st.render();
 	}
 	
