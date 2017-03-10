@@ -2,8 +2,9 @@ package ca.uhn.fhir.utils.common.io;
 
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
-
+@Ignore("Not yet implemented")
 public class ResourceLoadingUtilsTest {
 
 	@Test

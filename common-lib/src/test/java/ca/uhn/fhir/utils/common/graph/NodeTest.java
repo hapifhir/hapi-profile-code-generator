@@ -43,7 +43,8 @@ public class NodeTest {
 		Node<String> root = new Node<String>("root");
 		root.setPayload("rootPayload");
 		root.addToPath("root.child1.child2.child3", "child3payload");
-		assertEquals("child3", root.getFirstChild().getFirstChild().getFirstChild().getName());
+		assertEquals("Child3", root.getFirstChild().getFirstChild().getFirstChild().getName());
+		assertEquals("child3", root.getFirstChild().getFirstChild().getFirstChild().getOriginalName());
 		assertEquals("child3payload", root.getFirstChild().getFirstChild().getFirstChild().getPayload());
 	}
 	
