@@ -6,7 +6,8 @@
 		<profileDirectoryPath>/Users/cnanjo/work/qicore/profiles_stu3</profileDirectoryPath>
 	</profileDirectoryPaths>
 	<generatedCodePackage>org.socraticgrid.fhir.generated</generatedCodePackage>
-	<targetCodeGenerationDirectory>generated-source/java/</targetCodeGenerationDirectory>
+	<!--<targetCodeGenerationDirectory>generated-source/java/<targetCodeGenerationDirectory>-->
+	<targetCodeGenerationDirectory>/Users/cnanjo/repository/projects/qicore_model/src/main/stage</targetCodeGenerationDirectory>
 	<extensionRepositories>
 		<extensionRepository>/Users/cnanjo/repository/fhir_dstu3/fhir/trunk/build/publish/</extensionRepository>
 		<extensionRepository>/Users/cnanjo/work/qicore/profiles_stu3</extensionRepository>

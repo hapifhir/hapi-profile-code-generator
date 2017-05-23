@@ -318,6 +318,7 @@ public class CodeGeneratorConfigurator {
 		MethodBodyGenerator templateUtils = new MethodBodyGenerator().initialize();
 		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator(
 				config.getGeneratedCodePackage(), resourceLoader, templateUtils);
+		generator.setDestinationDirectory(config.getTargetCodeGenerationDirectory());
 		generator.setResourceLoadingPlan(config.getProfileNameList());
 		return generator;
 	}

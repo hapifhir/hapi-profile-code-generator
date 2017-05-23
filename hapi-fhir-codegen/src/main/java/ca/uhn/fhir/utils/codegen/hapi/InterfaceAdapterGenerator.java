@@ -505,7 +505,7 @@ public class InterfaceAdapterGenerator {
 			javaClass.addMethod().setPublic().setStatic(true).setName("adapt").setReturnType("java.lang.Object").setParameters("ca.uhn.fhir.model.api.IResource resource").setBody(templateUtils.getAdaptResource());
 			String factoryString = cleanUpWorkaroundClass(javaClass, true);
 			CodeGenerationUtils.buildTargetPackageDirectoryStructure(getDestinationDirectory(), getGeneratedPackage());
-			writer = new FileWriter("generated-source/java/org/socraticgrid/fhir/dstu3/generated/AdapterFactory.java");
+			writer = new FileWriter(getDestinationDirectory() + "/org/socraticgrid/fhir/dstu3/generated/AdapterFactory.java");
 			writer.write(factoryString);
 			LOGGER.debug("\n {}", factoryString);
 		} catch(Exception e) {

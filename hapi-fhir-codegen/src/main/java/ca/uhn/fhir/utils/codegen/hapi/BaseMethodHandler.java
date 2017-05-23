@@ -179,9 +179,9 @@ public abstract class BaseMethodHandler {
 		return method;
 	}
 
-	public Method constructGetterMethodWithCast(String attributeName, String suffix, String returnType, String castType) {
-		Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + suffix) + "Target", returnType);
-		method.setBody(getTemplate().getAdapterGetWithCastMethodDelegationBody(attributeName + "Target", castType));
+	public Method constructGetterMethodWithCast(String attributeName, String methodSignatureSuffix, String delegatedMethodSuffix, String returnType, String castType) {
+		Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName + methodSignatureSuffix), returnType);
+		method.setBody(getTemplate().getAdapterGetWithCastMethodDelegationBody(attributeName + delegatedMethodSuffix, castType));
 		method.addImport(castType);
 		return method;
 	}
@@ -326,8 +326,8 @@ public abstract class BaseMethodHandler {
 		addMethod(methods, method);
 	}
 
-	public void buildGetterMethodWithCast(List<Method> methods, String attributeName, String suffix, String returnType, String castType) {
-		Method method = constructGetterMethodWithCast(attributeName, suffix, returnType, castType);
+	public void buildGetterMethodWithCast(List<Method> methods, String attributeName, String methodSignatureSuffix, String delegateMethodSuffix, String returnType, String castType) {
+		Method method = constructGetterMethodWithCast(attributeName, methodSignatureSuffix, delegateMethodSuffix, returnType, castType);
 		addMethod(methods, method);
 	}
 

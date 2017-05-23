@@ -55,9 +55,11 @@ public class InterfaceAdapterGeneratorTest {
 	@Test
 	public void testGenerateInterface_dstu3() {
 		try {//TODO Fix hard coded path
-			FileUtils.deleteDirectory(new File("generated-source/java/org/socraticgrid/fhir/dstu3/generated/"));
-			Main.generateDstu3Code(ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan-dstu3.xml"), false);
-			File genDir = new File("generated-source/java/org/socraticgrid/fhir/dstu3/generated/");
+			String configFilePath = ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan-dstu3.xml");
+			CodeGeneratorConfigurator configurator = CodeGeneratorConfigurator.buildConfigurator(configFilePath);
+			FileUtils.deleteDirectory(new File(configurator.getTargetCodeGenerationDirectory()));
+			Main.generateDstu3Code(configFilePath, false);
+			File genDir = new File(configurator.getTargetCodeGenerationDirectory() + "/org/socraticgrid/fhir/dstu3/generated/");
 			assertTrue(genDir.exists());
 			assertTrue(genDir.isDirectory());
 			assertEquals(111, genDir.listFiles().length);
