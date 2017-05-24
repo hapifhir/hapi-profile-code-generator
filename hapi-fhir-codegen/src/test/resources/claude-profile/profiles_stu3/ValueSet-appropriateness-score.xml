@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ValueSet xmlns="http://hl7.org/fhir">
+  <id value="appropriateness-score"/>
+  <meta>
+    <profile value="http://hl7.org/fhir/StructureDefinition/valueset-shareable-definition"/>
+  </meta>
+  <url value="http://hl7.org/fhir/qicore/ValueSet/appropriateness-score"/>
+  <name value="QICoreAppropriatenessScore"/>
+  <status value="draft"/>
+  <contact>
+    <telecom>
+      <system value="other"/>
+    </telecom>
+    <telecom>
+      <system value="email"/>
+    </telecom>
+  </contact>
+  <date value="2016-08-04T18:30:50-06:00"/>
+  <description value="The RAND scoring for appropriateness of the procedure."/>
+  <compose>
+    <include>
+      <system value="http://hl7.org/fhir/qicore/CodeSystem/appropriateness-score"/>
+    </include>
+  </compose>
+</ValueSet>

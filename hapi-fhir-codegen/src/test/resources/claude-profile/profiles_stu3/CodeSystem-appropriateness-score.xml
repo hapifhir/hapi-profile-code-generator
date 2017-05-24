@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<CodeSystem xmlns="http://hl7.org/fhir">
+  <id value="appropriateness-score"/>
+  <url value="http://hl7.org/fhir/qicore/CodeSystem/appropriateness-score"/>
+  <name value="QICoreAppropriatenessScore"/>
+  <status value="draft"/>
+  <experimental value="false"/>
+  <contact>
+    <telecom>
+      <system value="other"/>
+    </telecom>
+    <telecom>
+      <system value="email"/>
+    </telecom>
+  </contact>
+  <date value="2016-08-04T18:30:50-06:00"/>
+  <description value="The RAND scoring for appropriateness of the procedure."/>
+  <caseSensitive value="true"/>
+  <valueSet value="http://hl7.org/fhir/qicore/ValueSet/appropriateness-score"/>
+  <content value="complete"/>
+  <concept>
+    <code value="extremely-inappropriate"/>
+    <display value="Extremely Inappropriate"/>
+    <definition value="The procedure is extremely inappropriate"/>
+  </concept>
+  <concept>
+    <code value="inappropriate"/>
+    <display value="Inappropriate"/>
+    <definition value="The procedure is inappropriate"/>
+  </concept>
+  <concept>
+    <code value="probably-inappropriate"/>
+    <display value="Probably Inappropriate"/>
+    <definition value="The procedure is probably inappropriate"/>
+  </concept>
+  <concept>
+    <code value="uncertain-inappropriate"/>
+    <display value="Uncertain Inappropriate"/>
+    <definition value="The appropriateness of the procedure is uncertain, leaning towards inappropriate"/>
+  </concept>
+  <concept>
+    <code value="uncertain"/>
+    <display value="Uncertain"/>
+    <definition value="The appropriateness of the procedure is uncertain"/>
+  </concept>
+  <concept>
+    <code value="uncertain-appropriate"/>
+    <display value="Uncertain Appropriate"/>
+    <definition value="The appropriateness of the procedure is uncertain, leaning towards appropriate"/>
+  </concept>
+  <concept>
+    <code value="probably-appropriate"/>
+    <display value="Probably Appropriate"/>
+    <definition value="The procedure is probably appropriate"/>
+  </concept>
+  <concept>
+    <code value="appropriate"/>
+    <display value="Appropriate"/>
+    <definition value="The procedure is appropriate"/>
+  </concept>
+  <concept>
+    <code value="extremely-appropriate"/>
+    <display value="Extremely Appropriate"/>
+    <definition value="The procedure is extremely appropriate"/>
+  </concept>
+</CodeSystem>

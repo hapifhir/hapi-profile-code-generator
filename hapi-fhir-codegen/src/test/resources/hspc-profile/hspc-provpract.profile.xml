@@ -1,0 +1,2663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="hspc-provpract"/>
+  <url value="http://fhir.org/guides/hspc/StructureDefinition/hspc-provpract"/>
+  <name value="Profile hspc-provpract"/>
+  <status value="draft"/>
+  <publisher value="HSPC"/>
+  <contact>
+    <telecom>
+      <system value="other"/>
+      <value value="http://healthcaresoa.org"/>
+    </telecom>
+  </contact>
+  <date value="2015-05-13"/>
+  <mapping>
+    <identity value="v2"/>
+    <uri value="http://hl7.org/v2"/>
+    <name value="HL7 v2 Mapping"/>
+  </mapping>
+  <mapping>
+    <identity value="rim"/>
+    <uri value="http://hl7.org/v3"/>
+    <name value="RIM Mapping"/>
+  </mapping>
+  <mapping>
+    <identity value="servd"/>
+    <uri value="http://www.omg.org/spec/ServD/1.0/"/>
+    <name value="ServD"/>
+  </mapping>
+  <mapping>
+    <identity value="w5"/>
+    <uri value="http://hl7.org/fhir/w5"/>
+    <name value="W5 Mapping"/>
+  </mapping>
+  <kind value="resource"/>
+  <abstract value="false"/>
+  <type value="Practitioner"/>
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Practitioner"/>
+  <derivation value="constraint"/>
+  <snapshot>
+    <element id="Practitioner:hspcproviderpractitioner">
+      <path value="Practitioner"/>
+      <name value="HSPCProviderPractitioner"/>
+      <short value="A person with a  formal responsibility in the provisioning of healthcare or related services"/>
+      <definition value="A person who is directly or indirectly involved in the provisioning of healthcare."/>
+      <comments value="Note that a cab driver no longer fits the bill. You probably would be interested in the organization rather than the individual?"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRD (as one example)"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="Role"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="Provider"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="administrative.individual"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.id">
+      <path value="Practitioner.id"/>
+      <short value="Logical id of this artifact"/>
+      <definition value="The logical id of the resource, as used in the URL for the resource. Once assigned, this value never changes."/>
+      <comments value="The only time that a resource does not have an id is when it is being submitted to the server using a create operation."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Resource.id"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="id"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.meta">
+      <path value="Practitioner.meta"/>
+      <short value="Metadata about the resource"/>
+      <definition value="The metadata about the resource. This is content that is maintained by the infrastructure. Changes to the content may not always be associated with version changes to the resource."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Resource.meta"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Meta"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.implicitRules">
+      <path value="Practitioner.implicitRules"/>
+      <short value="A set of rules under which this content was created"/>
+      <definition value="A reference to a set of rules that were followed when the resource was constructed, and which must be understood when processing the content."/>
+      <comments value="Asserting this rule set restricts the content to be only understood by a limited set of trading partners. This inherently limits the usefulness of the data in the long term. However, the existing health eco-system is highly fractured, and not yet ready to define, collect, and exchange data in a generally computable sense. Wherever possible, implementers and/or specification writers should avoid using this element as much as possible."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Resource.implicitRules"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="uri"/>
+      </type>
+      <isModifier value="true"/>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.language">
+      <path value="Practitioner.language"/>
+      <short value="Language of the resource content"/>
+      <definition value="The base language in which the resource is written."/>
+      <comments value="Language is provided to support indexing and accessibility (typically, services such as text to speech use the language tag). The html language tag in the narrative applies  to the narrative. The language tag on the resource may be used to specify the language of other presentations generated from the data in the resource  Not all the content has to be in the base language. The Resource.language should not be assumed to apply to the narrative automatically. If a language is specified, it should it also be specified on the div element in the html (see rules in HTML5 for information about the relationship between xml:lang and the html lang attribute)."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Resource.language"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="code"/>
+      </type>
+      <binding>
+        <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet">
+          <valueReference>
+            <reference value="http://hl7.org/fhir/ValueSet/all-languages"/>
+          </valueReference>
+        </extension>
+        <strength value="extensible"/>
+        <description value="A human language."/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/languages"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.text">
+      <path value="Practitioner.text"/>
+      <short value="Text summary of the resource, for human interpretation"/>
+      <definition value="A human-readable narrative that contains a summary of the resource, and may be used to represent the content of the resource to a human. The narrative need not encode all the structured data, but is required to contain sufficient detail to make it &quot;clinically safe&quot; for a human to just read the narrative. Resource definitions may define what content should be represented in the narrative to ensure clinical safety."/>
+      <comments value="Contained resources do not have narrative. Resources that are not contained SHOULD have a narrative. In some cases, a resource may only have text with little or no additional discrete data (as long as all minOccurs=1 elements are satisfied).  This may be necessary for data from legacy systems where information is captured as a &quot;text blob&quot; or where text is additionally entered raw or narrated and encoded in formation is added later."/>
+      <alias value="narrative"/>
+      <alias value="html"/>
+      <alias value="xhtml"/>
+      <alias value="display"/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="DomainResource.text"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Narrative"/>
+      </type>
+      <condition value="dom-1"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value="Act.text?"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.contained">
+      <path value="Practitioner.contained"/>
+      <short value="Contained, inline Resources"/>
+      <definition value="These resources do not have an independent existence apart from the resource that contains them - they cannot be identified independently, and nor can they have their own independent transaction scope."/>
+      <comments value="This should never be done when the content can be identified properly, as once identification is lost, it is extremely difficult (and context dependent) to restore it again."/>
+      <alias value="inline resources"/>
+      <alias value="anonymous resources"/>
+      <alias value="contained resources"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="DomainResource.contained"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Resource"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="N/A"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.extension">
+      <path value="Practitioner.extension"/>
+      <short value="Additional Content defined by implementations"/>
+      <definition value="May be used to represent additional information that is not part of the basic definition of the resource. In order to make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension."/>
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone."/>
+      <alias value="extensions"/>
+      <alias value="user content"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="DomainResource.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="N/A"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.modifierExtension">
+      <path value="Practitioner.modifierExtension"/>
+      <short value="Extensions that cannot be ignored"/>
+      <definition value="May be used to represent additional information that is not part of the basic definition of the resource, and that modifies the understanding of the element that contains it. Usually modifier elements provide negation or qualification. In order to make the use of extensions safe and manageable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension. Applications processing a resource are required to check for modifier extensions."/>
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone."/>
+      <alias value="extensions"/>
+      <alias value="user content"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="DomainResource.modifierExtension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+      <isModifier value="true"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value="N/A"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.identifier">
+      <path value="Practitioner.identifier"/>
+      <short value="A identifier for the person as this agent"/>
+      <definition value="An identifier that applies to this person in this role."/>
+      <requirements value="Often, specific identities are assigned for the agent."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.identifier"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Identifier"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRD-7 (or XCN.1)"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./id"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Identifiers"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="id"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.active">
+      <path value="Practitioner.active"/>
+      <short value="Whether this practitioner&#39;s record is in active use"/>
+      <definition value="Whether this practitioner&#39;s record is in active use."/>
+      <comments value="Default is true.   If the practitioner is not in use by one organization, then it should mark the period on the PractitonerRole with an end date (even if they are active) as they may be active in another role."/>
+      <requirements value="Need to be able to mark a practitioner record as not to be used because it was created in error."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.active"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="boolean"/>
+      </type>
+      <defaultValueBoolean value="true"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./StatusCode"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="status"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.name">
+      <path value="Practitioner.name"/>
+      <short value="The name(s) associated with the practitioner"/>
+      <definition value="The name(s) associated with the practitioner."/>
+      <comments value="The selection of the use property should ensure that there is a single usual name specified, and others use the nickname (alias), old, or other values as appropriate.  In general select the value to be used in the ResourceReference.display based on this:  1. There is more than 1 name 2. Use = usual 3. Period is current to the date of the usage 4. Use = official 5. Other order as decided by internal business rules."/>
+      <requirements value="The name(s) that a Practitioner is known by. Where there are multiple, the name that the practitioner is usually known as should be used in the display."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.name"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="HumanName"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XCN Components"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./name"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./PreferredName (GivenNames, FamilyName, TitleCode)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom">
+      <path value="Practitioner.telecom"/>
+      <short value="A contact detail for the practitioner (that apply to all roles)"/>
+      <definition value="A contact detail for the practitioner, e.g. a telephone number or an email address."/>
+      <comments value="Person may have multiple ways to be contacted with different uses or applicable periods.  May need to have options for contacting the person urgently, and also to help with identification  These typically will have home numbers, or mobile numbers that are not role specific."/>
+      <requirements value="Need to know how to reach a practitioner independent to any roles the practitioner may have."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.telecom"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="ContactPoint"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRT-15, STF-10, ROL-12"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./telecom"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./ContactPoints"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom.id">
+      <path value="Practitioner.telecom.id"/>
+      <representation value="xmlAttr"/>
+      <short value="xml:id (or equivalent in JSON)"/>
+      <definition value="unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Element.id"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom.extension:preferenceindicator$Extension">
+      <path value="Practitioner.telecom.extension"/>
+      <name value="PreferenceIndicator"/>
+      <short value="Extension"/>
+      <definition value="An Extension"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <constraint>
+        <key value="ext-1"/>
+        <severity value="error"/>
+        <human value="Must have either extensions or value[x], not both"/>
+        <expression value="extension.exists() != value.exists()"/>
+        <xpath value="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &#39;value&#39;)])"/>
+      </constraint>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom.system">
+      <path value="Practitioner.telecom.system"/>
+      <short value="phone | fax | email | pager | other"/>
+      <definition value="Telecommunications form for contact point - what communications system is required to make use of the contact."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="ContactPoint.system"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="code"/>
+      </type>
+      <condition value="cpt-2"/>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="required"/>
+        <description value="Telecommunications form for contact point"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/contact-point-system"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XTN.3"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./scheme"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./ContactPointType"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom.value">
+      <path value="Practitioner.telecom.value"/>
+      <short value="The actual contact point details"/>
+      <definition value="The actual contact point details, in a form that is meaningful to the designated communication system (i.e. phone number or email address)."/>
+      <comments value="Additional text data such as phone extension numbers, or notes about use of the contact are sometimes included in the value."/>
+      <requirements value="Need to support legacy numbers that are not in a tightly controlled format."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="ContactPoint.value"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XTN.1 (or XTN.12)"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./url"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Value"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom.use">
+      <path value="Practitioner.telecom.use"/>
+      <short value="home | work | temp | old | mobile - purpose of this contact point"/>
+      <definition value="Identifies the purpose for the contact point."/>
+      <comments value="This is labeled as &quot;Is Modifier&quot; because applications should not mistake a temporary or old contact etc.for a current/permanent one. Applications can assume that a contact is current unless it explicitly says that it is temporary or old."/>
+      <requirements value="Need to track the way a person uses this contact, so a user can choose which is appropriate for their purpose."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="ContactPoint.use"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="code"/>
+      </type>
+      <isModifier value="true"/>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="required"/>
+        <description value="Use of contact point"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/contact-point-use"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XTN.2 - but often indicated by field"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="unique(./use)"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./ContactPointPurpose"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom.rank">
+      <path value="Practitioner.telecom.rank"/>
+      <short value="Specify preferred order of use (1 = highest)"/>
+      <definition value="Specifies a preferred order in which to use a set of contacts. Contacts are ranked with lower values coming before higher values."/>
+      <comments value="Note that rank does not necessarily follow the order in which the contacts are represented in the instance."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="ContactPoint.rank"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="positiveInt"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="n/a"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom.period">
+      <path value="Practitioner.telecom.period"/>
+      <short value="Time period when the contact point was/is in use"/>
+      <definition value="Time period when the contact point was/is in use."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="ContactPoint.period"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Period"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="N/A"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./useablePeriod[type=&quot;IVL&lt;TS&gt;&quot;]"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./StartDate and ./EndDate"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address">
+      <path value="Practitioner.address"/>
+      <short value="Address(es) of the practitioner that are not role specific (typically home address)"/>
+      <definition value="Address(es) of the practitioner that are not role specific (typically home address).  Work addresses are not typically entered in this property as they are usually role dependent."/>
+      <comments value="The PractitionerRole does not have an address value on it, as it is expected that the location property be used for this purpose (which has an address)."/>
+      <requirements value="The home/mailing address of the practitioner is often required for employee administration purposes, and also for some rostering services where the start point (practitioners home) can be used in calculations."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.address"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Address"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="ORC-24, STF-11, ROL-11, PRT-14"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./addr"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Addresses"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.id">
+      <path value="Practitioner.address.id"/>
+      <representation value="xmlAttr"/>
+      <short value="xml:id (or equivalent in JSON)"/>
+      <definition value="unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Element.id"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.extension:primaryindicator$Extension">
+      <path value="Practitioner.address.extension"/>
+      <name value="PrimaryIndicator"/>
+      <short value="Extension"/>
+      <definition value="An Extension"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <constraint>
+        <key value="ext-1"/>
+        <severity value="error"/>
+        <human value="Must have either extensions or value[x], not both"/>
+        <expression value="extension.exists() != value.exists()"/>
+        <xpath value="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &#39;value&#39;)])"/>
+      </constraint>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="The set of values to indicate affirmative or negative"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/v2-0136"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.use">
+      <path value="Practitioner.address.use"/>
+      <short value="home | work | temp | old - purpose of this address"/>
+      <definition value="The purpose of this address."/>
+      <comments value="This is labeled as &quot;Is Modifier&quot; because applications should not mistake a temporary or old address etc.for a current/permanent one. Applications can assume that an address is current unless it explicitly says that it is temporary or old."/>
+      <requirements value="Allows an appropriate address to be chosen from a list of many."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.use"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="code"/>
+      </type>
+      <exampleCode value="home"/>
+      <isModifier value="true"/>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="required"/>
+        <description value="The use of an address"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/address-use"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.7"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="unique(./use)"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./AddressPurpose"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.type">
+      <path value="Practitioner.address.type"/>
+      <short value="postal | physical | both"/>
+      <definition value="Distinguishes between physical addresses (those you can visit) and mailing addresses (e.g. PO Boxes and care-of addresses). Most addresses are both."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.type"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="code"/>
+      </type>
+      <exampleCode value="both"/>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="required"/>
+        <description value="The type of an address (physical / postal)"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/address-type"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.18"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="unique(./use)"/>
+      </mapping>
+      <mapping>
+        <identity value="vcard"/>
+        <map value="address type parameter"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.text">
+      <path value="Practitioner.address.text"/>
+      <short value="Text representation of the address"/>
+      <definition value="A full text representation of the address."/>
+      <comments value="Can provide both a text representation and parts."/>
+      <requirements value="A renderable, unencoded form."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.text"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <exampleString value="137 Nowhere Street, Erewhon 9132"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.1 + XAD.2 + XAD.3 + XAD.4 + XAD.5 + XAD.6"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./formatted"/>
+      </mapping>
+      <mapping>
+        <identity value="vcard"/>
+        <map value="address label parameter"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.line">
+      <path value="Practitioner.address.line"/>
+      <short value="Street name, number, direction &amp; P.O. Box etc."/>
+      <definition value="This component contains the house number, apartment number, street name, street direction,  P.O. Box number, delivery hints, and similar address information."/>
+      <requirements value="home | work | temp | old - purpose of this address."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Address.line"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <exampleString value="137 Nowhere Street"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.1 + XAD.2 (note: XAD.1 and XAD.2 have different meanings for a company address than for a person address)"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="AD.part[parttype = AL]"/>
+      </mapping>
+      <mapping>
+        <identity value="vcard"/>
+        <map value="street"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./StreetAddress (newline delimitted)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.city">
+      <path value="Practitioner.address.city"/>
+      <short value="Name of city, town etc."/>
+      <definition value="The name of the city, town, village or other community or delivery center."/>
+      <alias value="Municpality"/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.city"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <exampleString value="Erewhon"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.3"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="AD.part[parttype = CTY]"/>
+      </mapping>
+      <mapping>
+        <identity value="vcard"/>
+        <map value="locality"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Jurisdiction"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.district">
+      <path value="Practitioner.address.district"/>
+      <short value="District name (aka county)"/>
+      <definition value="The name of the administrative area (county)."/>
+      <comments value="District is sometimes known as county, but in some regions &#39;county&#39; is used in place of city (municipality), so county name should be conveyed in city instead."/>
+      <alias value="County"/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.district"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <exampleString value="Madison"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.9"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="AD.part[parttype = CNT | CPA]"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.state">
+      <path value="Practitioner.address.state"/>
+      <short value="Sub-unit of country (abbreviations ok)"/>
+      <definition value="Sub-unit of a country with limited sovereignty in a federally organized country. A code may be used if codes are in common use (i.e. US 2 letter state codes)."/>
+      <alias value="Province"/>
+      <alias value="Territory"/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.state"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.4"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="AD.part[parttype = STA]"/>
+      </mapping>
+      <mapping>
+        <identity value="vcard"/>
+        <map value="region"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Region"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.postalCode">
+      <path value="Practitioner.address.postalCode"/>
+      <short value="Postal code for area"/>
+      <definition value="A postal code designating a region defined by the postal service."/>
+      <alias value="Zip"/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.postalCode"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <exampleString value="9132"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.5"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="AD.part[parttype = ZIP]"/>
+      </mapping>
+      <mapping>
+        <identity value="vcard"/>
+        <map value="code"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./PostalIdentificationCode"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.country">
+      <path value="Practitioner.address.country"/>
+      <short value="Country (can be ISO 3166 3 letter code)"/>
+      <definition value="Country - a nation as commonly understood or generally accepted."/>
+      <comments value="ISO 3166 3 letter codes can be used in place of a full country name."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.country"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.6"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="AD.part[parttype = CNT]"/>
+      </mapping>
+      <mapping>
+        <identity value="vcard"/>
+        <map value="country"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Country"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.period">
+      <path value="Practitioner.address.period"/>
+      <short value="Time period when address was/is in use"/>
+      <definition value="Time period when address was/is in use."/>
+      <requirements value="Allows addresses to be placed in historical context."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Address.period"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Period"/>
+      </type>
+      <examplePeriod>
+        <start value="2010-03-23"/>
+        <end value="2010-07-01"/>
+      </examplePeriod>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="XAD.12 / XAD.13 + XAD.14"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./usablePeriod[type=&quot;IVL&lt;TS&gt;&quot;]"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./StartDate and ./EndDate"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.gender">
+      <path value="Practitioner.gender"/>
+      <short value="male | female | other | unknown"/>
+      <definition value="Administrative Gender - the gender that the person is considered to have for administration and record keeping purposes."/>
+      <requirements value="Needed to address the person correctly."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.gender"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="code"/>
+      </type>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="required"/>
+        <description value="The gender of a person used for administrative purposes."/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/administrative-gender"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="STF-5"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./administrativeGender"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./GenderCode"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.birthDate">
+      <path value="Practitioner.birthDate"/>
+      <short value="The date  on which the practitioner was born"/>
+      <definition value="The date of birth for the practitioner."/>
+      <requirements value="Needed for identification."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.birthDate"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="date"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="STF-6"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./birthTime"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(not represented in ServD)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.photo">
+      <path value="Practitioner.photo"/>
+      <short value="Image of the person"/>
+      <definition value="Image of the person."/>
+      <requirements value="Many EHR systems have the capability to capture an image of patients and personnel. Fits with newer social media usage too."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.photo"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Attachment"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./subjectOf/ObservationEvent[code=&quot;photo&quot;]/value"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./ImageURI (only supports the URI reference)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role">
+      <path value="Practitioner.role"/>
+      <slicing>
+        <discriminator value="Practitioner.role.organization|false|open"/>
+        <discriminator value=" Practitioner.role.code"/>
+        <rules value="open"/>
+      </slicing>
+      <short value="Roles/organizations the practitioner is associated with"/>
+      <definition value="The list of roles/organizations that the practitioner is associated with."/>
+      <comments value="The address to be used for this PractitionerRole is in the referenced location (removing duplication across all the services provided at the location)."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value=".(Role)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole">
+      <path value="Practitioner.role"/>
+      <name value="PractitionerRole"/>
+      <short value="Roles/organizations the practitioner is associated with"/>
+      <definition value="The list of roles/organizations that the practitioner is associated with."/>
+      <comments value="The address to be used for this PractitionerRole is in the referenced location (removing duplication across all the services provided at the location)."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value=".(Role)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.id">
+      <path value="Practitioner.role.id"/>
+      <representation value="xmlAttr"/>
+      <short value="xml:id (or equivalent in JSON)"/>
+      <definition value="unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Element.id"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.extension">
+      <path value="Practitioner.role.extension"/>
+      <short value="Additional Content defined by implementations"/>
+      <definition value="May be used to represent additional information that is not part of the basic definition of the element. In order to make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension."/>
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone."/>
+      <alias value="extensions"/>
+      <alias value="user content"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.modifierExtension">
+      <path value="Practitioner.role.modifierExtension"/>
+      <short value="Extensions that cannot be ignored"/>
+      <definition value="May be used to represent additional information that is not part of the basic definition of the element, and that modifies the understanding of the element that contains it. Usually modifier elements provide negation or qualification. In order to make the use of extensions safe and manageable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension. Applications processing a resource are required to check for modifier extensions."/>
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone."/>
+      <alias value="extensions"/>
+      <alias value="user content"/>
+      <alias value="modifiers"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="BackboneElement.modifierExtension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+      <isModifier value="true"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value="N/A"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.organization">
+      <path value="Practitioner.role.organization"/>
+      <short value="Organization where the roles are performed"/>
+      <definition value="The organization where the Practitioner performs the roles associated."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.organization"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Organization"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="scopingOrganization"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.code">
+      <path value="Practitioner.role.code"/>
+      <short value="Roles which this practitioner may perform"/>
+      <definition value="Roles which this practitioner is authorized to perform for the organization."/>
+      <comments value="A person may have more than one role. At least one role is required."/>
+      <requirements value="Need to know what authority the practitioner has - what can they do?"/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.code"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="A set of codes that describe the general practice category for a provider."/>
+        <valueSetReference>
+          <reference value="ValueSet/practitioner-providerPractitionerType"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRD-1 / STF-18  / PRA-3  / PRT-4  / ROL-3 / ORC-12 / OBR-16 / PV1-7 / PV1-8 / PV1-9 / PV1-17"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./code"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.specialty">
+      <path value="Practitioner.role.specialty"/>
+      <short value="Specific specialty of the practitioner"/>
+      <definition value="Specific specialty of the practitioner."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.specialty"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="A set of codes that describe the specific specialty in which a provider practices."/>
+        <valueSetReference>
+          <reference value="ValueSet/practitioner-providerPractitionerSpecialty"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRA-5"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="indirectAuthority/QualifiedEntity[code &lt; Speciality]/code"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Specialty"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.identifier">
+      <path value="Practitioner.role.identifier"/>
+      <short value="Business Identifiers that are specific to a role/location"/>
+      <definition value="Business Identifiers that are specific to a role/location."/>
+      <requirements value="Some business identifiers are specific to a location and should be able to be associated."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.identifier"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Identifier"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.telecom">
+      <path value="Practitioner.role.telecom"/>
+      <short value="Contact details that are specific to the role/location/service"/>
+      <definition value="Contact details that are specific to the role/location/service."/>
+      <requirements value="Often practitioners have a dedicated line for each location (or service) that they work at, and need to be able to define separate contact details for each of these."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.telecom"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="ContactPoint"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.period">
+      <path value="Practitioner.role.period"/>
+      <short value="The period during which the practitioner is authorized to perform in these role(s)"/>
+      <definition value="The period during which the person is authorized to act as a practitioner in these role(s) for the organization."/>
+      <requirements value="Even after the agencies is revoked, the fact that it existed must still be recorded."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.period"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Period"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRD-8/9 / PRA-5.4"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./effectiveTime"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="when.done"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.location">
+      <path value="Practitioner.role.location"/>
+      <short value="The location(s) at which this practitioner provides care"/>
+      <definition value="The location(s) at which this practitioner provides care."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.location"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Location"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./target[classCode=&quot;indirectAuthority].source[classCode=SDLOC]"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)&lt;br/&gt; However these are accessed via the Site.ServiceSite.ServiceSiteProvider record. (The Site has the location)"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="where"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.healthcareService">
+      <path value="Practitioner.role.healthcareService"/>
+      <short value="The list of healthcare services that this worker provides for this role&#39;s Organization/Location(s)"/>
+      <definition value="The list of healthcare services that this worker provides for this role&#39;s Organization/Location(s)."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.healthcareService"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/HealthcareService"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./target[classCode=&quot;indirectAuthority].id?"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.endpoint">
+      <path value="Practitioner.role.endpoint"/>
+      <short value="Technical endpoints providing access to services operated for the PractitonerRole"/>
+      <definition value="Technical endpoints providing access to services operated for the PractitonerRole."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.endpoint"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Endpoint"/>
+      </type>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation">
+      <path value="Practitioner.role"/>
+      <name value="AdministrativeAffiliation"/>
+      <short value="Roles/organizations the practitioner is associated with"/>
+      <definition value="The list of roles/organizations that the practitioner is associated with."/>
+      <comments value="The address to be used for this PractitionerRole is in the referenced location (removing duplication across all the services provided at the location)."/>
+      <alias value="AdministrativeAffiliation"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value=".(Role)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.id">
+      <path value="Practitioner.role.id"/>
+      <representation value="xmlAttr"/>
+      <short value="xml:id (or equivalent in JSON)"/>
+      <definition value="unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Element.id"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.extension">
+      <path value="Practitioner.role.extension"/>
+      <short value="Additional Content defined by implementations"/>
+      <definition value="May be used to represent additional information that is not part of the basic definition of the element. In order to make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension."/>
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone."/>
+      <alias value="extensions"/>
+      <alias value="user content"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.modifierExtension">
+      <path value="Practitioner.role.modifierExtension"/>
+      <short value="Extensions that cannot be ignored"/>
+      <definition value="May be used to represent additional information that is not part of the basic definition of the element, and that modifies the understanding of the element that contains it. Usually modifier elements provide negation or qualification. In order to make the use of extensions safe and manageable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension. Applications processing a resource are required to check for modifier extensions."/>
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone."/>
+      <alias value="extensions"/>
+      <alias value="user content"/>
+      <alias value="modifiers"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="BackboneElement.modifierExtension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+      <isModifier value="true"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value="N/A"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.organization">
+      <path value="Practitioner.role.organization"/>
+      <short value="Organization where the roles are performed"/>
+      <definition value="The organization where the Practitioner performs the roles associated."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.organization"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Organization"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="scopingOrganization"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.code">
+      <path value="Practitioner.role.code"/>
+      <short value="Roles which this practitioner may perform"/>
+      <definition value="Roles which this practitioner is authorized to perform for the organization."/>
+      <comments value="A person may have more than one role. At least one role is required."/>
+      <requirements value="Need to know what authority the practitioner has - what can they do?"/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.code"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="example"/>
+        <description value="The role a person plays representing an organization"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/practitioner-role"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRD-1 / STF-18  / PRA-3  / PRT-4  / ROL-3 / ORC-12 / OBR-16 / PV1-7 / PV1-8 / PV1-9 / PV1-17"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./code"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.specialty">
+      <path value="Practitioner.role.specialty"/>
+      <short value="Specific specialty of the practitioner"/>
+      <definition value="Specific specialty of the practitioner."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.specialty"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="example"/>
+        <description value="Specific specialty associated with the agency"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/practitioner-specialty"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRA-5"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="indirectAuthority/QualifiedEntity[code &lt; Speciality]/code"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Specialty"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.identifier">
+      <path value="Practitioner.role.identifier"/>
+      <short value="Business Identifiers that are specific to a role/location"/>
+      <definition value="Business Identifiers that are specific to a role/location."/>
+      <requirements value="Some business identifiers are specific to a location and should be able to be associated."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.identifier"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Identifier"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.telecom">
+      <path value="Practitioner.role.telecom"/>
+      <short value="Contact details that are specific to the role/location/service"/>
+      <definition value="Contact details that are specific to the role/location/service."/>
+      <requirements value="Often practitioners have a dedicated line for each location (or service) that they work at, and need to be able to define separate contact details for each of these."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.telecom"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="ContactPoint"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.period">
+      <path value="Practitioner.role.period"/>
+      <short value="The period during which the practitioner is authorized to perform in these role(s)"/>
+      <definition value="The period during which the person is authorized to act as a practitioner in these role(s) for the organization."/>
+      <requirements value="Even after the agencies is revoked, the fact that it existed must still be recorded."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.period"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Period"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRD-8/9 / PRA-5.4"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./effectiveTime"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="when.done"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.location">
+      <path value="Practitioner.role.location"/>
+      <short value="The location(s) at which this practitioner provides care"/>
+      <definition value="The location(s) at which this practitioner provides care."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.location"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Location"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./target[classCode=&quot;indirectAuthority].source[classCode=SDLOC]"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)&lt;br/&gt; However these are accessed via the Site.ServiceSite.ServiceSiteProvider record. (The Site has the location)"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="where"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.healthcareService">
+      <path value="Practitioner.role.healthcareService"/>
+      <short value="The list of healthcare services that this worker provides for this role&#39;s Organization/Location(s)"/>
+      <definition value="The list of healthcare services that this worker provides for this role&#39;s Organization/Location(s)."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.healthcareService"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/HealthcareService"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./target[classCode=&quot;indirectAuthority].id?"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation.endpoint">
+      <path value="Practitioner.role.endpoint"/>
+      <short value="Technical endpoints providing access to services operated for the PractitonerRole"/>
+      <definition value="Technical endpoints providing access to services operated for the PractitonerRole."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.endpoint"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Endpoint"/>
+      </type>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation">
+      <path value="Practitioner.role"/>
+      <name value="PracticeAffiliation"/>
+      <short value="Roles/organizations the practitioner is associated with"/>
+      <definition value="The list of roles/organizations that the practitioner is associated with."/>
+      <comments value="The address to be used for this PractitionerRole is in the referenced location (removing duplication across all the services provided at the location)."/>
+      <alias value="PracticeAffiliation"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value=".(Role)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.id">
+      <path value="Practitioner.role.id"/>
+      <representation value="xmlAttr"/>
+      <short value="xml:id (or equivalent in JSON)"/>
+      <definition value="unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Element.id"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.extension">
+      <path value="Practitioner.role.extension"/>
+      <slicing id="3">
+        <discriminator value="url"/>
+        <ordered value="false"/>
+        <rules value="open"/>
+      </slicing>
+      <short value="Extension"/>
+      <definition value="An Extension"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.extension:practiceaffiliationtype$Extension">
+      <path value="Practitioner.role.extension"/>
+      <name value="PracticeAffiliationType"/>
+      <short value="Extension"/>
+      <definition value="An Extension"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <constraint>
+        <key value="ext-1"/>
+        <severity value="error"/>
+        <human value="Must have either extensions or value[x], not both"/>
+        <expression value="extension.exists() != value.exists()"/>
+        <xpath value="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &#39;value&#39;)])"/>
+      </constraint>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="example"/>
+        <description value="A set of codes that describe the kinds of affiliations a provider may have pertaining to the practice of medicine"/>
+        <valueSetReference>
+          <reference value="ValueSet/practitioner-practiceAffiliationType"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.extension:practitionerprivilege$Extension">
+      <path value="Practitioner.role.extension"/>
+      <name value="PractitionerPrivilege"/>
+      <short value="Extension"/>
+      <definition value="An Extension"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <constraint>
+        <key value="ext-1"/>
+        <severity value="error"/>
+        <human value="Must have either extensions or value[x], not both"/>
+        <expression value="extension.exists() != value.exists()"/>
+        <xpath value="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &#39;value&#39;)])"/>
+      </constraint>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="A set of codes that describe the level at which a provider is authorized to practice medicine at a given isntitution"/>
+        <valueSetReference>
+          <reference value="ValueSet/practitioner-privilege"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.modifierExtension">
+      <path value="Practitioner.role.modifierExtension"/>
+      <short value="Extensions that cannot be ignored"/>
+      <definition value="May be used to represent additional information that is not part of the basic definition of the element, and that modifies the understanding of the element that contains it. Usually modifier elements provide negation or qualification. In order to make the use of extensions safe and manageable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension. Applications processing a resource are required to check for modifier extensions."/>
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone."/>
+      <alias value="extensions"/>
+      <alias value="user content"/>
+      <alias value="modifiers"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="BackboneElement.modifierExtension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+      <isModifier value="true"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value="N/A"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.organization">
+      <path value="Practitioner.role.organization"/>
+      <short value="Organization where the roles are performed"/>
+      <definition value="The organization where the Practitioner performs the roles associated."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.organization"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Organization"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="scopingOrganization"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.code">
+      <path value="Practitioner.role.code"/>
+      <short value="Roles which this practitioner may perform"/>
+      <definition value="Roles which this practitioner is authorized to perform for the organization."/>
+      <comments value="A person may have more than one role. At least one role is required."/>
+      <requirements value="Need to know what authority the practitioner has - what can they do?"/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.code"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="example"/>
+        <description value="The role a person plays representing an organization"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/practitioner-role"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRD-1 / STF-18  / PRA-3  / PRT-4  / ROL-3 / ORC-12 / OBR-16 / PV1-7 / PV1-8 / PV1-9 / PV1-17"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./code"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.specialty">
+      <path value="Practitioner.role.specialty"/>
+      <short value="Specific specialty of the practitioner"/>
+      <definition value="Specific specialty of the practitioner."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.specialty"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <isSummary value="true"/>
+      <binding>
+        <strength value="example"/>
+        <description value="Specific specialty associated with the agency"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/practitioner-specialty"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRA-5"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="indirectAuthority/QualifiedEntity[code &lt; Speciality]/code"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Specialty"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.identifier">
+      <path value="Practitioner.role.identifier"/>
+      <short value="Business Identifiers that are specific to a role/location"/>
+      <definition value="Business Identifiers that are specific to a role/location."/>
+      <requirements value="Some business identifiers are specific to a location and should be able to be associated."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.identifier"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Identifier"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.telecom">
+      <path value="Practitioner.role.telecom"/>
+      <short value="Contact details that are specific to the role/location/service"/>
+      <definition value="Contact details that are specific to the role/location/service."/>
+      <requirements value="Often practitioners have a dedicated line for each location (or service) that they work at, and need to be able to define separate contact details for each of these."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.telecom"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="ContactPoint"/>
+      </type>
+      <isSummary value="true"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.period">
+      <path value="Practitioner.role.period"/>
+      <short value="The period during which the practitioner is authorized to perform in these role(s)"/>
+      <definition value="The period during which the person is authorized to act as a practitioner in these role(s) for the organization."/>
+      <requirements value="Even after the agencies is revoked, the fact that it existed must still be recorded."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.role.period"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Period"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PRD-8/9 / PRA-5.4"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./effectiveTime"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="when.done"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.location">
+      <path value="Practitioner.role.location"/>
+      <short value="The location(s) at which this practitioner provides care"/>
+      <definition value="The location(s) at which this practitioner provides care."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.location"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Location"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./target[classCode=&quot;indirectAuthority].source[classCode=SDLOC]"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="(ServD maps Practitioners and Organizations via another entity, so this concept is not available)&lt;br/&gt; However these are accessed via the Site.ServiceSite.ServiceSiteProvider record. (The Site has the location)"/>
+      </mapping>
+      <mapping>
+        <identity value="w5"/>
+        <map value="where"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.healthcareService">
+      <path value="Practitioner.role.healthcareService"/>
+      <short value="The list of healthcare services that this worker provides for this role&#39;s Organization/Location(s)"/>
+      <definition value="The list of healthcare services that this worker provides for this role&#39;s Organization/Location(s)."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.healthcareService"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/HealthcareService"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./target[classCode=&quot;indirectAuthority].id?"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.endpoint">
+      <path value="Practitioner.role.endpoint"/>
+      <short value="Technical endpoints providing access to services operated for the PractitonerRole"/>
+      <definition value="Technical endpoints providing access to services operated for the PractitonerRole."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.role.endpoint"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Endpoint"/>
+      </type>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification">
+      <path value="Practitioner.qualification"/>
+      <short value="Qualifications obtained by training and certification"/>
+      <definition value="Qualifications obtained by training and certification."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.qualification"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="BackboneElement"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="CER?"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./indirectAuthority/QualifiedEntity[code &lt; qualifiedEntity]"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Qualifications"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification.id">
+      <path value="Practitioner.qualification.id"/>
+      <representation value="xmlAttr"/>
+      <short value="xml:id (or equivalent in JSON)"/>
+      <definition value="unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Element.id"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification.extension:credentialeligibiltyindicator$Extension">
+      <path value="Practitioner.qualification.extension"/>
+      <name value="CredentialEligibiltyIndicator"/>
+      <short value="Extension"/>
+      <definition value="An Extension"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <constraint>
+        <key value="ext-1"/>
+        <severity value="error"/>
+        <human value="Must have either extensions or value[x], not both"/>
+        <expression value="extension.exists() != value.exists()"/>
+        <xpath value="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &#39;value&#39;)])"/>
+      </constraint>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="The set of values to indicate affirmative or negative"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/v2-0136"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification.modifierExtension">
+      <path value="Practitioner.qualification.modifierExtension"/>
+      <short value="Extensions that cannot be ignored"/>
+      <definition value="May be used to represent additional information that is not part of the basic definition of the element, and that modifies the understanding of the element that contains it. Usually modifier elements provide negation or qualification. In order to make the use of extensions safe and manageable, there is a strict set of governance applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension. Applications processing a resource are required to check for modifier extensions."/>
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone."/>
+      <alias value="extensions"/>
+      <alias value="user content"/>
+      <alias value="modifiers"/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="BackboneElement.modifierExtension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+      </type>
+      <isModifier value="true"/>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="rim"/>
+        <map value="N/A"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification.identifier">
+      <path value="Practitioner.qualification.identifier"/>
+      <short value="An identifier for this qualification for the practitioner"/>
+      <definition value="An identifier that applies to this person&#39;s qualification in this role."/>
+      <requirements value="Often, specific identities are assigned for the qualification."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.qualification.identifier"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Identifier"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./id"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification.code">
+      <path value="Practitioner.qualification.code"/>
+      <short value="Coded representation of the qualification"/>
+      <definition value="Coded representation of the qualification."/>
+      <min value="1"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.qualification.code"/>
+        <min value="1"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <binding>
+        <strength value="example"/>
+        <description value="Specific qualification the practitioner has to provide a service"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/anzsco-occupations"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./code"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Qualifications.Value"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification.period">
+      <path value="Practitioner.qualification.period"/>
+      <short value="Period during which the qualification is valid"/>
+      <definition value="Period during which the qualification is valid."/>
+      <requirements value="Qualifications are often for a limited period of time, and can be revoked."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.qualification.period"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Period"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./effectiveTime"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Qualifications.StartDate and ./Qualifications.EndDate"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification.issuer">
+      <path value="Practitioner.qualification.issuer"/>
+      <short value="Organization that regulates and issues the qualification"/>
+      <definition value="Organization that regulates and issues the qualification."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Practitioner.qualification.issuer"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="Reference"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Organization"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./scoper"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.communication">
+      <path value="Practitioner.communication"/>
+      <short value="A language the practitioner is able to use in patient communication"/>
+      <definition value="A language the practitioner is able to use in patient communication."/>
+      <comments value="The structure aa-BB with this exact casing is one the most widely used notations for locale. However not all systems actually code this but instead have it as free text. Hence CodeableConcept instead of code as the data type."/>
+      <requirements value="Knowing which language a practitioner speaks can help in facilitating communication with patients."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Practitioner.communication"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+      <mustSupport value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <extension url="http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet">
+          <valueReference>
+            <reference value="http://hl7.org/fhir/ValueSet/all-languages"/>
+          </valueReference>
+        </extension>
+        <strength value="extensible"/>
+        <description value="A human language."/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/languages"/>
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2"/>
+        <map value="PID-15, NK1-20, LAN-2"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./languageCode"/>
+      </mapping>
+      <mapping>
+        <identity value="servd"/>
+        <map value="./Languages.LanguageSpokenCode"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.communication.id">
+      <path value="Practitioner.communication.id"/>
+      <representation value="xmlAttr"/>
+      <short value="xml:id (or equivalent in JSON)"/>
+      <definition value="unique id for the element within a resource (for internal references). This may be any string value that does not contain spaces."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="Element.id"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <mapping>
+        <identity value="rim"/>
+        <map value="n/a"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.communication.extension:communicationmode$Extension">
+      <path value="Practitioner.communication.extension"/>
+      <name value="CommunicationMode"/>
+      <short value="Extension"/>
+      <definition value="The method by which an individual communicates."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="Element.extension"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <constraint>
+        <key value="ext-1"/>
+        <severity value="error"/>
+        <human value="Must have either extensions or value[x], not both"/>
+        <expression value="extension.exists() != value.exists()"/>
+        <xpath value="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &#39;value&#39;)])"/>
+      </constraint>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="A set of codes that describe the method by which an individual communicates"/>
+        <valueSetReference>
+          <reference value="ValueSet/communicationMode"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.communication.coding">
+      <path value="Practitioner.communication.coding"/>
+      <short value="Code defined by a terminology system"/>
+      <definition value="A reference to a code defined by a terminology system."/>
+      <comments value="Codes may be defined very casually in enumerations, or code lists, up to very formal definitions such as SNOMED CT - see the HL7 v3 Core Principles for more information.  Ordering of codings is undefined and SHALL NOT be used to infer meaning. Generally, at most only one of the coding values will be labelled as UserSelected = true."/>
+      <requirements value="Allows for translations and alternate encodings within a code system.  Also supports communication of the same instance to systems requiring different encodings."/>
+      <min value="0"/>
+      <max value="*"/>
+      <base>
+        <path value="CodeableConcept.coding"/>
+        <min value="0"/>
+        <max value="*"/>
+      </base>
+      <type>
+        <code value="Coding"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="C*E.1-8, C*E.10-22"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="union(., ./translation)"/>
+      </mapping>
+      <mapping>
+        <identity value="orim"/>
+        <map value="fhir:CodeableConcept.coding rdfs:subPropertyOf dt:CD.coding"/>
+      </mapping>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.communication.text">
+      <path value="Practitioner.communication.text"/>
+      <short value="Plain text representation of the concept"/>
+      <definition value="A human language representation of the concept as seen/selected/uttered by the user who entered the data and/or which represents the intended meaning of the user."/>
+      <comments value="Very often the text is the same as a displayName of one of the codings."/>
+      <requirements value="The codes from the terminologies do not always capture the correct meaning with all the nuances of the human using them, or sometimes there is no appropriate code at all. In these cases, the text is used to capture the full meaning of the source."/>
+      <min value="0"/>
+      <max value="1"/>
+      <base>
+        <path value="CodeableConcept.text"/>
+        <min value="0"/>
+        <max value="1"/>
+      </base>
+      <type>
+        <code value="string"/>
+      </type>
+      <isSummary value="true"/>
+      <mapping>
+        <identity value="v2"/>
+        <map value="C*E.9. But note many systems use C*E.2 for this"/>
+      </mapping>
+      <mapping>
+        <identity value="rim"/>
+        <map value="./originalText[mediaType/code=&quot;text/plain&quot;]/data"/>
+      </mapping>
+      <mapping>
+        <identity value="orim"/>
+        <map value="fhir:CodeableConcept.text rdfs:subPropertyOf dt:CD.originalText"/>
+      </mapping>
+    </element>
+  </snapshot>
+  <differential>
+    <element id="Practitioner:hspcproviderpractitioner">
+      <path value="Practitioner"/>
+      <name value="HSPCProviderPractitioner"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom">
+      <path value="Practitioner.telecom"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.telecom.extension:preferenceindicator$Extension">
+      <path value="Practitioner.telecom.extension"/>
+      <name value="PreferenceIndicator"/>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address">
+      <path value="Practitioner.address"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.address.extension:primaryindicator$Extension">
+      <path value="Practitioner.address.extension"/>
+      <name value="PrimaryIndicator"/>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="The set of values to indicate affirmative or negative"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/v2-0136"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole">
+      <path value="Practitioner.role"/>
+      <name value="PractitionerRole"/>
+      <slicing>
+        <discriminator value="Practitioner.role.organization|false|open"/>
+        <discriminator value=" Practitioner.role.code"/>
+        <rules value="open"/>
+      </slicing>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.code">
+      <path value="Practitioner.role.code"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="A set of codes that describe the general practice category for a provider."/>
+        <valueSetReference>
+          <reference value="ValueSet/practitioner-providerPractitionerType"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practitionerrole.specialty">
+      <path value="Practitioner.role.specialty"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="A set of codes that describe the specific specialty in which a provider practices."/>
+        <valueSetReference>
+          <reference value="ValueSet/practitioner-providerPractitionerSpecialty"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:administrativeaffiliation">
+      <path value="Practitioner.role"/>
+      <name value="AdministrativeAffiliation"/>
+      <alias value="AdministrativeAffiliation"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation">
+      <path value="Practitioner.role"/>
+      <name value="PracticeAffiliation"/>
+      <alias value="PracticeAffiliation"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.extension:practiceaffiliationtype$Extension">
+      <path value="Practitioner.role.extension"/>
+      <name value="PracticeAffiliationType"/>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="example"/>
+        <description value="A set of codes that describe the kinds of affiliations a provider may have pertaining to the practice of medicine"/>
+        <valueSetReference>
+          <reference value="ValueSet/practitioner-practiceAffiliationType"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.role:practiceaffiliation.extension:practitionerprivilege$Extension">
+      <path value="Practitioner.role.extension"/>
+      <name value="PractitionerPrivilege"/>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="A set of codes that describe the level at which a provider is authorized to practice medicine at a given isntitution"/>
+        <valueSetReference>
+          <reference value="ValueSet/practitioner-privilege"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification">
+      <path value="Practitioner.qualification"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.qualification.extension:credentialeligibiltyindicator$Extension">
+      <path value="Practitioner.qualification.extension"/>
+      <name value="CredentialEligibiltyIndicator"/>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="The set of values to indicate affirmative or negative"/>
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/v2-0136"/>
+        </valueSetReference>
+      </binding>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.communication">
+      <path value="Practitioner.communication"/>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+    </element>
+    <element id="Practitioner:hspcproviderpractitioner.communication.extension:communicationmode$Extension">
+      <path value="Practitioner.communication.extension"/>
+      <name value="CommunicationMode"/>
+      <definition value="The method by which an individual communicates."/>
+      <type>
+        <code value="Extension"/>
+        <profile value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+      </type>
+      <mustSupport value="false"/>
+      <isModifier value="false"/>
+      <isSummary value="false"/>
+      <binding>
+        <strength value="preferred"/>
+        <description value="A set of codes that describe the method by which an individual communicates"/>
+        <valueSetReference>
+          <reference value="ValueSet/communicationMode"/>
+        </valueSetReference>
+      </binding>
+    </element>
+  </differential>
+</StructureDefinition>
