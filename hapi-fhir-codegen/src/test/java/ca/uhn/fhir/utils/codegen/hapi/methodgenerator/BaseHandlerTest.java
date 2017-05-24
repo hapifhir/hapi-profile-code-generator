@@ -20,7 +20,7 @@ public class BaseHandlerTest {
 	private FhirResourceManagerDstu2 fhirResourceManager;
 	
 	public BaseHandlerTest() {
-		template = new MethodBodyGenerator().initialize();
+		template = new MethodBodyGenerator().initialize("templates");
 		fhirResourceManager = new FhirResourceManagerDstu2();
 	}
 	

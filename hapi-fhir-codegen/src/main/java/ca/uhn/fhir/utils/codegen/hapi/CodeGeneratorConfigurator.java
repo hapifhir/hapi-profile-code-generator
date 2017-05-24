@@ -1,20 +1,19 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-
+import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
+import ca.uhn.fhir.utils.codegen.hapi.dstu3.FhirResourceManagerDstu3;
+import ca.uhn.fhir.utils.common.xml.XmlUtils;
+import ca.uhn.fhir.utils.fhir.FhirExtensionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import ca.uhn.fhir.utils.codegen.hapi.dstu2.FhirResourceManagerDstu2;
-import ca.uhn.fhir.utils.codegen.hapi.dstu3.FhirResourceManagerDstu3;
-import ca.uhn.fhir.utils.common.xml.XmlUtils;
-import ca.uhn.fhir.utils.fhir.FhirExtensionManager;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Naive configurator whose responsibilities include:
@@ -34,7 +33,7 @@ public class CodeGeneratorConfigurator {
 
 	public static final Logger LOGGER = LoggerFactory
 			.getLogger(CodeGeneratorConfigurator.class);
-	public static final String DEFAULT_GENERATED_CODE_PACKAGE = "org.socraticgrid.fhir.generated";
+	public static final String DEFAULT_GENERATED_CODE_PACKAGE = "org.hspc.fhir.dstu3.generated";
 	public static final String ELEMENT_LABEL_PROFILE_SOURCE_FILE_PATH = "profileSourceFilePath";
 	public static final String ELEMENT_LABEL_PROFILE_SOURCE_DIRECTORY_PATH = "profileDirectoryPath";
 	public static final String ELEMENT_LABEL_PROFILE_NAME = "profileName";
@@ -48,8 +47,12 @@ public class CodeGeneratorConfigurator {
 	private List<String> profileNameList;
 	private List<String> extensionRepositories;
 	private Document configuration;
-	private String generatedCodePackage = DEFAULT_GENERATED_CODE_PACKAGE;
+	private String generatedCodePackage;
 	private String targetCodeGenerationDirectory;
+	private String baseDirectory;
+	private String buildDirectory;
+
+
 	/**
 	 * Constructor for CodeGeneratorConfigurator.
 	 * 
@@ -67,7 +70,8 @@ public class CodeGeneratorConfigurator {
 		profileNameList = new ArrayList<String>();
 		extensionRepositories = new ArrayList<String>();
 	}
-	
+
+
 	/**
 	 * Returns list of profile file paths
 	 * @return
@@ -120,7 +124,8 @@ public class CodeGeneratorConfigurator {
 	 * @param generatedCodePackage
 	 */
 	public void setGeneratedCodePackage(String generatedCodePackage) {
-		this.generatedCodePackage = generatedCodePackage;
+		if (this.generatedCodePackage == null)
+			this.generatedCodePackage = generatedCodePackage;
 	}
 	
 	/**
@@ -139,7 +144,8 @@ public class CodeGeneratorConfigurator {
 	 */
 	public void setTargetCodeGenerationDirectory(
 			String targetCodeGenerationDirectory) {
-		this.targetCodeGenerationDirectory = targetCodeGenerationDirectory;
+		if (this.targetCodeGenerationDirectory == null)
+			this.targetCodeGenerationDirectory = targetCodeGenerationDirectory;
 	}
 
 	/**
@@ -175,7 +181,8 @@ public class CodeGeneratorConfigurator {
 	 * @param profileNameList
 	 */
 	public void setProfileNameList(List<String> profileNameList) {
-		this.profileNameList = profileNameList;
+		if (this.profileNameList.size() == 0)
+			this.profileNameList = profileNameList;
 	}
 	
 	/**
@@ -296,12 +303,13 @@ public class CodeGeneratorConfigurator {
 	 * @param resourceLoader
 	 * @return
 	 */
-	public static InterfaceAdapterGenerator buildInterfaceAdapterGenerator(
+	public InterfaceAdapterGenerator buildInterfaceAdapterGenerator(
 			CodeGeneratorConfigurator config, FhirResourceManagerDstu2 resourceLoader) {
-		MethodBodyGenerator templateUtils = new MethodBodyGenerator().initialize();
+		MethodBodyGenerator templateUtils = new MethodBodyGenerator().initialize(config.getBuildDirectory());
 		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator(
 				config.getGeneratedCodePackage(), resourceLoader, templateUtils);
 		generator.setResourceLoadingPlan(config.getProfileNameList());
+		generator.setDestinationDirectory(config.targetCodeGenerationDirectory);
 		return generator;
 	}
 	
@@ -313,12 +321,13 @@ public class CodeGeneratorConfigurator {
 	 * @param resourceLoader
 	 * @return
 	 */
-	public static InterfaceAdapterGenerator buildInterfaceAdapterGeneratorDstu3(
+	public InterfaceAdapterGenerator buildInterfaceAdapterGeneratorDstu3(
 			CodeGeneratorConfigurator config, FhirResourceManagerDstu3 resourceLoader) {
-		MethodBodyGenerator templateUtils = new MethodBodyGenerator().initialize();
+		MethodBodyGenerator templateUtils = new MethodBodyGenerator().initialize(config.getBuildDirectory());
 		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator(
 				config.getGeneratedCodePackage(), resourceLoader, templateUtils);
 		generator.setResourceLoadingPlan(config.getProfileNameList());
+		generator.setDestinationDirectory(config.targetCodeGenerationDirectory);
 		return generator;
 	}
 
@@ -342,45 +351,52 @@ public class CodeGeneratorConfigurator {
 	 * Loads profile source files from the configuration file. 
 	 */
 	private void loadProfileSourceFilePaths() {
-		loadElementList(ELEMENT_LABEL_PROFILE_SOURCE_FILE_PATH,
-				profileSourceFilePaths);
+		if (profileSourceFilePaths.size() == 0) {
+			loadElementList(ELEMENT_LABEL_PROFILE_SOURCE_FILE_PATH,
+					profileSourceFilePaths);
+		}
 	}
 	
 	/**
 	 * Loads profile directory paths from the configuration file.
 	 */
 	private void loadProfileDirectoryPath() {
-		loadElementList(ELEMENT_LABEL_PROFILE_SOURCE_DIRECTORY_PATH,
-				profileDirectoryPaths);
+		if (profileDirectoryPaths.size() == 0) {
+			loadElementList(ELEMENT_LABEL_PROFILE_SOURCE_DIRECTORY_PATH,
+					profileDirectoryPaths);
+		}
 	}
 	
 	/**
 	 * Loads the set of profile names to consider for code generation.
 	 */
 	private void loadProfileNames() {
-		loadElementList(ELEMENT_LABEL_PROFILE_NAME, profileNameList);
+		if (profileNameList.size() == 0) {
+			loadElementList(ELEMENT_LABEL_PROFILE_NAME, profileNameList);
+		}
 	}
 
 	/**
 	 * Loads all directories that contain relevant FHIR extensions for code generation.
 	 */
 	public void loadExtensionRepositories() {
-		loadElementList(ELEMENT_LABEL_EXTENSION_REPOSITORY,
-				extensionRepositories);
+		if (extensionRepositories.size() == 0)
+			loadElementList(ELEMENT_LABEL_EXTENSION_REPOSITORY,
+					extensionRepositories);
 	}
 	
 	/**
 	 * Loads the package name for the generated code. At this time, only one package name is supported.
 	 */
 	public void loadGeneratedCodePackage() {
-		generatedCodePackage = loadElementContentFromConfiguration(ELEMENT_LABEL_GENERATED_CODE_PACKAGE);
+		setGeneratedCodePackage(loadElementContentFromConfiguration(ELEMENT_LABEL_GENERATED_CODE_PACKAGE));
 	}
 	
 	/**
 	 * Loads the target directory for the generated code. 
 	 */
 	public void loadTargetCodeGenerationDirectory() {
-		targetCodeGenerationDirectory = loadElementContentFromConfiguration(ELEMENT_LABEL_TARGET_CODE_DIRECTORY);
+		setTargetCodeGenerationDirectory(loadElementContentFromConfiguration(ELEMENT_LABEL_TARGET_CODE_DIRECTORY));
 	}
 
 	/**
@@ -409,9 +425,8 @@ public class CodeGeneratorConfigurator {
 
 	/**
 	 * Helper method for loading an XML element.
-	 * 
-	 * @param elementTagName
-	 * @param itemList
+	 *
+	 * @param elementName
 	 *            The text value of that element.
 	 */
 	private String loadElementContentFromConfiguration(String elementName) {
@@ -427,5 +442,29 @@ public class CodeGeneratorConfigurator {
 					+ " node supported in configuration file");
 		}
 		return elementValue;
+	}
+
+	public void setProjectBaseDirectory(String projectBaseDirectory) {
+		this.baseDirectory = projectBaseDirectory;
+	}
+
+	public String getBaseDirectory() {
+		return baseDirectory;
+	}
+
+	public void setBaseDirectory(String baseDirectory) {
+		this.baseDirectory = baseDirectory;
+	}
+
+	public void setProjectBuildDirectory(String projectBuildDirectory) {
+		this.buildDirectory = projectBuildDirectory;
+	}
+
+	public String getBuildDirectory() {
+		return buildDirectory;
+	}
+
+	public void setBuildDirectory(String buildDirectory) {
+		this.buildDirectory = buildDirectory;
 	}
 }

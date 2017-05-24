@@ -7,7 +7,7 @@
 		<artifactId>hapi-fhir-codegen-tools</artifactId>
 	</parent>
 	<artifactId>common-lib</artifactId>
-	<name>Common Utilities</name>
+	<name>Common Library</name>
 	<description>This module holds common utilities that may be used by two or more modules and that represent core structures and behavior not specific to any given domain. Generally these fall under static utility libraries and general structure of use in any number of contexts.</description>
 
 	<dependencies>
@@ -27,4 +27,8 @@
 			<version>4.0.2</version>
 		</dependency>
 	</dependencies>
+
+	<properties>
+		<maven.test.skip>true</maven.test.skip>
+	</properties>
 </project>

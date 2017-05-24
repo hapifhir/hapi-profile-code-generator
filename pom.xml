@@ -11,6 +11,7 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<hapi.fhir.version>1.4-SNAPSHOT</hapi.fhir.version>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
     <dependencies>
 		<dependency>
@@ -116,5 +117,7 @@
 		<module>common-lib</module>
 		<module>common-codegen</module>
 		<module>hapi-fhir-codegen</module>
-	</modules>
+        <module>fhir-profile-adapter-plugin</module>
+        <module>fhir-profile-adapter-model</module>
+    </modules>
 </project>

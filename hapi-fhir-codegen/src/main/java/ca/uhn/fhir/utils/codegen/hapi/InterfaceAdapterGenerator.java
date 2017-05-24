@@ -1,5 +1,6 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -198,7 +199,7 @@ public class InterfaceAdapterGenerator {
 	}
 	
 	public void executePlanDstu3(boolean failOnError) {
-		buildFactoryDstu3();//TODO Must handle this
+		buildFactoryDstu3(getGeneratedPackage());//TODO Must handle this
 		for(String resourceName : resourceGenerationPlan) {
 			try {
 				generateInterfaceAndAdapterDstu3(resourceName);
@@ -226,7 +227,7 @@ public class InterfaceAdapterGenerator {
 			//Node<ElementDefinitionDt> root = profileWalker.getRoot();
 			profileTreeBuilder = new ProfileTreeBuilder(profile);
 			profileTreeBuilder.initialize();
-			GenerateLogicalViewCommandDstu2 command = new GenerateLogicalViewCommandDstu2(profile, fhirResourceManager, templateUtils, resolver, "org.socraticgrid.fhir.generated");
+			GenerateLogicalViewCommandDstu2 command = new GenerateLogicalViewCommandDstu2(profile, fhirResourceManager, templateUtils, resolver, "org.hspc.fhir.generated");
 			profileTreeBuilder.getRoot().executeCommandDepthFirstPost(command);
 			ClassModel rootModel = command.getClassMap().get(profileTreeBuilder.getRoot().getPathFromRoot());
 			String resourceName = getUnderlyingFhirCoreResourceName(profile.getName(), profile.getBase());
@@ -266,10 +267,11 @@ public class InterfaceAdapterGenerator {
 			org.hl7.fhir.dstu3.model.StructureDefinition profile = fhirResourceManagerDstu3.getProfile(profileName);
 			profileTreeBuilderDstu3 = new ca.uhn.fhir.utils.fhir.dstu3.ProfileTreeBuilder(profile);
 			profileTreeBuilderDstu3.initialize();
-			GenerateLogicalViewCommandDstu3 command = new GenerateLogicalViewCommandDstu3(profile, fhirResourceManagerDstu3, templateUtils, "org.socraticgrid.fhir.dstu3.generated");
+			GenerateLogicalViewCommandDstu3 command = new GenerateLogicalViewCommandDstu3(profile, fhirResourceManagerDstu3, templateUtils, getGeneratedPackage());
 			profileTreeBuilderDstu3.getRoot().executeCommandDepthFirstPost(command);
 			ClassModel rootModel = command.getClassMap().get(profileTreeBuilderDstu3.getRoot().getPathFromRoot());
 			for(ClassModel model : command.getClassMap().values()) {
+				System.out.println("Processing Model : " + model);
 				if(model != rootModel && canProcess(model)) {
 					try {
 						String supportingClass = InterfaceAdapterGenerator.cleanUpWorkaroundClass(CodeGenerationUtils.buildJavaClass(model, model.getName()), true);
@@ -460,19 +462,20 @@ public class InterfaceAdapterGenerator {
 		FileWriter writer = null;
 		try {
 			final JavaClassSource javaClass = Roaster.create(JavaClassSource.class);
-			javaClass.setPackage(generatedPackage).setName("AdapterFactory");
+			javaClass.setPackage(getGeneratedPackage()).setName("AdapterFactory");
 			javaClass.addImport(org.slf4j.LoggerFactory.class);
 			javaClass.addImport(java.util.List.class);
 			javaClass.addImport(ca.uhn.fhir.model.api.BundleEntry.class);
 			javaClass.addImport(ca.uhn.fhir.model.api.IResource.class);
-			javaClass.addField().setName("GENERATED_PACKAGE_PREFIX").setStringInitializer("org.socraticgrid.fhir.generated.").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
-			javaClass.addField().setName("HAPI_FHIR_RESOURCE_PREFIX").setStringInitializer("ca.uhn.fhir.model.dstu2.resource.").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
+			javaClass.addField().setName("GENERATED_PACKAGE_PREFIX").setStringInitializer(getGeneratedPackage() + ".").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
+			javaClass.addField().setName("HAPI_FHIR_RESOURCE_PREFIX").setStringInitializer(getGeneratedPackage() + ".resource.").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
 			javaClass.addField().setName("LOGGER").setLiteralInitializer("LoggerFactory.getLogger(AdapterFactory.class)").setStatic(true).setPublic().setFinal(true).setType(org.slf4j.Logger.class);
 			javaClass.addMethod().setPublic().setStatic(true).setName("adapt").setReturnType("java.util.Map").setParameters("ca.uhn.fhir.model.api.Bundle bundle").setBody(templateUtils.getAdaptBundle());
 			javaClass.addMethod().setPublic().setStatic(true).setName("adapt").setReturnType("java.lang.Object").setParameters("ca.uhn.fhir.model.api.IResource resource").setBody(templateUtils.getAdaptResource());
 			String factoryString = cleanUpWorkaroundClass(javaClass, true);
 			CodeGenerationUtils.buildTargetPackageDirectoryStructure(getDestinationDirectory(), getGeneratedPackage());
-			writer = new FileWriter("generated-source/java/org/socraticgrid/fhir/generated/AdapterFactory.java");
+//			writer = new FileWriter("generated-source/java/org/hspc/fhir/dstu2/generated/AdapterFactory.java");
+			writer = new FileWriter(getDestinationDirectory() + "/AdapterFactory.java");
 			writer.write(factoryString);
 			LOGGER.debug("\n {}", factoryString);
 		} catch(Exception e) {
@@ -488,24 +491,26 @@ public class InterfaceAdapterGenerator {
 	 * convert incoming FHIR message to the appropriate adapter, provided one exists.
 	 * 
 	 */
-	public void buildFactoryDstu3() {
+	public void buildFactoryDstu3(String generatedPackage) {
 		FileWriter writer = null;
 		try {
-			setGeneratedPackage("org.socraticgrid.fhir.dstu3.generated");
+			setGeneratedPackage(generatedPackage);
 			final JavaClassSource javaClass = Roaster.create(JavaClassSource.class);
-			javaClass.setPackage(generatedPackage).setName("AdapterFactory");
+			javaClass.setPackage(this.generatedPackage).setName("AdapterFactory");
 			javaClass.addImport(org.slf4j.LoggerFactory.class);
 			javaClass.addImport(java.util.List.class);
 			javaClass.addImport(ca.uhn.fhir.model.api.BundleEntry.class);
 			javaClass.addImport(ca.uhn.fhir.model.api.IResource.class);
-			javaClass.addField().setName("GENERATED_PACKAGE_PREFIX").setStringInitializer("org.socraticgrid.fhir.dstu3.generated.").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
-			javaClass.addField().setName("HAPI_FHIR_RESOURCE_PREFIX").setStringInitializer("ca.uhn.fhir.model.dstu2.resource.").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
+			javaClass.addField().setName("GENERATED_PACKAGE_PREFIX").setStringInitializer(generatedPackage + ".").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
+			javaClass.addField().setName("HAPI_FHIR_RESOURCE_PREFIX").setStringInitializer("org.hl7.fhir.dstu3.model.").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
+//			javaClass.addField().setName("HAPI_FHIR_RESOURCE_PREFIX").setStringInitializer("ca.uhn.fhir.model.dstu2.resource.").setStatic(true).setPublic().setFinal(true).setType(java.lang.String.class);
 			javaClass.addField().setName("LOGGER").setLiteralInitializer("LoggerFactory.getLogger(AdapterFactory.class)").setStatic(true).setPublic().setFinal(true).setType(org.slf4j.Logger.class);
 			javaClass.addMethod().setPublic().setStatic(true).setName("adapt").setReturnType("java.util.Map").setParameters("ca.uhn.fhir.model.api.Bundle bundle").setBody(templateUtils.getAdaptBundle());
 			javaClass.addMethod().setPublic().setStatic(true).setName("adapt").setReturnType("java.lang.Object").setParameters("ca.uhn.fhir.model.api.IResource resource").setBody(templateUtils.getAdaptResource());
 			String factoryString = cleanUpWorkaroundClass(javaClass, true);
 			CodeGenerationUtils.buildTargetPackageDirectoryStructure(getDestinationDirectory(), getGeneratedPackage());
-			writer = new FileWriter("generated-source/java/org/socraticgrid/fhir/dstu3/generated/AdapterFactory.java");
+//			writer = new FileWriter("generated-source/java/org/hspc/fhir/dstu3/generated/AdapterFactory.java");
+			writer = new FileWriter(CodeGenerationUtils.generateGeneratedSourcePathFromPackageAndRootLocation(getDestinationDirectory(), getGeneratedPackage())+ "/AdapterFactory.java");
 			writer.write(factoryString);
 			LOGGER.debug("\n {}", factoryString);
 		} catch(Exception e) {

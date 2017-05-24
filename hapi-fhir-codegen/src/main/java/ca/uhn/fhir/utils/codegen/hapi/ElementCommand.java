@@ -17,6 +17,8 @@ import ca.uhn.fhir.utils.common.metamodel.ClassField;
 import ca.uhn.fhir.utils.common.metamodel.ClassModel;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 
+import static ca.uhn.fhir.utils.codegen.hapi.CodeGeneratorConfigurator.DEFAULT_GENERATED_CODE_PACKAGE;
+
 public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 	
 	private FhirResourceManagerDstu2 fhirResourceManager;
@@ -74,7 +76,7 @@ public class ElementCommand implements CommandInterface<ElementDefinitionDt> {
 				throw new RuntimeException("Error: a duplicate class was found.");
 			}
 			ClassModel classModel = new ClassModel(className);
-			classModel.setNamespace("org.socraticgrid.fhir.generated");//TODO Makes this an argument and configurable
+			classModel.setNamespace(DEFAULT_GENERATED_CODE_PACKAGE);//TODO Makes this an argument and configurable
 			ClassField fieldUri = buildUriField("uri", extensionDefUri);
 			classModel.addField(fieldUri);
 			Method.addGetterSetterFieldToClass(classModel, "rootObjectExtension", "ca.uhn.fhir.model.api.ExtensionDt");

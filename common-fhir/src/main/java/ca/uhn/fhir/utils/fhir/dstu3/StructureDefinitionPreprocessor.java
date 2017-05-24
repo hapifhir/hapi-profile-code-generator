@@ -33,13 +33,13 @@ public class StructureDefinitionPreprocessor {
 						rootPath = PathUtils.getNonExtensionRootPath(element.getPath());
 					}
 					delta = currentLevel - previousLevel;
-					System.out.println(element.getPath() + "  -  " + element.getName() + ":" + currentLevel);
+					System.out.println(element.getPath() + "  -  " + element.getSliceName() + ":" + currentLevel);
 					if(delta <= 0) {
 						for(int i = 0; i < -delta + 1; i++) {
 							rootPath = PathUtils.getPathPrefix(rootPath);
 						}
 					} 
-					rootPath += "." + PathUtils.getLastPathComponent(element.getName());
+					rootPath += "." + PathUtils.getLastPathComponent(element.getSliceName());
 					System.out.println(rootPath + ":" + currentLevel);
 					System.out.println("---------------");
 					element.setPath(rootPath);
@@ -73,7 +73,7 @@ public class StructureDefinitionPreprocessor {
 				 path.indexOf(".extension.extension") > 0 ||
 				 path.indexOf(".extension.url") > 0 ||
 				 path.indexOf(".extension.value[x]") > 0 ) &&
-				 (element.getName() == null || element.getName().equals("extension"));
+				 (element.getSliceName() == null || element.getSliceName().equals("extension"));
 		return isMeta;
 	}
 }

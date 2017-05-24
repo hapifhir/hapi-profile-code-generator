@@ -169,6 +169,7 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	 */
 	private void loadResourceProfile(String profileFilePath) {
 		try {
+			System.out.println(String.format("Loading Profile '%s'", profileFilePath));
 			loadResourceProfiles(ResourceLoadingUtils.getReaderFromFilePath(profileFilePath));
 		} catch(Exception e) {
 			LOGGER.error("Error loading resources from configurator " + profileFilePath, e);
@@ -228,8 +229,7 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	/**
 	 * Method generates the resource-name-to-class index for all resources
 	 * defined in a profile.
-	 * 
-	 * @param ctx
+	 *
 	 */
 	private void populateResourceNameToClassMap() {
 		for(StructureDefinition profile : profileNameToProfileMap.values()) {
@@ -637,7 +637,7 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	 * Ask James Agnew
 	 * TODO Cover all simple types - https://hl7-fhir.github.io/datatypes.html
 	 * 
-	 * @param element
+	 * @param code
 	 * @return
 	 */
 	public static boolean hasEquivalentJavaType(String code) {
@@ -843,7 +843,7 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	 */
 	public static ElementDefinition shallowCloneElement(ElementDefinition element) {
 		ElementDefinition clonedElement = new ElementDefinition();
-		clonedElement.setName(element.getName());
+		clonedElement.setSliceName(element.getSliceName());
 		clonedElement.setContentReference(element.getContentReference());
 		clonedElement.setPath(element.getPath());
 		List<ElementDefinition.TypeRefComponent> clonedTypes = new ArrayList<ElementDefinition.TypeRefComponent>();//Should do for all lists
@@ -858,7 +858,7 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 		clonedElement.setDefinition(element.getDefinition());
 		clonedElement.getAlias().addAll(element.getAlias());
 		clonedElement.getCode().addAll(element.getCode());
-		clonedElement.setComments(element.getComments());
+		clonedElement.setCommentElement(element.getCommentElement());
 		clonedElement.getCondition().addAll(element.getCondition());
 		clonedElement.getConstraint().addAll(element.getConstraint());
 		clonedElement.setDefaultValue(element.getDefaultValue());

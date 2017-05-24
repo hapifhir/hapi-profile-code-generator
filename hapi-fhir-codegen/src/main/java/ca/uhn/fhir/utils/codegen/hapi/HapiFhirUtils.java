@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import ca.uhn.fhir.context.*;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.PositiveIntType;
 import org.hl7.fhir.dstu3.model.UnsignedIntType;
@@ -13,13 +14,6 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.uhn.fhir.context.BaseRuntimeChildDatatypeDefinition;
-import ca.uhn.fhir.context.BaseRuntimeChildDefinition;
-import ca.uhn.fhir.context.BaseRuntimeElementCompositeDefinition;
-import ca.uhn.fhir.context.BaseRuntimeElementDefinition;
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.RuntimeChildChoiceDefinition;
-import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt.Type;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.model.datatype.dstu2.FhirDatatypeEnum;
@@ -211,7 +205,11 @@ public class HapiFhirUtils {
 			String nextPart = iter.next();
 			BaseRuntimeChildDefinition child = parentDef.getChildByName(nextPart);
 			if (child == null) {
-				throw new RuntimeException("No type found for " + resourceName + "." + structurePath);
+				for (BaseRuntimeChildDefinition c : parentDef.getChildren()) {
+					System.out.println(c.getElementName());
+				}
+				throw new RuntimeException("No type found for " + resourceName + "." + structurePath + " in "
+						+ parentDef.getName());
 			}
 			BaseRuntimeElementDefinition<?> childDef = child.getChildByName(nextPart);
 
@@ -304,10 +302,17 @@ public class HapiFhirUtils {
 			if(child == null) {
 				System.out.println("HERE");
 			}
-			BaseRuntimeElementDefinition<?> childDef = child.getChildByName(nextPart);
+
+			if ((nextPart.indexOf("[") > 0) && (nextPart.indexOf("]") > 0)) {
+				System.out.println("Found One: " + nextPart);
+			}
+
+			System.out.println("HapiFhirUtils:" + resourceClass.getCanonicalName() + ":" + structurePath+ ":" + nextPart);
+			//Noman item[x] children would have different name
+			//BaseRuntimeElementDefinition<?> childDef =  child.getChildByName(nextPart);
 
 			if (iter.hasNext()) {
-				parentDef = (BaseRuntimeElementCompositeDefinition<?>) childDef;
+				parentDef = (BaseRuntimeElementCompositeDefinition<?>) child.getChildByName(nextPart);
 			} else {
 				Class<? extends IBase> datatype = null;
 				Class<? extends Enum<?>> enumerationType = null;

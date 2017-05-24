@@ -20,10 +20,14 @@ public abstract class TemplateUtils {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(TemplateUtils.class);
 	
-	private String templateFolderPath = "src/main/resources/templates";
-	private String templateFolderPathCommon = "src/main/resources/templates/common";
-	private String templateFolderPathDstu2 = "src/main/resources/templates/dstu2";
-	private String templateFolderPathDstu3 = "src/main/resources/templates/dstu3";
+	private String templateFolderPath = "/templates";
+//	private String templateFolderPath = "src/main/resources/templates";
+	private String templateFolderPathCommon = "/templates/common";
+//	private String templateFolderPathCommon = "src/main/resources/templates/common";
+	private String templateFolderPathDstu2 = "/templates/dstu2";
+//	private String templateFolderPathDstu2 = "src/main/resources/templates/dstu2";
+	private String templateFolderPathDstu3 = "/templates/dstu3";
+//	private String templateFolderPathDstu3 = "src/main/resources/templates/dstu3";
 	private STGroup groupMain;
 	private STGroup groupCommon;
 	private STGroup groupDstu2;
@@ -36,12 +40,12 @@ public abstract class TemplateUtils {
 	 * the templates into memory.
 	 * 
 	 */
-	public TemplateUtils initialize() {
+	public TemplateUtils initialize(String templateBase) {
 		try {
-			File rootMain = new File(templateFolderPath);
-			File rootCommon = new File(templateFolderPathCommon);
-			File rootDstu2 = new File(templateFolderPathDstu2);
-			File rootDstu3 = new File(templateFolderPathDstu3);
+			File rootMain = new File(templateBase + templateFolderPath);
+			File rootCommon = new File(templateBase + templateFolderPathCommon);
+			File rootDstu2 = new File(templateBase + templateFolderPathDstu2);
+			File rootDstu3 = new File(templateBase + templateFolderPathDstu3);
 			groupMain = new STGroupDir(rootMain.getCanonicalPath());
 			groupCommon = new STGroupDir(rootCommon.getCanonicalPath());
 			groupDstu2 = new STGroupDir(rootDstu2.getCanonicalPath());

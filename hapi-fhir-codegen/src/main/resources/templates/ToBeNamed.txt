@@ -15,7 +15,7 @@ import ca.uhn.fhir.model.api.IResource;
 
 public class AdapterFactory
 {
-	public static final String GENERATED_PACKAGE_PREFIX = "org.socraticgrid.fhir.generated.";
+	public static final String GENERATED_PACKAGE_PREFIX = "org.hspc.fhir.generated.";
 	public static final String HAPI_FHIR_RESOURCE_PREFIX = "ca.uhn.fhir.model.dstu2.resource.";
 	public static final Logger LOGGER = LoggerFactory.getLogger(AdapterFactory.class);
 	

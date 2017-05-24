@@ -30,7 +30,8 @@ import ca.uhn.fhir.utils.fhir.model.datatype.dstu2.FhirDatatypeEnum;
  *
  */
 public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
-	
+
+	protected final String resourcePackage;
 	private List<HapiType> hapiTypes;
 	private M manager;
 	private FhirContext ctx;
@@ -53,14 +54,15 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 	private Cardinality cardinality;
 	private String extensionUri;
 	
-	public BaseTypeConverter(M manager) {
+	public BaseTypeConverter(M manager, String resourcePackage) {
 		this.manager = manager;
+		this.resourcePackage = resourcePackage;
 		this.ctx = manager.getFhirContext();
 		this.hapiTypes = new ArrayList<HapiType>();
 	}
 
-	public BaseTypeConverter(M manager, E element) {
-		this(manager);
+	public BaseTypeConverter(M manager, E element, String resourcePackage) {
+		this(manager, resourcePackage);
 		this.element = element;
 		processElement();
 	}
@@ -354,5 +356,4 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 			setCardinality(Cardinality.REQUIRED_MULTIPLE);
 		}
 	}
-
 }

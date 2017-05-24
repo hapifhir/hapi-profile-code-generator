@@ -73,7 +73,7 @@ public class ProfileTreeBuilder {
 		root = new Node<ElementDefinition>(rootElement.getPath());
 		root.setPayload(rootElement);
 		for(ElementDefinition element : elementIndex.values()) {
-			String path = PathUtils.generateExtensionPath(element.getPath(), element.getName());
+			String path = PathUtils.generateExtensionPath(element.getPath(), element.getSliceName());
 			LOGGER.debug(path);
 			if(path.contains("Encounter.relatedCondition")) {
 				System.out.println("Stop here");
@@ -299,7 +299,7 @@ public class ProfileTreeBuilder {
 	 * @return
 	 */
 	public static String generateElementSignature(ElementDefinition element) {
-		String pathAndName = element.getPath() + ": " + element.getName();
+		String pathAndName = element.getPath() + ": " + element.getSliceName();
 		return pathAndName;
 	}
 }

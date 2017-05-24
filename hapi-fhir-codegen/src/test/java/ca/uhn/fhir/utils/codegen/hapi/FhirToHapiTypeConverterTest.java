@@ -45,7 +45,7 @@ public class FhirToHapiTypeConverterTest {
 		type.setCode(FhirDatatypeEnum.REFERENCE.toString());
 		type.addProfile("http://hl7.org/fhir/StructureDefinition/MedicationAdministration");
 		element.addType(type);
-		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element, "generatedpackage");
 		assertTrue(converter.getHapiType().isReference());
 		assertFalse(converter.isExtension());
 		assertEquals(MedicationAdministration.class.getName(), converter.getHapiType().getDatatype());
@@ -57,7 +57,7 @@ public class FhirToHapiTypeConverterTest {
 		type.setCode(FhirDatatypeEnum.EXTENSION.toString());
 		type.addProfile("http://hl7.org/fhir/StructureDefinition/us-core-race");
 		element.addType(type);
-		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element, "generatedpackage");
 		assertEquals(1, converter.getHapiTypes().size());
 		assertTrue(converter.isExtension());
 		assertFalse(converter.isMultiType());
@@ -72,7 +72,7 @@ public class FhirToHapiTypeConverterTest {
 		type.setCode(FhirDatatypeEnum.EXTENSION.toString());
 		type.addProfile("http://hl7.org/fhir/StructureDefinition/qicore-procedurerequest-appropriatenessScore");
 		element.addType(type);
-		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element, "generatedpackage");
 		assertEquals(2, converter.getHapiTypes().size());
 		assertTrue(converter.isExtension());
 		assertTrue(converter.isMultiType());
@@ -86,7 +86,7 @@ public class FhirToHapiTypeConverterTest {
 		Type type = new Type();
 		type.setCode(FhirDatatypeEnum.BOOLEAN.toString());
 		element.addType(type);
-		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element, "generatedpackage");
 		assertEquals(BooleanDt.class.getName(), converter.getHapiType().getDatatype());
 	}
 
@@ -95,7 +95,7 @@ public class FhirToHapiTypeConverterTest {
 		Type type = new Type();
 		type.setCode(FhirDatatypeEnum.ADDRESS.toString());
 		element.addType(type);
-		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element, "generatedpackage");
 		assertEquals(AddressDt.class.getName(), converter.getHapiType().getDatatype());
 	}
 
@@ -104,7 +104,7 @@ public class FhirToHapiTypeConverterTest {
 		Type type = new Type();
 		type.setCode("Patient");
 		element.addType(type);
-		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element, "generatedpackage");
 		assertEquals(Patient.class.getName(), converter.getHapiType().getDatatype());
 	}
 	
@@ -118,7 +118,7 @@ public class FhirToHapiTypeConverterTest {
 		type.setCode("boolean");
 		element.addType(type);
 		
-		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+		FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, "generatedpackage");
 		assertEquals(2, converter.getHapiTypes().size());
 		assertEquals(Patient.class.getName(), converter.getHapiType().getDatatype());
 		assertEquals(BooleanDt.class.getName(), converter.getHapiTypes().get(1).getDatatype());
