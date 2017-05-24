@@ -424,11 +424,13 @@ public class MethodHandler extends BaseMethodHandler {
                 buildWrapResourceInReferenceSetter(methods, attributeName, "Target", "", type.getDatatype(), getParentType());
 
             } else {
-                buildGetterMethod(methods, attributeName, disambiguationGetterSuffix, "", "org.hl7.fhir.dstu3.model.Reference", null, converter.isExtension(), converter.getExtensionUri());
+                if(StringUtils.isEmpty(disambiguationGetterSuffix)) {
+                    buildGetterMethod(methods, attributeName, disambiguationGetterSuffix, "", "org.hl7.fhir.dstu3.model.Reference", null, converter.isExtension(), converter.getExtensionUri());//Useless function
+                }
                 buildSetterMethod(methods, attributeName, "org.hl7.fhir.dstu3.model.Reference", getParentType());
 
                 if(type.getDatatype() != null) {
-                    buildGetterMethodWithCast(methods, attributeName, disambiguationGetterSuffix, type.getDatatype(), type.getDatatype());
+                    buildGetterMethodWithCast(methods, attributeName, disambiguationGetterSuffix + "Target", "Target", type.getDatatype(), type.getDatatype());
                     buildSetterMethod(methods, attributeName + "Target", type.getDatatype(), getParentType());
                 }
 
