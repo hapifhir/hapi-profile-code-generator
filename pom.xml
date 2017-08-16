@@ -116,5 +116,7 @@
 		<module>common-lib</module>
 		<module>common-codegen</module>
 		<module>hapi-fhir-codegen</module>
+		<module>fhir-profile-adapter-plugin</module>
+		<module>fhir-profile-adapter-model</module>
 	</modules>
 </project>
