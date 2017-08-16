@@ -7,14 +7,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.dstu3.model.ElementDefinition;
+import org.hl7.fhir.dstu3.model.Resource;
+import org.hl7.fhir.dstu3.model.StructureDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
-import ca.uhn.fhir.model.dstu2.resource.StructureDefinition;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
 import ca.uhn.fhir.utils.fhir.PathUtils;
@@ -32,11 +34,11 @@ public class FhirExtensionDefinition {
 	private String profileUrl;
 	private String shortDescription;
 	private String longDescription;
-	private Map<String, ElementDefinitionDt> extensionIndex;
-	private List<List<ElementDefinitionDt>> orderedHierarchy = new ArrayList<List<ElementDefinitionDt>>();
+	private Map<String, ElementDefinition> extensionIndex;
+	private List<List<ElementDefinition>> orderedHierarchy = new ArrayList<List<ElementDefinition>>();
 
 	public FhirExtensionDefinition() {
-		extensionIndex = new HashMap<String, ElementDefinitionDt>();
+		extensionIndex = new HashMap<String, ElementDefinition>();
 	}
 
 	public String getProfileUrl() {
@@ -63,26 +65,26 @@ public class FhirExtensionDefinition {
 		this.longDescription = longDescription;
 	}
 	
-	public Map<String, ElementDefinitionDt> getExtensions() {
+	public Map<String, ElementDefinition> getExtensions() {
 		return this.extensionIndex;
 	}
 	
-	public void addExtension(ElementDefinitionDt extension) {
-		this.extensionIndex.put(extension.getName(), extension);
+	public void addExtension(ElementDefinition extension) {
+		this.extensionIndex.put(extension.getSliceName(), extension);
 	}
 	
-	protected void addToOrderedHierarchy(int level, ElementDefinitionDt element) {
-		List<ElementDefinitionDt> levelItems = null;
+	protected void addToOrderedHierarchy(int level, ElementDefinition element) {
+		List<ElementDefinition> levelItems = null;
 		if(orderedHierarchy.size() <= level || orderedHierarchy.get(level) == null) {
-			levelItems = new ArrayList<ElementDefinitionDt>();
+			levelItems = new ArrayList<ElementDefinition>();
 			orderedHierarchy.add(levelItems);
 		}
 		levelItems = orderedHierarchy.get(level);
 		levelItems.add(element);
 	}
 	
-	protected ElementDefinitionDt getLastVisitedAtLevel(int level) {
-		List<ElementDefinitionDt> levelList = null;
+	protected ElementDefinition getLastVisitedAtLevel(int level) {
+		List<ElementDefinition> levelList = null;
 		if(orderedHierarchy.size() > level && orderedHierarchy.get(level) != null && orderedHierarchy.get(level).size() >= 0) {
 			levelList = orderedHierarchy.get(level);
 			return levelList.get(levelList.size() - 1);
@@ -91,11 +93,16 @@ public class FhirExtensionDefinition {
 		}
 	}
 	
-	public ElementDefinitionDt getExtensionByName(String name) {
+	public ElementDefinition getExtensionByName(String name) {
 		return extensionIndex.get(name);
 	}
+
+	public ElementDefinitionDt getExtensionByNameDstu2(String name) {
+//		return extensionIndex.get(name);
+		return null;
+	}
 	
-	public ElementDefinitionDt getExtensionByFullyQualifiedUri(String uri) {
+	public ElementDefinition getExtensionByFullyQualifiedUri(String uri) {
 		String name = PathUtils.getExtensionAnchor(uri);
 		if(name != null) {
 			return getExtensionByName(name);
@@ -116,25 +123,25 @@ public class FhirExtensionDefinition {
 		if(definition.getUrl().contains("relatedCondition")) {
 			System.out.println("STOP HERE");
 		}
-		List<ElementDefinitionDt> elements = definition.getSnapshot().getElement();
+		List<ElementDefinition> elements = definition.getSnapshot().getElement();
 		int currentLevel = 0;
-		for(ElementDefinitionDt element : elements) {
-			LOGGER.debug("Visiting " + element.getPath() + " --> " + element.getName());
+		for(ElementDefinition element : elements) {
+			LOGGER.debug("Visiting " + element.getPath() + " --> " + element.getSliceName());
 			currentLevel = PathUtils.getExtensionLevelInPath(element.getPath());
 			if(element.getPath().equals("Extension")) {
-				ElementDefinitionDt consolidated = new ElementDefinitionDt();
-				consolidated.setName(PathUtils.getLastResourcePathComponent(definition.getUrl()));
+				ElementDefinition consolidated = new ElementDefinition();
+				consolidated.setSliceName(PathUtils.getLastResourcePathComponent(definition.getUrl()));
 				consolidated.setPath(element.getPath());
 				extensionDefinition.addExtension(consolidated);
 				extensionDefinition.addToOrderedHierarchy(currentLevel, consolidated);
-			} else if(StringUtils.isNotBlank(element.getName()) && !element.getName().equals("extension")) {
-				ElementDefinitionDt consolidated = new ElementDefinitionDt();
-				consolidated.setName(element.getName());
+			} else if(StringUtils.isNotBlank(element.getSliceName()) && !element.getSliceName().equals("extension")) {
+				ElementDefinition consolidated = new ElementDefinition();
+				consolidated.setSliceName(element.getSliceName());
 				consolidated.setPath(element.getPath());
 				extensionDefinition.addExtension(consolidated);
 				extensionDefinition.addToOrderedHierarchy(currentLevel, consolidated);
 			}
-			ElementDefinitionDt consolidated = extensionDefinition.getLastVisitedAtLevel(currentLevel);
+			ElementDefinition consolidated = extensionDefinition.getLastVisitedAtLevel(currentLevel);
 			if(consolidated == null) {
 				consolidated = extensionDefinition.getLastVisitedAtLevel(currentLevel - 1);
 			}
@@ -147,12 +154,12 @@ public class FhirExtensionDefinition {
 		return extensionDefinition;
 	}
 	
-	public static boolean isExtensionRoot(ElementDefinitionDt element) {
+	public static boolean isExtensionRoot(ElementDefinition element) {
 		return element.getPath() != null && (element.getPath().equals("Extension") || element.getPath().equals("Extension.id") || element.getPath().equals("Extension.url") || element.getPath().equals("Extension.value[x]") ||
-				(element.getPath().equals("Extension.extension") && StringUtils.isBlank(element.getName())));
+				(element.getPath().equals("Extension.extension") && StringUtils.isBlank(element.getSliceName())));
 	}
 	
-	protected static ElementDefinitionDt processRootExtensionElement(ElementDefinitionDt original, ElementDefinitionDt consolidated) {
+	protected static ElementDefinition processRootExtensionElement(ElementDefinition original, ElementDefinition consolidated) {
 		if(original.getPath().equals("Extension")) {
 			processExtensionElement(original, consolidated);
 		} else if(original.getPath().equals("Extension.url")) {
@@ -165,8 +172,8 @@ public class FhirExtensionDefinition {
 		return consolidated;
 	}
 	
-	protected static ElementDefinitionDt processNestedExtensionElement(ElementDefinitionDt original, ElementDefinitionDt consolidated) {
-		if(original.getPath().endsWith(".extension") && StringUtils.isNotEmpty(original.getName()) && !original.getName().equals("extension")) {
+	protected static ElementDefinition processNestedExtensionElement(ElementDefinition original, ElementDefinition consolidated) {
+		if(original.getPath().endsWith(".extension") && StringUtils.isNotEmpty(original.getSliceName()) && !original.getSliceName().equals("extension")) {
 			processExtensionElement(original, consolidated);
 		} else if(original.getPath().endsWith(".extension.url")) {
 			processExtensionUrlElement(original, consolidated);
@@ -178,23 +185,23 @@ public class FhirExtensionDefinition {
 		return consolidated;
 	}
 	
-	protected static void processExtensionElement(ElementDefinitionDt element, ElementDefinitionDt consolidated) {
+	protected static void processExtensionElement(ElementDefinition element, ElementDefinition consolidated) {
 		consolidated.setMin(element.getMin());
 		consolidated.setMax(element.getMax());
 		consolidated.setShort(element.getShort());
-		consolidated.setDefinition(element.getDefinitionElement());
+		consolidated.setDefinition(element.getDefinitionElement().getValue());
 		consolidated.setType(element.getType());
 	}
 	
-	protected static void processExtensionUrlElement(ElementDefinitionDt element, ElementDefinitionDt consolidated) {
+	protected static void processExtensionUrlElement(ElementDefinition element, ElementDefinition consolidated) {
 		consolidated.setFixed(element.getFixed());
 	}
 	
-	protected static void processExtensionValueElement(ElementDefinitionDt element, ElementDefinitionDt consolidated) {
+	protected static void processExtensionValueElement(ElementDefinition element, ElementDefinition consolidated) {
 		consolidated.setType(element.getType());
 	}
 
-	protected static void processExtensionMultiValueElement(ElementDefinitionDt element, ElementDefinitionDt consolidated) {
+	protected static void processExtensionMultiValueElement(ElementDefinition element, ElementDefinition consolidated) {
 		if(element.getType() != null && element.getType().size() == 38) {
 			consolidated.getType().clear(); //TODO This is a hack. Currently, structures simply specify a value[x] even if they have no value.
 			//Clearing the type or else downstream logic will be assume that this extension has 38 value types.
@@ -212,9 +219,9 @@ public class FhirExtensionDefinition {
 	public static FhirExtensionDefinition loadExtension(File extensionFile) {
 		FhirExtensionDefinition extension = null;
 		try(FileReader reader = new FileReader(extensionFile)) {
-			FhirContext context = FhirContext.forDstu2();
+			FhirContext context = FhirContext.forDstu3();
 			IParser parser = context.newXmlParser();
-			IResource resource = (IResource) parser.parseResource(reader);
+			Resource resource = (Resource) parser.parseResource(reader);
 			if(resource instanceof StructureDefinition) {
 				extension = FhirExtensionDefinition.populateFromStructureDefinition((StructureDefinition)resource);
 			}

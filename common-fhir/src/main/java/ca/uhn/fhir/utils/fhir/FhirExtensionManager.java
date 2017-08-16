@@ -1,5 +1,12 @@
 package ca.uhn.fhir.utils.fhir;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
+import org.hl7.fhir.dstu3.model.StructureDefinition;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -7,16 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import ca.uhn.fhir.context.FhirContext;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.hl7.fhir.dstu3.model.StructureDefinition;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
 
 /**
  * Class manages FHIR extensions and acts like an in-memory FHIR extension registry.
@@ -62,7 +59,7 @@ public class FhirExtensionManager {
 	
 	public void loadExtensions() {
 		for(String location : profileRepositoryLocations) {
-			LOGGER.info("Processing profile directory: " + location);
+			LOGGER.info("Processing Extensions directory: " + location);
 			File profileDirectory = new File(location);
 			List<File> extensions = findExtensionDefinitionFiles(profileDirectory);
 			for(File extensionFile : extensions) {
@@ -100,6 +97,7 @@ public class FhirExtensionManager {
 					boolean isStructureDefinition = (
 							(name.startsWith("StructureDefinition-") && name.endsWith(".xml")) ||
 							(name.startsWith("extension-") && name.endsWith(".xml")) ||
+									(name.endsWith(".extension.xml")) ||
 							(name.endsWith(".profile.xml")));
 					return isStructureDefinition;
 				}
