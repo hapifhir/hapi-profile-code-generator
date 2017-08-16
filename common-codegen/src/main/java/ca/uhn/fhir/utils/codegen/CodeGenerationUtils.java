@@ -5,8 +5,10 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster.model.source.FieldSource;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
@@ -59,7 +61,7 @@ public class CodeGenerationUtils {
 	 */
 	public static String generateGeneratedSourcePathFromPackageAndRootLocation(String destinationDirectory,
 			String generatedPackage) {
-		return destinationDirectory + File.separator + generatedPackage.replaceAll("\\.", File.separator);
+		return destinationDirectory + File.separator + generatedPackage.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
 	}
 
 	/**
@@ -109,9 +111,11 @@ public class CodeGenerationUtils {
 	 * @return
 	 */
 	public static String makeIdentifierJavaSafe(String name) {
-		String cleanedName = name.replaceAll("-", "");
-		cleanedName = cleanedName.replaceAll("", "");
-		return cleanedName;
+		if ((name.indexOf('-') >= 0) || (name.indexOf('_') >= 0))
+			name = WordUtils.capitalizeFully(name, new char[]{'_', '-'}).replaceAll("_", "").replaceAll("-", "");
+//		String cleanedName = name.replaceAll("-", "");
+//		cleanedName = cleanedName.replaceAll("", "");
+		return name;
 	}
 
 	/**
@@ -157,8 +161,8 @@ public class CodeGenerationUtils {
 	/**
 	 * Generic method to build a java interface
 	 * 
+	 * @param interfaceModel
 	 * @param interfaceName
-	 * @param accessors
 	 * @return
 	 */
 	public static JavaInterfaceSource buildJavaInterface(ClassModel interfaceModel, String interfaceName) {
@@ -210,8 +214,8 @@ public class CodeGenerationUtils {
 	/**
 	 * Generic method to build a java class
 	 * 
-	 * @param interfaceName
-	 * @param accessors
+	 * @param classModel
+	 * @param adapterName
 	 * @return
 	 */
 	public static JavaClassSource buildJavaClass(ClassModel classModel, String adapterName) {
