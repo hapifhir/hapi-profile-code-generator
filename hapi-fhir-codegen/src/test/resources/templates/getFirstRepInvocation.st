@@ -1,0 +1,1 @@
+getFirstRepInvocation(className, propertyName) ::= "return <className>.get<propertyName>FirstRep();"

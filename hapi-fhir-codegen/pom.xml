@@ -7,6 +7,7 @@
   </parent>
   <artifactId>hapi-fhir-codegen</artifactId>
   <name>HAPI FHIR Code Generation Tools</name>
+    <packaging>jar</packaging>
   <description>HAPI FHIR Code Generation Tools</description>
   <dependencies>
   	<dependency>

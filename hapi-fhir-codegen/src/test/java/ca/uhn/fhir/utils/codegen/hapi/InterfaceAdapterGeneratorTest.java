@@ -22,12 +22,12 @@ import ca.uhn.fhir.utils.fhir.FhirExtensionManager;
 
 public class InterfaceAdapterGeneratorTest {
 	
-	private FhirResourceManagerDstu2 loader;
+//	private FhirResourceManagerDstu2 loader;
 	private FhirResourceManagerDstu3 loaderDstu3;
 
 	@Before
 	public void setUp() throws Exception {
-		loader = new FhirResourceManagerDstu2();
+//		loader = new FhirResourceManagerDstu2();
 		//loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("profiles-resources.xml"));
 		loaderDstu3 = new FhirResourceManagerDstu3();
 		//loaderDstu3.loadResourceProfiles(ResourceLoadingUtils.getReaderFromFilePath("/Users/cnanjo/repository/fhir_dstu3/fhir/trunk/build/publish/profiles-resources.xml"));
@@ -39,13 +39,19 @@ public class InterfaceAdapterGeneratorTest {
 
 	@Test
 	public void testGenerateInterface() {
-		try {//TODO Fix hard coded path
-			FileUtils.deleteDirectory(new File("generated-source/java/org/socraticgrid/fhir/generated/"));
-			Main.generateCode(ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan.xml"), false);
-			File genDir = new File("generated-source/java/org/socraticgrid/fhir/generated/");
+		try {
+			CodeGeneratorConfigurator configurator =
+					Main.generateDstu3Code(
+							ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan-dstu3.xml")
+							, true);
+
+			final String path = configurator.getTargetCodeGenerationDirectory()
+					+ File.separatorChar + configurator.getGeneratedCodePackage().replace('.', File.separatorChar);
+			File genDir = new File(path);
 			assertTrue(genDir.exists());
 			assertTrue(genDir.isDirectory());
-			assertEquals(111, genDir.listFiles().length);
+			assertEquals((configurator.getProfileNameList().size() *2) + 1, genDir.listFiles().length);
+//			FileUtils.deleteDirectory(new File(configurator.getTargetCodeGenerationDirectory()).getParentFile());
 		} catch(Exception e) {
 			e.printStackTrace();
 			fail();
@@ -54,36 +60,40 @@ public class InterfaceAdapterGeneratorTest {
 	
 	@Test
 	public void testGenerateInterface_dstu3() {
-		try {//TODO Fix hard coded path
-			String configFilePath = ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan-dstu3.xml");
-			CodeGeneratorConfigurator configurator = CodeGeneratorConfigurator.buildConfigurator(configFilePath);
-			FileUtils.deleteDirectory(new File(configurator.getTargetCodeGenerationDirectory()));
-			Main.generateDstu3Code(configFilePath, false);
-			File genDir = new File(configurator.getTargetCodeGenerationDirectory() + "/org/socraticgrid/fhir/dstu3/generated/");
+		try {
+			CodeGeneratorConfigurator configurator =
+					CodeGeneratorConfigurator.buildConfigurator(
+							ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan-dstu3.xml"));
+			final String path = configurator.getTargetCodeGenerationDirectory()
+					+ File.separatorChar + configurator.getGeneratedCodePackage().replace('.', File.separatorChar);
+
+			Main.generateDstu3Code(configurator, true);
+			File genDir = new File(path);
 			assertTrue(genDir.exists());
 			assertTrue(genDir.isDirectory());
-			assertEquals(111, genDir.listFiles().length);
+			assertEquals((configurator.getProfileNameList().size() *2) + 1, genDir.listFiles().length);
+//			FileUtils.deleteDirectory(new File(configurator.getTargetCodeGenerationDirectory()).getParentFile());
 		} catch(Exception e) {
 			e.printStackTrace();
 			fail();
 		}
 	}
 	
-	@Test
-	public void testQiCoreProfile() {
-		loader = new FhirResourceManagerDstu2();
-		loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("qicore-patient.profile.xml"));
-		loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("qicore-organization.profile.xml"));
-		FhirExtensionManager manager = new FhirExtensionManager();
-		manager.addProfileRepositoryLocation("/Users/cnanjo/repository/fhir/trunk/build/publish");
-		manager.addProfileRepositoryLocation("/Users/cnanjo/repository/fhir/trunk/build/publish/qicore");
-		manager.initialize();
-		loader.setExtensionManager(manager);
-		MethodBodyGenerator utils = new MethodBodyGenerator();
-		utils.initialize();
-		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator("org.socraticgrid.fhir.generated", loader, utils);
-		generator.generateInterfaceAndAdapter("QICore-Patient");
-	}
+//	@Test
+//	public void testQiCoreProfile() {
+//		loader = new FhirResourceManagerDstu2();
+//		loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("qicore-patient.profile.xml"));
+//		loader.loadResourceProfiles(ResourceLoadingUtils.getReaderFromClasspath("qicore-organization.profile.xml"));
+//		FhirExtensionManager manager = new FhirExtensionManager();
+//		manager.addProfileRepositoryLocation("/Users/cnanjo/repository/fhir/trunk/build/publish");
+//		manager.addProfileRepositoryLocation("/Users/cnanjo/repository/fhir/trunk/build/publish/qicore");
+//		manager.initialize();
+//		loader.setExtensionManager(manager);
+//		MethodBodyGenerator utils = new MethodBodyGenerator();
+//		utils.initialize();
+//		InterfaceAdapterGenerator generator = new InterfaceAdapterGenerator("org.socraticgrid.fhir.generated", loader, utils);
+//		generator.generateInterfaceAndAdapter("QICore-Patient");
+//	}
 	
 	@Test
 	public void testRoaster() {

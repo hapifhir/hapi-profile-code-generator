@@ -1,0 +1,1 @@
+getMethodInvocation(className, propertyName) ::= "return <className>.get<propertyName>();"

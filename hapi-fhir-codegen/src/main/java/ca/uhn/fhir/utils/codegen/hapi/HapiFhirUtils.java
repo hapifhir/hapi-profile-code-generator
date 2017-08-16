@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import ca.uhn.fhir.context.*;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.PositiveIntType;
 import org.hl7.fhir.dstu3.model.UnsignedIntType;
@@ -211,7 +212,11 @@ public class HapiFhirUtils {
 			String nextPart = iter.next();
 			BaseRuntimeChildDefinition child = parentDef.getChildByName(nextPart);
 			if (child == null) {
-				throw new RuntimeException("No type found for " + resourceName + "." + structurePath);
+				for (BaseRuntimeChildDefinition c : parentDef.getChildren()) {
+					System.out.println(c.getElementName());
+				}
+				throw new RuntimeException("No type found for " + resourceName + "." + structurePath + " in "
+						+ parentDef.getName());
 			}
 			BaseRuntimeElementDefinition<?> childDef = child.getChildByName(nextPart);
 
@@ -234,7 +239,8 @@ public class HapiFhirUtils {
 	/**
 	 * 
 	 * @param ctx
-	 * @param resourceName
+	 * @param resourceClass
+	 * @param structurePath
 	 *            E.g., "Patient"
 	 * @param structurePath
 	 *            E.g., "address.line"
@@ -264,6 +270,8 @@ public class HapiFhirUtils {
 					datatype = ((BaseRuntimeChildDatatypeDefinition) child).getDatatype();
 				} else if (child instanceof ca.uhn.fhir.context.RuntimeChildResourceBlockDefinition) {
 					// Do nothing here
+				} else if (child instanceof ca.uhn.fhir.context.RuntimeChildPrimitiveEnumerationDatatypeDefinition) {
+					enumerationType = ((BaseRuntimeChildDatatypeDefinition) child).getBoundEnumType();
 				} else if (child instanceof ca.uhn.fhir.context.RuntimeChildPrimitiveBoundCodeDatatypeDefinition) {
 					enumerationType = ((BaseRuntimeChildDatatypeDefinition) child).getBoundEnumType();
 					datatype = ((BaseRuntimeChildDatatypeDefinition) child).getDatatype();
@@ -304,10 +312,17 @@ public class HapiFhirUtils {
 			if(child == null) {
 				System.out.println("HERE");
 			}
-			BaseRuntimeElementDefinition<?> childDef = child.getChildByName(nextPart);
+
+			if ((nextPart.indexOf("[") > 0) && (nextPart.indexOf("]") > 0)) {
+				System.out.println("Found One: " + nextPart);
+			}
+
+			System.out.println("HapiFhirUtils:" + resourceClass.getCanonicalName() + ":" + structurePath+ ":" + nextPart);
+			//Noman item[x] children would have different name
+			//BaseRuntimeElementDefinition<?> childDef =  child.getChildByName(nextPart);
 
 			if (iter.hasNext()) {
-				parentDef = (BaseRuntimeElementCompositeDefinition<?>) childDef;
+				parentDef = (BaseRuntimeElementCompositeDefinition<?>) child.getChildByName(nextPart);
 			} else {
 				Class<? extends IBase> datatype = null;
 				Class<? extends Enum<?>> enumerationType = null;

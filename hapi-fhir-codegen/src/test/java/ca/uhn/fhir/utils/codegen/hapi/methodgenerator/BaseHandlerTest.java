@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.uhn.fhir.utils.common.io.ResourceLoadingUtils;
 import org.junit.Test;
 
 import ca.uhn.fhir.model.dstu2.composite.ElementDefinitionDt;
@@ -20,7 +21,7 @@ public class BaseHandlerTest {
 	private FhirResourceManagerDstu2 fhirResourceManager;
 	
 	public BaseHandlerTest() {
-		template = new MethodBodyGenerator().initialize();
+		template = new MethodBodyGenerator().initialize(ResourceLoadingUtils.getPathFromResourceClassPath("/"));
 		fhirResourceManager = new FhirResourceManagerDstu2();
 	}
 	

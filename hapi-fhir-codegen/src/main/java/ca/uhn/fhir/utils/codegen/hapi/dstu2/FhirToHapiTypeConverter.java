@@ -10,12 +10,12 @@ import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
 
 public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinitionDt, FhirResourceManagerDstu2> {
 	
-	public FhirToHapiTypeConverter(FhirResourceManagerDstu2 manager) {
-		super(manager);
+	public FhirToHapiTypeConverter(FhirResourceManagerDstu2 manager, String generatedPackage) {
+		super(manager, generatedPackage);
 	}
 
-	public FhirToHapiTypeConverter(FhirResourceManagerDstu2 manager, ElementDefinitionDt element) {
-		super(manager, element);
+	public FhirToHapiTypeConverter(FhirResourceManagerDstu2 manager, ElementDefinitionDt element, String generatedPackage) {
+		super(manager, element, generatedPackage);
 	}
 	
 	protected void processElement() {
@@ -45,7 +45,7 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 	protected void processExtension(String code, String extensionUri) {
 		FhirExtensionDefinition extensionDef = getFhirResourceManager().getFhirExtension(PathUtils.getExtensionRootPath(extensionUri));
 		String extensionName = PathUtils.getExtensionName(extensionUri);
-		ElementDefinitionDt extendedElement = extensionDef.getExtensionByName(extensionName);
+		ElementDefinitionDt extendedElement = extensionDef.getExtensionByNameDstu2(extensionName);
 		processElement(extendedElement);
 	}
 

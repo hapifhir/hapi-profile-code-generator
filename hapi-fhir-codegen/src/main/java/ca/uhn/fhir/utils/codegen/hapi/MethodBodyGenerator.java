@@ -1,13 +1,9 @@
 package ca.uhn.fhir.utils.codegen.hapi;
 
-import java.io.File;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupDir;
 
 import ca.uhn.fhir.utils.common.st.TemplateUtils;
 
@@ -24,8 +20,8 @@ public class MethodBodyGenerator extends TemplateUtils {
 	
 	public MethodBodyGenerator() {}
 	
-	public MethodBodyGenerator initialize() {
-		super.initialize();
+	public MethodBodyGenerator initialize(String resourceRoot) {
+		super.initialize(resourceRoot);
 		return this;
 	}
 	
@@ -146,11 +142,18 @@ public class MethodBodyGenerator extends TemplateUtils {
 	 */
 	public String getAddToListMethodDelegatedBody_dstu3(String className, String propertyName, String propertyType) {
 		propertyName = StringUtils.capitalize(propertyName);
-		ST st = getGroupMain().getInstanceOf("addToListMethodDelegatedBody_dstu3");
-		st.add("fieldName", className);
-		st.add("propertyName", propertyName);
-		st.add("propertyType", propertyType);
-		return st.render();
+		String template = "addToListMethodDelegatedBody_dstu3";
+		ST st = getGroupMain().getInstanceOf(template);
+		if (st != null) {
+			st.add("fieldName", className);
+			st.add("propertyName", propertyName);
+			st.add("propertyType", propertyType);
+			return st.render();
+		} else {
+			System.out.println(template + " Template is Missing.");
+			return null;
+		}
+
 	}
 	
 	/**
@@ -167,7 +170,16 @@ public class MethodBodyGenerator extends TemplateUtils {
 		st.add("param", "param");
 		return st.render();
 	}
-	
+
+	public String getAdapterSetMethodDelegationBodyWithListToToSingleElement(String argumentType, String propertyName) {
+		propertyName = StringUtils.capitalize(propertyName);
+		ST st = getGroupMain().getInstanceOf("setMethodInvocation");
+		st.add("className", "adaptedClass");
+		st.add("propertyName", propertyName);
+		st.add("param", "Arrays.asList(new " + argumentType + "[]{param})");
+		return st.render();
+	}
+
 	/**
 	 * Method delegating to the adapter's class setter.
 	 * 
@@ -604,7 +616,7 @@ public class MethodBodyGenerator extends TemplateUtils {
 	/**
 	 * Method returning setter body for extensions of a single type with multiple cardinality.
 	 *
-	 * @param type - The argument type
+	 * @param rootClassName - The argument type
 	 * @param uri - The URI for the FHIR extension
 	 *
 	 * @return

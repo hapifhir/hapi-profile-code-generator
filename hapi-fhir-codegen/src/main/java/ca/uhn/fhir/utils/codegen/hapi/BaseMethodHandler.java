@@ -101,6 +101,15 @@ public abstract class BaseMethodHandler {
 		return method;
 	}
 
+	//Noman 1
+	public Method constructSetterMethod(String attributeName, String argumentType, String returnType, boolean cardinalityChanged) {
+		Method method = constructSetMethodSignature(attributeName, argumentType, returnType);
+		method.setBody(getTemplate().getAdapterSetMethodDelegationBodyWithListToToSingleElement(argumentType, attributeName));
+		method.addImport(argumentType);
+		method.addImport("java.util.Arrays");
+		return method;
+	}
+
 	/**
 	 * Builds setter signature name using the JavaBean convention
 	 *
@@ -119,7 +128,7 @@ public abstract class BaseMethodHandler {
 	 * </code>
 	 * </pre>
 	 * @param fieldName
-	 * @param type
+	 * @param parameterType
 	 * @return
 	 */
 	public Method constructAddMethodSignature(String fieldName, String parameterType, String returnType) {
@@ -162,6 +171,24 @@ public abstract class BaseMethodHandler {
 		return method;
 	}
 
+	//Noman 1
+	public Method constructGetterMethod(String attributeName, String returnType, String datatype, boolean isExtension, String extensionUri, boolean cardinilityChangted) {
+		return constructGetterMethod(attributeName, "", "", returnType, datatype, isExtension, extensionUri, cardinilityChangted);
+	}
+
+	//Noman 0
+	public Method constructGetterMethod(String attributeName, String methodSignatureSuffix, String delegatedCallSuffix, String returnType, String datatype, boolean isExtension, String extensionUri, boolean cardinilityChanged) {
+		Method method = Method.constructNoArgMethod(Method.buildGetterName(attributeName) + methodSignatureSuffix, returnType);
+		if (cardinilityChanged) {
+			method.setBody(getTemplate().getExtensionGetterBodyDstu3("adaptedClass", datatype, extensionUri, attributeName));//TODO Test this out for primitive types that are extended. THIS IS UNTESTED CODE.
+		} else {
+			method.setBody(getTemplate().getAdapterGetMethodDelegationWithTryCatchBody(attributeName + delegatedCallSuffix));
+		}
+		if (datatype != null) {
+			method.addImport(datatype);
+		}
+		return method;
+	}
 	public Method constructGetterMethod(String attributeName, String returnType, String datatype, boolean isExtension, String extensionUri) {
 		return constructGetterMethod(attributeName, "", "", returnType, datatype, isExtension, extensionUri);
 	}
@@ -306,6 +333,11 @@ public abstract class BaseMethodHandler {
 		addMethod(methods, method);
 	}
 
+	public void buildAddElementMethod(List<Method> methods, String attributeName, String returnType) {
+		Method method = constructFluentAddMethod(attributeName, returnType);
+		addMethod(methods, method);
+	}
+
 	public void buildFluentAddMethod(List<Method> methods, String attributeName, String returnType) {
 		Method method = constructFluentAddMethod(attributeName, returnType);
 		addMethod(methods, method);
@@ -313,6 +345,12 @@ public abstract class BaseMethodHandler {
 
 	public void buildListGetterMethod(List<Method> methods, String attributeName, String listReturnType, String listParameterType, boolean isExtension, String extensionUri) {
 		Method method = constructListGetterMethod(attributeName, listReturnType, listParameterType, isExtension, extensionUri);
+		addMethod(methods, method);
+	}
+
+	//Noman 2
+	public void buildGetterMethod(List<Method> methods, String attributeName, String returnType, String fhirType, boolean isExtension, String extensionUri, boolean cardinilityChanged) {
+		Method method = constructGetterMethod(attributeName, returnType, fhirType, isExtension, extensionUri, cardinilityChanged);
 		addMethod(methods, method);
 	}
 
@@ -346,8 +384,14 @@ public abstract class BaseMethodHandler {
 		addMethod(methods, method);
 	}
 
+	///Noman s2
 	public void buildSetterMethod(List<Method> methods, String attributeName, String argumentType, String returnType) {
 		Method method = constructSetterMethod(attributeName, argumentType, returnType);
+		addMethod(methods, method);
+	}
+
+	public void buildSetterMethod(List<Method> methods, String attributeName, String argumentType, String returnType, boolean cardinilityChanged) {
+		Method method = constructSetterMethod(attributeName, argumentType, returnType, cardinilityChanged);
 		addMethod(methods, method);
 	}
 
@@ -399,7 +443,7 @@ public abstract class BaseMethodHandler {
 	 * </code>
 	 * </pre>
 	 * @param fieldName
-	 * @param type
+	 * @param returnType
 	 * @return
 	 */
 	public Method buildAddMethodDelegated(String fieldName, String returnType) {

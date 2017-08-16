@@ -3,9 +3,7 @@ package ca.uhn.fhir.utils.codegen.hapi;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hl7.fhir.dstu3.model.CodeType;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.Resource;
+import org.hl7.fhir.dstu3.model.*;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
@@ -30,7 +28,8 @@ import ca.uhn.fhir.utils.fhir.model.datatype.dstu2.FhirDatatypeEnum;
  *
  */
 public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
-	
+
+	protected final String resourcePackage;
 	private List<HapiType> hapiTypes;
 	private M manager;
 	private FhirContext ctx;
@@ -53,14 +52,15 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 	private Cardinality cardinality;
 	private String extensionUri;
 	
-	public BaseTypeConverter(M manager) {
+	public BaseTypeConverter(M manager, String resourcePackage) {
 		this.manager = manager;
+		this.resourcePackage = resourcePackage;
 		this.ctx = manager.getFhirContext();
 		this.hapiTypes = new ArrayList<HapiType>();
 	}
 
-	public BaseTypeConverter(M manager, E element) {
-		this(manager);
+	public BaseTypeConverter(M manager, E element, String resourcePackage) {
+		this(manager, resourcePackage);
 		this.element = element;
 		processElement();
 	}
@@ -196,6 +196,18 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 			}
 		}
 	}
+
+	protected void processElement(ElementDefinition elt) {
+		if(elt != null && elt.getType() != null && elt.getType().size() > 0) {
+			if(elt.getType().size() > 1) {
+				setMultiType(true);
+			}
+			for (ElementDefinition.TypeRefComponent typeRefComponent : elt.getType()) {
+				UriType uri = typeRefComponent.getProfileElement();
+				processType(typeRefComponent.getCode(), (uri != null) ? uri.getValueAsString() : null);
+			}
+		}
+	}
 	
 	protected void processType(String code, String profileUri) {
 		if(getFullAttributePath().contains("race")) {
@@ -318,7 +330,6 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 	 * Returns the attribute name cleaned up from other notations such
 	 * as the FHIR choice notation [x].
 	 *
-	 * @param attributePath
 	 * @return
      */
 	public String parseAttributeName() {
@@ -354,5 +365,4 @@ public abstract class BaseTypeConverter<E,M extends IFhirResourceManager> {
 			setCardinality(Cardinality.REQUIRED_MULTIPLE);
 		}
 	}
-
 }

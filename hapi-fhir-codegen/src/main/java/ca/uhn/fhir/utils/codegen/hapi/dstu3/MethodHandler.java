@@ -14,16 +14,23 @@ import ca.uhn.fhir.utils.common.metamodel.Cardinality;
 import ca.uhn.fhir.utils.common.metamodel.Method;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.model.datatype.dstu2.FhirDatatypeEnum;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.dstu3.model.ElementDefinition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MethodHandler extends BaseMethodHandler {
 
     private Node<ElementDefinition> node;
     private FhirResourceManagerDstu3 manager;
+    private final String generatedCodePackage;
 
-    public MethodHandler(FhirResourceManagerDstu3 manager, MethodBodyGenerator template, Node<ElementDefinition> node) {
+    public MethodHandler(FhirResourceManagerDstu3 manager, MethodBodyGenerator template, Node<ElementDefinition> node, String generatedCodePackage) {
         super(template);
         this.node = node;
         this.manager = manager;
+        this.generatedCodePackage = generatedCodePackage;
     }
 
     public List<Method> generateMethods() {
@@ -46,12 +53,17 @@ public class MethodHandler extends BaseMethodHandler {
 
     public FhirToHapiTypeConverter createConverter() {
         ElementDefinition element = node.getPayload();
-        FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element);
+        FhirToHapiTypeConverter converter = new FhirToHapiTypeConverter(manager, element, generatedCodePackage);
         return converter;
     }
 
     public void generateMethods(FhirToHapiTypeConverter converter, List<Method> methods) {
         List<HapiType> types = converter.getHapiTypes();
+        System.out.println("Attribute path:" + converter.getFullAttributePath());
+
+        if ("Immunization.doseQuantity".equals(converter.getFullAttributePath())) {
+            System.out.println("Start Debugging");
+        }
         if (types == null || types.isEmpty() || converter.getCardinality() == Cardinality.CONSTRAINED_OUT) {
             return;
         } else {
@@ -80,7 +92,7 @@ public class MethodHandler extends BaseMethodHandler {
             }
             for (HapiType type : types) {
                 if (type.getDatatype() == null && type.getGeneratedType() == null) {
-                    System.out.println("Investigate");
+                    System.out.println("Investigate : " + converter.getFullAttributePath());
                     //TODO Currently not handled: text, meta, references
                     continue;
                 }
@@ -246,9 +258,25 @@ public class MethodHandler extends BaseMethodHandler {
      * @param attributeName
      */
     private void handleFhirDatatype(FhirToHapiTypeConverter converter, HapiType type, List<Method> methods, String attributeName) {
-        buildGetterMethod(methods, attributeName, type.getDatatypeOrList(), type.getDatatype(), converter.isExtension(), converter.getExtensionUri());
-        buildSetterMethod(methods, attributeName, type.getDatatypeOrList(), getParentType());
+        if (attributeName.equalsIgnoreCase("name")) {
+            System.out.println(attributeName);
+        }
+        Boolean cadinilityChangedToRequiredSingleValue = converter.getElement().getBase().getMax().equals("*") && converter.getElement().getMax().equals("1");
+        ;
+//Noman 3
+        if (cadinilityChangedToRequiredSingleValue) {
+            buildGetterMethod(methods, attributeName, type.getDatatypeOrList(), type.getDatatype(), converter.isExtension(), converter.getExtensionUri(), cadinilityChangedToRequiredSingleValue);
+            buildSetterMethod(methods, attributeName, type.getDatatypeOrList(), getParentType(), cadinilityChangedToRequiredSingleValue);
+            buildAddMethod(methods, attributeName, type.getDatatypeOrList(), getParentType());
+        } else {
+            buildGetterMethod(methods, attributeName, type.getDatatypeOrList(), type.getDatatype(), converter.isExtension(), converter.getExtensionUri());
+            buildSetterMethod(methods, attributeName, type.getDatatypeOrList(), getParentType());
+        }
         buildHasMethod(methods, attributeName);
+    }
+
+    private Boolean cadinilityChangedToRequiredSingleValue(FhirToHapiTypeConverter converter) {
+        return converter.getElement().getBase().getMax().equals("*") && converter.getElement().getMax().equals("1");
     }
 
     /**
@@ -274,11 +302,25 @@ public class MethodHandler extends BaseMethodHandler {
             throw new RuntimeException("Multi Enum Types Not implemented yet " + converter.getFullAttributePath());
         } else {
             buildHasMethod(methods, attributeName);
-            buildHasMethod(methods, attributeName, BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX);
-            buildGetterMethod(methods, attributeName, type.getEnumerationType(), type.getEnumerationType(), converter.isExtension(), converter.getExtensionUri());
-            buildGetterMethod(methods, attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", type.getDatatype(), converter.isExtension(), converter.getExtensionUri());
-            buildSetterMethod(methods, attributeName, type.getEnumerationType(), getParentType());
-            buildSetterMethod(methods, attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", getParentType());
+
+            if (converter.getCardinality().equals(Cardinality.OPTIONAL_MULTIPLE)) {
+                buildHasMethodWithArgument(methods, attributeName, "", type.getEnumerationType());
+                buildGetterMethod(methods, attributeName, "List<Enumeration<" + type.getEnumerationType() + ">>",  type.getEnumerationType() , converter.isExtension(), converter.getExtensionUri());
+//                buildGetterMethod(methods, attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", type.getDatatype(), converter.isExtension(), converter.getExtensionUri());
+
+                buildSetterMethod(methods, attributeName, "List<Enumeration<" + type.getEnumerationType()+ ">>", getParentType());
+                buildAddMethod(methods, attributeName, type.getEnumerationType(), getParentType());
+//                buildAddMethod(methods, attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX,  type.getEnumerationType(), getParentType());
+
+            } else {
+                buildHasMethod(methods, attributeName, BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX);
+                buildGetterMethod(methods, attributeName, type.getEnumerationType(), type.getEnumerationType(), converter.isExtension(), converter.getExtensionUri());
+                buildGetterMethod(methods, attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", type.getDatatype(), converter.isExtension(), converter.getExtensionUri());
+
+                buildSetterMethod(methods, attributeName, type.getEnumerationType(), getParentType());
+                buildSetterMethod(methods, attributeName + BaseMethodHandler.ATTRIBUTE_NAME_ELEMENT_SUFFIX, type.getDatatype() + "<" + type.getEnumerationType() + ">", getParentType());
+
+            }
         }
     }
 

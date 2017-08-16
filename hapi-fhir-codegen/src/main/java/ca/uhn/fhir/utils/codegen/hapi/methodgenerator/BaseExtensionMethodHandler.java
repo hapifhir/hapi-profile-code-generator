@@ -64,8 +64,7 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 	 * All method generation operations will be done using the metadata specified
 	 * by the cloned element definition which represent the formal extension in the
 	 * context of this profile.
-	 * 
-	 * @param element
+	 *
 	 * @return
 	 */
 	public void handleExtensionElement() {
@@ -75,7 +74,7 @@ public abstract class BaseExtensionMethodHandler extends BaseMethodGenerator {
 			LOGGER.error(extensionUri + " for element " + getElement().getName() + " has no associated extension registered");
 		}
 		String extensionName = PathUtils.getExtensionName(extensionUri);
-		extendedElement = extensionDef.getExtensionByName(extensionName);
+		extendedElement = extensionDef.getExtensionByNameDstu2(extensionName);
 		if(extendedElement == null) {
 			LOGGER.error("Error processing " + extensionUri + " no extension definition found. Check URI or extension directories");
 		}

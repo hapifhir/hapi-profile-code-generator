@@ -1,6 +1,7 @@
 package ca.uhn.fhir.utils.codegen.hapi.dstu3;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import ca.uhn.fhir.utils.codegen.hapi.GenerateLogicalViewCommandBase;
 import org.hl7.fhir.dstu3.model.ElementDefinition;
@@ -17,14 +18,16 @@ import ca.uhn.fhir.utils.codegen.hapi.HapiType;
 import ca.uhn.fhir.utils.fhir.PathUtils;
 import ca.uhn.fhir.utils.fhir.model.FhirExtensionDefinition;
 
+//import static ca.uhn.fhir.utils.codegen.hapi.CodeGeneratorConfigurator.DEFAULT_GENERATED_CODE_PACKAGE;
+
 public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition, FhirResourceManagerDstu3> {
 	
-	public FhirToHapiTypeConverter(FhirResourceManagerDstu3 manager) {
-		super(manager);
+	public FhirToHapiTypeConverter(FhirResourceManagerDstu3 manager, String resourcePackage) {
+		super(manager, resourcePackage);
 	}
 
-	public FhirToHapiTypeConverter(FhirResourceManagerDstu3 manager, ElementDefinition element) {
-		super(manager, element);
+	public FhirToHapiTypeConverter(FhirResourceManagerDstu3 manager, ElementDefinition element, String resourcePackage) {
+		super(manager, element, resourcePackage);
 	}
 	
 	protected void processElement() {
@@ -60,7 +63,9 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 			String typeProfile = null;
 			if(type.getProfile() != null) {
                 typeProfile = type.getProfile();
-            }
+            } else if (type.getTargetProfile() != null) {
+				typeProfile = type.getTargetProfile();
+			}
 			processType(type.getCode(), typeProfile);
         }
 	}
@@ -122,7 +127,7 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 				//TODO Fix to return generated type rather than profile.
 				String generatedType = GenerateLogicalViewCommandDstu3.generateAdapterName(profile);
 				if(generatedType != null) {
-					hapiType.setGeneratedType("org.socraticgrid.fhir.dstu3.generated." + generatedType);
+					hapiType.setGeneratedType(resourcePackage + "." + generatedType);
 				}
 				hapiType.setDatatypeClass(HapiFhirUtils.getResourceClass(getFhirContext(), PathUtils.getLastResourcePathComponent(profile.getBaseDefinition())));
 			}
@@ -142,8 +147,9 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 		if(extensionUri == null) {
 			System.out.println("Extension URI is null");
 		}
-		ElementDefinitionDt extendedElement = extensionDef.getExtensionByName(extensionName);
-		processElementDt(extendedElement);
+
+		ElementDefinition extendedElement = extensionDef.getExtensionByName(extensionName);
+		processElement(extendedElement);
 	}
 	
 	public void assignCardinality(ElementDefinition element) {
@@ -151,6 +157,5 @@ public class FhirToHapiTypeConverter extends BaseTypeConverter<ElementDefinition
 		String max = (element.getMax()!= null)?element.getMax():"";
 		assignCardinality(min, max);
 	}
-
 
 }

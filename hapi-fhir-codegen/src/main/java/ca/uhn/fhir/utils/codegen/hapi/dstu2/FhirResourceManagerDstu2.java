@@ -139,11 +139,11 @@ public class FhirResourceManagerDstu2 implements IFhirResourceManager<StructureD
 	 */
 	public void loadResourceProfiles(CodeGeneratorConfigurator configurator) {
 		for(String profileFilePath: configurator.getProfileFilePaths()) {
-			loadResourceProfile(profileFilePath);
+			loadResourceProfile(ResourceLoadingUtils.getPathFromResourceClassPath(profileFilePath));
 		}
 		
 		for(String directoryPath : configurator.getProfileDirectoryPaths()) {
-			File dir = new File(directoryPath);
+			File dir = new File(ResourceLoadingUtils.getPathFromResourceClassPath(directoryPath));
 			if(dir.exists() && dir.isDirectory()) {
 				File[] profileFiles = dir.listFiles();
 				for(File profileFile : profileFiles) {
@@ -221,8 +221,7 @@ public class FhirResourceManagerDstu2 implements IFhirResourceManager<StructureD
 	/**
 	 * Method generates the resource-name-to-class index for all resources
 	 * defined in a profile.
-	 * 
-	 * @param ctx
+	 *
 	 */
 	private void populateResourceNameToClassMap() {
 		for(StructureDefinition profile : profileNameToProfileMap.values()) {
@@ -630,7 +629,7 @@ public class FhirResourceManagerDstu2 implements IFhirResourceManager<StructureD
 	 * Ask James Agnew
 	 * TODO Cover all simple types - https://hl7-fhir.github.io/datatypes.html
 	 * 
-	 * @param element
+	 * @param type
 	 * @return
 	 */
 	public static boolean hasEquivalentJavaType(Type type) {
