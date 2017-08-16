@@ -47,11 +47,11 @@ public class ResourceLoadingUtils {
 	 * This class makes use of Class.getClassLoader().getResourceAsStream(path) to get the resource so the path
 	 * should not be prefixed by a slash '/' as is required when one uses Class.getResourceAsStream(path).
 	 * 
-	 * @param relativePath
+	 * @param path
 	 * @return
 	 */
-	public static InputStream getInputStreamFromClasspath(String absolutePath) {
-		return ResourceLoadingUtils.class.getClassLoader().getResourceAsStream(absolutePath);
+	public static InputStream getInputStreamFromClasspath(String path) {
+		return ResourceLoadingUtils.class.getClassLoader().getResourceAsStream(path);
 	}
 	
 	/**
@@ -64,11 +64,11 @@ public class ResourceLoadingUtils {
 	 * This class makes use of Class.getClassLoader().getResourceAsStream(path) to get the resource so the path
 	 * should not be prefixed by a slash '/' as is required when one uses Class.getResourceAsStream(path).
 	 * 
-	 * @param relativePath
+	 * @param path
 	 * @return
 	 */
-	public static Reader getReaderFromClasspath(String absolutePath) {
-		InputStream is = getInputStreamFromClasspath(absolutePath);
+	public static Reader getReaderFromClasspath(String path) {
+		InputStream is = getInputStreamFromClasspath(path);
 		return new InputStreamReader(is);
 	}
 	
@@ -82,7 +82,7 @@ public class ResourceLoadingUtils {
 	 * This class makes use of Class.getClassLoader().getResource(path) to get the resource so the path
 	 * should be prefixed by a slash '/' as is required when one uses Class.getResource(resourceRelativePath).
 	 * 
-	 * @param relativePath
+	 * @param resourcePath
 	 * @return
 	 */
 	public static String getPathFromResourceClassPath(String resourcePath) {

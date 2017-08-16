@@ -1,14 +1,14 @@
 package ca.uhn.fhir.utils.common.st;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupDir;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Code generation framework using StringTemplate
@@ -19,11 +19,11 @@ import org.stringtemplate.v4.STGroupDir;
 public abstract class TemplateUtils {
 	
 	public static final Logger LOGGER = LoggerFactory.getLogger(TemplateUtils.class);
-	
-	private String templateFolderPath = "src/main/resources/templates";
-	private String templateFolderPathCommon = "src/main/resources/templates/common";
-	private String templateFolderPathDstu2 = "src/main/resources/templates/dstu2";
-	private String templateFolderPathDstu3 = "src/main/resources/templates/dstu3";
+
+	private String templateFolderPath = "/templates";
+	private String templateFolderPathCommon = "/templates/common";
+	private String templateFolderPathDstu2 = "/templates/dstu2";
+	private String templateFolderPathDstu3 = "/templates/dstu3";
 	private STGroup groupMain;
 	private STGroup groupCommon;
 	private STGroup groupDstu2;
@@ -34,21 +34,43 @@ public abstract class TemplateUtils {
 	/**
 	 * Method initializes the template utility by loading
 	 * the templates into memory.
-	 * 
+	 *
+	 * @param resourceRoot
 	 */
-	public TemplateUtils initialize() {
+	public TemplateUtils initialize(String resourceRoot) {
 		try {
-			File rootMain = new File(templateFolderPath);
-			File rootCommon = new File(templateFolderPathCommon);
-			File rootDstu2 = new File(templateFolderPathDstu2);
-			File rootDstu3 = new File(templateFolderPathDstu3);
-			groupMain = new STGroupDir(rootMain.getCanonicalPath());
-			groupCommon = new STGroupDir(rootCommon.getCanonicalPath());
-			groupDstu2 = new STGroupDir(rootDstu2.getCanonicalPath());
-			groupDstu3 = new STGroupDir(rootDstu3.getCanonicalPath());
-			groupMain.importTemplates(groupCommon);
-			groupMain.importTemplates(groupDstu2);
-			groupMain.importTemplates(groupDstu3);
+
+			File rootMain;
+			try {
+				rootMain = new File(resourceRoot + templateFolderPath);
+				groupMain = new STGroupDir(rootMain.getCanonicalPath());
+			} catch (Exception e) {
+				LOGGER.warn(e.getMessage());
+			}
+
+			try {
+				File rootCommon = new File(resourceRoot + templateFolderPathCommon);
+				groupCommon = new STGroupDir(rootCommon.getCanonicalPath());
+				groupMain.importTemplates(groupCommon);
+			} catch (Exception e) {
+				LOGGER.warn(e.getMessage());
+			}
+
+			try {
+				File rootDstu2 = new File(resourceRoot + templateFolderPathDstu2);
+				groupMain.importTemplates(groupDstu2);
+				groupDstu2 = new STGroupDir(rootDstu2.getCanonicalPath());
+			} catch (Exception e) {
+				LOGGER.warn(e.getMessage());
+			}
+
+			try {
+				File rootDstu3 = new File(resourceRoot + templateFolderPathDstu3);
+				groupDstu3 = new STGroupDir(rootDstu3.getCanonicalPath());
+				groupMain.importTemplates(groupDstu3);
+			} catch (Exception e) {
+				LOGGER.warn(e.getMessage());
+			}
 			return this;
 		} catch(Exception e) {
 			LOGGER.error("Error initializing StringTemplate. Validate template path: " + templateFolderPath, e);
