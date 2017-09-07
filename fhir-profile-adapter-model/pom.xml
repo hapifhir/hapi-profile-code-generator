@@ -55,11 +55,13 @@
                             <profileDirectoryPaths>
                                 <profileDirectoryPath>
                                     /stu-3.0.0/profiles/us-core3-profile
+                                    <!--/stu-3.0.0/profiles/qi-core3-profile/lib/uscore-->
                                 </profileDirectoryPath>
                             </profileDirectoryPaths>
                             <extensionRepositories>
                                 <extensionRepositorie>
-                                    /stu-3.0.0/profiles/us-core3-profile/extension
+                                    <!--/stu-3.0.0/profiles/us-core3-profile/extension-->
+                                    /stu-3.0.0/profiles/qi-core3-profile/lib/uscore
                                 </extensionRepositorie>
                             </extensionRepositories>
                             <sourceGenerationDirectory>src/main/java</sourceGenerationDirectory>
@@ -83,6 +85,36 @@
                                 <profileName>us-core-organization</profileName>
                                 <profileName>us-core-patient</profileName>
                             </profileNames>
+                            <!--<profileNames>-->
+                                <!--<profileName>qicore-patient</profileName>-->
+                                <!--<profileName>qicore-organization</profileName>-->
+                                <!--<profileName>qicore-observation</profileName>-->
+                                <!--<profileName>qicore-condition</profileName>-->
+                                <!--<profileName>qicore-device</profileName>-->
+                                <!--<profileName>qicore-relatedperson</profileName>-->
+                                <!--<profileName>qicore-adverseevent</profileName>-->
+                                <!--<profileName>qicore-allergyintolerance</profileName>-->
+                                <!--<profileName>qicore-communication</profileName>-->
+                                <!--<profileName>qicore-communicationrequest</profileName>-->
+                                <!--<profileName>qicore-diagnosticrequest</profileName>-->
+                                <!--<profileName>qicore-diagnosticreport</profileName>-->
+                                <!--<profileName>qicore-encounter</profileName>-->
+                                <!--<profileName>qicore-goal</profileName>-->
+                                <!--<profileName>qicore-immunization</profileName>-->
+                                <!--<profileName>qicore-imagingstudy</profileName>-->
+                                <!--<profileName>qicore-location</profileName>-->
+                                <!--<profileName>qicore-medication</profileName>-->
+                                <!--<profileName>qicore-medicationadministration</profileName>-->
+                                <!--<profileName>qicore-medicationdispense</profileName>-->
+                                <!--<profileName>qicore-medicationorder</profileName>-->
+                                <!--<profileName>qicore-medicationstatement</profileName>-->
+                                <!--<profileName>qicore-practitioner</profileName>-->
+                                <!--<profileName>qicore-procedure</profileName>-->
+                                <!--<profileName>qicore-procedurerequest</profileName>-->
+                                <!--<profileName>qicore-referralrequest</profileName>-->
+                                <!--<profileName>qicore-specimen</profileName>-->
+                                <!--<profileName>qicore-substance</profileName>-->
+                            <!--</profileNames>-->
                             <package>org.hspc.fhir.model.stu3</package>
                             <version>STU3</version>
                             <buildDatatypes>true</buildDatatypes>
