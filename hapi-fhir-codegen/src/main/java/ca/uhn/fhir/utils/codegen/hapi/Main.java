@@ -50,9 +50,9 @@ public class Main {
 		codeGenerator.executePlanDstu3(failOnError);
 	}
 
-	public static void main(String[] args) throws Exception {
-		FileUtils.deleteDirectory(new File("generated-source/java/org/hspc/fhir/dstu3/generated/"));
-		Main.generateDstu3Code(ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan-dstu3.xml"), true);
-	}
+//	public static void main(String[] args) throws Exception {
+//		FileUtils.deleteDirectory(new File("generated-source/java/org/hspc/fhir/dstu3/generated/"));
+//		Main.generateDstu3Code(ResourceLoadingUtils.getPathFromResourceClassPath("/config/generation-plan-dstu3.xml"), true);
+//	}
 
 }
