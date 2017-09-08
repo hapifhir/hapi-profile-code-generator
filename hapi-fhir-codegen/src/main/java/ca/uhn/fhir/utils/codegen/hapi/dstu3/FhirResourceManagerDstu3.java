@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.uhn.fhir.context.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.dstu3.model.Bundle;
@@ -185,7 +186,13 @@ public class FhirResourceManagerDstu3 implements IFhirResourceManager<StructureD
 	 */
 	public void loadResourceProfiles(Reader resourceProfiles) {
 		try (Reader reader = resourceProfiles) {
-			IBaseResource resource = (IBaseResource) ctx.newXmlParser().parseResource(resourceProfiles);
+			IBaseResource resource;
+			try {
+				resource = ctx.newXmlParser().parseResource(resourceProfiles);
+			} catch (DataFormatException e) {
+				resource =  ctx.newJsonParser().parseResource(resourceProfiles);
+			}
+
 			if(resource instanceof Bundle) {
 				List<BundleEntryComponent> entries = ((Bundle)resource).getEntry();
 				for(BundleEntryComponent entry : entries) {

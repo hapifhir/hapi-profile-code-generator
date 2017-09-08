@@ -35,7 +35,7 @@
                         <configuration>
                             <type>jar</type>
                             <includeArtifactIds>hapi-fhir-codegen</includeArtifactIds>
-                            <includes>**/templates/,**/dstu-2.1/,**/stu-3.0.0/</includes>
+                            <includes>**/templates/,**/dstu-2.1/,**/stu-3.0.0/profile-definitions/,**/stu-3.0.0/profiles/</includes>
                             <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                         </configuration>
                     </execution>
@@ -54,13 +54,13 @@
                         <configuration>
                             <profileDirectoryPaths>
                                 <profileDirectoryPath>
-                                    /stu-3.0.0/profiles/us-core3-profile
+                                    <!--/stu-3.0.0/profiles/us-core3-profile-->
                                     /stu-3.0.0/profiles/qi-core3-profile
                                 </profileDirectoryPath>
                             </profileDirectoryPaths>
                             <extensionRepositories>
                                 <extensionRepositories>
-                                    /stu-3.0.0/profiles/us-core3-profile/extension
+                                    <!--/stu-3.0.0/profiles/us-core3-profile/extension-->
                                     /stu-3.0.0/profiles/qi-core3-profile
                                 </extensionRepositories>
                             </extensionRepositories>
